@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daily Planner</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #ffd6e7, #e6d6ff);
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 15px;
+        }
+
+        .planner {
+            background: white;
+            max-width: 600px;
+            margin: auto;
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            color: #8e44ad;
+        }
+
+        h2 {
+            color: #6c3483;
+        }
+
+        p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        button {
+            background: #8e44ad;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #6c3483;
+        }
+
+        .task {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8eaf4;
+            margin: 10px 0;
+            padding: 14px;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 17px;
+        }
+
+        .task input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .task input:checked + span {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="planner">
+
+    <h1>🌸 Hi! This Is The Daily Planner 🌸</h1>
+
+    <p>Let's make today a beautiful day! 💖</p>
+
+    <button onclick="nextPlan()">Let's Start ✨</button>
+
+    <div id="plan"></div>
+
+</div>
+
+<script>
+
+let currentPlan = 0;
+
+const plans = [
+
+    {
+        title: "🌅 Morning Plan",
+        tasks: [
+            "Wake up",
+            "Make my bed",
+            "Pray",
+            "Important meeting",
+            "Breakfast",
+            "Skincare",
+            "Review homework",
+            "Wear uniform",
+            "Go to school"
+        ]
+    },
+
+    {
+        title: "☀️ Afternoon Plan",
+        tasks: [
+            "Change your clothes",
+            "Wash your face",
+            "Eat lunch",
+            "Check your school schedule for the next day",
+            "Pray",
+            "Iron your uniform",
+            "Study",
+            "Rest"
+        ]
+    },
+
+    {
+        title: "🌆 Evening Plan",
+        tasks: [
+            "Review",
+            "Pray",
+            "Dinner",
+            "Help my mom"
+        ]
+    },
+
+    {
+        title: "🌙 Night Plan",
+        tasks: [
+            "Game",
+            "Review",
+            "Pray",
+            "Spend some time with my family",
+            "Night routine",
+            "Get ready for bed"
+        ]
+    }
+
+];
+
+function nextPlan() {
+
+    const plan = plans[currentPlan];
+
+    let html = "<h2>" + plan.title + "</h2>";
+
+    plan.tasks.forEach(function(task, index) {
+
+        html += `
+            <label class="task">
+                <input type="checkbox" id="task-${currentPlan}-${index}">
+                <span>${task}</span>
+            </label>
+        `;
+
+    });
+
+    document.getElementById("plan").innerHTML = html;
+
+    currentPlan++;
+
+    if (currentPlan >= plans.length) {
+        currentPlan = 0;
+    }
+}
+
+</script>
+
+</body>
+</html>
