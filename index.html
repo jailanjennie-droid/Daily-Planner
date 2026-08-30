@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Daily Planner</title>
 
     <style>
@@ -10,14 +13,14 @@
             background: linear-gradient(135deg, #ffd6e7, #e6d6ff);
             min-height: 100vh;
             margin: 0;
-            padding: 40px 15px;
+            padding: 30px 15px;
         }
 
         .planner {
             background: white;
             max-width: 600px;
             margin: auto;
-            padding: 35px;
+            padding: 30px;
             border-radius: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
@@ -39,14 +42,17 @@
             background: #8e44ad;
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 15px 25px;
             border-radius: 15px;
             font-size: 18px;
             cursor: pointer;
+            margin: 8px;
+            transition: 0.2s;
         }
 
         button:hover {
             background: #6c3483;
+            transform: scale(1.05);
         }
 
         .task {
@@ -71,10 +77,19 @@
             text-decoration: line-through;
             opacity: 0.5;
         }
-    </style>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        #star {
+            display: none;
+            font-size: 60px;
+            margin: 20px;
+        }
+
+        #tasks {
+            margin-top: 20px;
+        }
+    </style>
 </head>
+
 <body>
 
 <div class="planner">
@@ -86,6 +101,14 @@
     <button onclick="nextPlan()">Let's Start ✨</button>
 
     <div id="plan"></div>
+
+    <hr>
+
+    <button id="add-task">✨ Add Task</button>
+
+    <div id="tasks"></div>
+
+    <div id="star">⭐</div>
 
 </div>
 
@@ -158,7 +181,7 @@ function nextPlan() {
 
         html += `
             <label class="task">
-                <input type="checkbox" id="task-${currentPlan}-${index}">
+                <input type="checkbox" onchange="checkAllTasks()">
                 <span>${task}</span>
             </label>
         `;
@@ -172,37 +195,63 @@ function nextPlan() {
     if (currentPlan >= plans.length) {
         currentPlan = 0;
     }
+
+    checkAllTasks();
 }
 
-if (tasks.querySelectorAll('input[type="checkbox"]').length > 0 &&
-    tasks.querySelectorAll('input[type="checkbox"]:checked').length ===
-    tasks.querySelectorAll('input[type="checkbox"]').length) {
-  alert("⭐ AMAZING! You completed all your tasks! ⭐");
-}
-</script>
 
-<div id="task-area">
-</div>
-<script>
 const addTaskButton = document.getElementById("add-task");
+
 const tasks = document.getElementById("tasks");
 
-addTaskButton.addEventListener("click", function () {
-  const taskText = prompt("What task do you want to add?");
 
-  if (taskText && taskText.trim() !== "") {
-    const task = document.createElement("label");
-    task.innerHTML = `
-      <input type="checkbox">
-      
-      <span>${taskText}</span>
-    `;
-    tasks.appendChild(task);
-           if (tasks.querySelectorAll('input[type="checkbox"]').length > 0 &&
-    tasks.querySelectorAll('input[type="checkbox"]:checked').length ===
-    tasks.querySelectorAll('input[type="checkbox"]').length) {
-  alert("⭐ AMAZING! You completed all your tasks! ⭐");
+addTaskButton.addEventListener("click", function () {
+
+    const taskText = prompt("What task do you want to add?");
+
+    if (taskText && taskText.trim() !== "") {
+
+        const task = document.createElement("label");
+
+        task.className = "task";
+
+        task.innerHTML = `
+            <input type="checkbox">
+            <span>${taskText}</span>
+        `;
+
+        tasks.appendChild(task);
+
+        task.querySelector("input").addEventListener("change", checkAllTasks);
+
+        checkAllTasks();
+    }
+
+});
+
+
+function checkAllTasks() {
+
+    const allTasks = document.querySelectorAll('input[type="checkbox"]');
+
+    const completedTasks =
+        document.querySelectorAll('input[type="checkbox"]:checked');
+
+    const star = document.getElementById("star");
+
+    if (allTasks.length > 0 && completedTasks.length === allTasks.length) {
+
+        star.style.display = "block";
+
+    } else {
+
+        star.style.display = "none";
+
+    }
+
 }
+
 </script>
+
 </body>
 </html>
