@@ -182,7 +182,6 @@ if (tasks.querySelectorAll('input[type="checkbox"]').length > 0 &&
 </script>
 
 <div id="task-area">
-  <button id="add-task">✨ Add Task</button>
   <div id="tasks"></div>
 </div>
 <script>
@@ -196,16 +195,15 @@ addTaskButton.addEventListener("click", function () {
     const task = document.createElement("label");
     task.innerHTML = `
       <input type="checkbox">
+      
       <span>${taskText}</span>
     `;
     tasks.appendChild(task);
-      if (tasks.querySelectorAll('input[type="checkbox"]').length > 0 &&
+           if (tasks.querySelectorAll('input[type="checkbox"]').length > 0 &&
     tasks.querySelectorAll('input[type="checkbox"]:checked').length ===
     tasks.querySelectorAll('input[type="checkbox"]').length) {
   alert("⭐ AMAZING! You completed all your tasks! ⭐");
 }
-  }
-});
 </script>
 </body>
 </html>
