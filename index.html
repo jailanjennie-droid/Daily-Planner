@@ -1,1 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>Daily Planner</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #ffd6e7, #e6d6ff);
+            min-height: 100vh;
+            margin: 0;
+            padding: 30px 15px;
+        }
+
+        .planner {
+            background: white;
+            max-width: 600px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            color: #8e44ad;
+        }
+
+        h2 {
+            color: #6c3483;
+        }
+
+        p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        button {
+            background: #8e44ad;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 8px;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #6c3483;
+            transform: scale(1.05);
+        }
+
+        .add-task-box {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .add-task-box input {
+            padding: 12px 18px;
+            font-size: 16px;
+            border: 2px solid #e6d6ff;
+            border-radius: 12px;
+            outline: none;
+            width: 65%;
+        }
+
+        .add-task-box input:focus {
+            border-color: #8e44ad;
+        }
+
+        .task {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8eaf4;
+            margin: 10px 0;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 17px;
+        }
+
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .task input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .task input:checked + span {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        /* دیزاینی دوگمەی سڕینەوە */
+        .delete-btn {
+            background: #ff7675;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0;
+            transition: 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #d63031;
+            transform: scale(1.05);
+        }
+
+        #tasks {
+            margin-top: 20px;
+        }
+
+        #star {
+            display: none;
+            font-size: 60px;
+            margin: 20px;
+        }
+
+        #doneButton {
+            display: none;
+            background: #e84393;
+        }
+
+        #message {
+            display: none;
+            font-size: 24px;
+            color: #8e44ad;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="planner">
+
+    <h1>🌸 Hi! This Is The Daily Planner 🌸</h1>
+
+    <p>Let's make today a beautiful day! 💖</p>
+
+    <button onclick="nextPlan()">Let's Start ✨</button>
+
+    <div id="plan"></div>
+
+    <hr>
+
+    <div class="add-task-box">
+        <input type="text" id="taskInput" placeholder="Write a new task here...">
+        <button id="addTaskButton">✨ Add Task</button>
+    </div>
+
+    <div id="tasks"></div>
+
+    <div id="star">⭐</div>
+
+    <button id="doneButton">🎉 Done!</button>
+
+    <div id="message">
+        🌸 Done! Have a good day! 💖
+    </div>
+
+</div>
+
+<script>
+
+let currentPlan = 0;
+
+const plans = [
+    {
+        title: "🌅 Morning Plan",
+        tasks: [
+            "Wake up",
+            "Make my bed",
+            "Pray",
+            "Important meeting",
+            "Breakfast",
+            "Skincare",
+            "Review homework",
+            "Wear uniform",
+            "Go to school"
+        ]
+    },
+    {
+        title: "☀️ Afternoon Plan",
+        tasks: [
+            "Change your clothes",
+            "Wash your face",
+            "Eat lunch",
+            "Check your school schedule for the next day",
+            "Pray",
+            "Iron your uniform",
+            "Study",
+            "Rest"
+        ]
+    },
+    {
+        title: "🌆 Evening Plan",
+        tasks: [
+            "Review",
+            "Pray",
+            "Dinner",
+            "Help my mom"
+        ]
+    },
+    {
+        title: "🌙 Night Plan",
+        tasks: [
+            "Game",
+            "Review",
+            "Pray",
+            "Spend some time with my family",
+            "Night routine",
+            "Get ready for bed"
+        ]
+    }
+];
+
+function nextPlan() {
+    const plan = plans[currentPlan];
+
+    let html = "<h2>" + plan.title + "</h2>";
+
+    plan.tasks.forEach(function(task) {
+        html += `
+            <div class="task">
+                <label class="task-left">
+                    <input type="checkbox" onchange="checkAllTasks()">
+                    <span>${task}</span>
+                </label>
+                <button class="delete-btn" onclick="deleteTask(this)">🗑️</button>
+            </div>
+        `;
+    });
+
+    document.getElementById("plan").innerHTML = html;
+
+    currentPlan++;
+
+    if (currentPlan >= plans.length) {
+        currentPlan = 0;
+    }
+
+    checkAllTasks();
+}
+
+const addTaskButton = document.getElementById("addTaskButton");
+const taskInput = document.getElementById("taskInput");
+const tasks = document.getElementById("tasks");
+
+function addNewTask() {
+    const taskText = taskInput.value.trim();
+
+    if (taskText !== "") {
+        const task = document.createElement("div");
+        task.className = "task";
+
+        task.innerHTML = `
+            <label class="task-left">
+                <input type="checkbox" onchange="checkAllTasks()">
+                <span>${taskText}</span>
+            </label>
+            <button class="delete-btn" onclick="deleteTask(this)">🗑️</button>
+        `;
+
+        tasks.appendChild(task);
+
+        taskInput.value = "";
+        checkAllTasks();
+    }
+}
+
+// فەنکشنی سڕینەوەی ئەرکەکان
+function deleteTask(button) {
+    const taskDiv = button.parentElement;
+    taskDiv.remove();
+    checkAllTasks();
+}
+
+addTaskButton.addEventListener("click", addNewTask);
+
+taskInput.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        addNewTask();
+    }
+});
+
+function checkAllTasks() {
+    const allTasks = document.querySelectorAll('input[type="checkbox"]');
+    const completedTasks = document.querySelectorAll('input[type="checkbox"]:checked');
+
+    const star = document.getElementById("star");
+    const doneButton = document.getElementById("doneButton");
+
+    if (allTasks.length > 0 && completedTasks.length === allTasks.length) {
+        star.style.display = "block";
+        doneButton.style.display = "inline-block";
+    } else {
+        star.style.display = "none";
+        doneButton.style.display = "none";
+    }
+}
+
+document.getElementById("doneButton").addEventListener("click", function() {
+    document.getElementById("message").style.display = "block";
+    this.style.display = "none";
+});
+
+</script>
+
+</body>
+</html>
