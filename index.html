@@ -176,5 +176,26 @@ function nextPlan() {
 
 </script>
 
+<div id="task-area">
+  <button id="add-task">✨ Add Task</button>
+  <div id="tasks"></div>
+</div>
+<script>
+const addTaskButton = document.getElementById("add-task");
+const tasks = document.getElementById("tasks");
+
+addTaskButton.addEventListener("click", function () {
+  const taskText = prompt("What task do you want to add?");
+
+  if (taskText && taskText.trim() !== "") {
+    const task = document.createElement("label");
+    task.innerHTML = `
+      <input type="checkbox">
+      <span>${taskText}</span>
+    `;
+    tasks.appendChild(task);
+  }
+});
+</script>
 </body>
 </html>
