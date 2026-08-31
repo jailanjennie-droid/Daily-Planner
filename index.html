@@ -64,12 +64,6 @@
         transform: scale(1.05);
     }
 
-    button:disabled {
-        background: #c8b5d0;
-        cursor: not-allowed;
-        transform: none;
-    }
-
     #startButton {
         margin-top: 15px;
         padding: 16px 30px;
@@ -83,29 +77,6 @@
 
     #plan {
         animation: fadeIn 0.5s ease;
-    }
-
-    /* Plan Navigation */
-    #planNavigation {
-        display: none;
-        margin-top: 10px;
-        animation: fadeIn 0.5s ease;
-    }
-
-    #nextPlanButton {
-        background: linear-gradient(135deg, #8e44ad, #e84393);
-    }
-
-    #nextPlanButton:disabled {
-        background: #d8c9dd;
-        color: #8d7d94;
-    }
-
-    #planCounter {
-        color: #8e44ad;
-        font-size: 15px;
-        font-weight: bold;
-        margin-top: 5px;
     }
 
     /* Add Task */
@@ -321,10 +292,6 @@
         h1 {
             font-size: 26px;
         }
-
-        #planNavigation button {
-            width: 90%;
-        }
     }
 </style>
 ```
@@ -355,23 +322,7 @@
 
     <div id="plan"></div>
 
-
-    <!-- Plan Navigation -->
-    <div id="planNavigation">
-
-        <button id="nextPlanButton" onclick="goToNextPlan()" disabled>
-            Next Plan ➡️
-        </button>
-
-        <div id="planCounter">
-            Plan 1 of 4
-        </div>
-
-    </div>
-
-
     <hr>
-
 
     <!-- Add Task -->
     <div class="add-task-box">
@@ -388,7 +339,6 @@
 
     </div>
 
-
     <div id="tasks"></div>
 
 
@@ -400,9 +350,7 @@
         </div>
 
         <div id="progress-bar">
-
             <div id="progress-fill"></div>
-
         </div>
 
     </div>
@@ -508,8 +456,6 @@ function startPlanner() {
 
     document.getElementById("drop-trash").style.display = "block";
 
-    document.getElementById("planNavigation").style.display = "block";
-
     nextPlan();
 
 }
@@ -538,7 +484,7 @@ function makeTaskDraggable(taskElement) {
 }
 
 
-/* Load Current Plan */
+/* Load Plan */
 
 function nextPlan() {
 
@@ -563,39 +509,15 @@ function nextPlan() {
 
     });
 
-
     const planContainer =
         document.getElementById("plan");
 
     planContainer.innerHTML = html;
 
-
     const loadedTasks =
         planContainer.querySelectorAll(".task");
 
     loadedTasks.forEach(makeTaskDraggable);
-
-
-    document.getElementById("planCounter").textContent =
-        "Plan " + (currentPlan + 1) + " of " + plans.length;
-
-
-    document.getElementById("nextPlanButton").disabled = true;
-
-
-    document.getElementById("completionArea").style.display = "none";
-
-    document.getElementById("message").style.display = "none";
-
-
-    checkAllTasks();
-
-}
-
-
-/* Go To Next Plan */
-
-function goToNextPlan() {
 
     currentPlan++;
 
@@ -605,7 +527,11 @@ function goToNextPlan() {
 
     }
 
-    nextPlan();
+    document.getElementById("message").style.display = "none";
+
+    document.getElementById("completionArea").style.display = "none";
+
+    checkAllTasks();
 
 }
 
@@ -712,10 +638,8 @@ dropTrash.addEventListener(
 
         dropTrash.classList.remove("drag-over");
 
-
         const draggingTask =
             document.querySelector(".task.dragging");
-
 
         if (draggingTask) {
 
@@ -738,39 +662,27 @@ function checkAllTasks() {
             'input[type="checkbox"]'
         );
 
-
     const completedTasks =
         document.querySelectorAll(
             'input[type="checkbox"]:checked'
         );
-
 
     const progressFill =
         document.getElementById(
             "progress-fill"
         );
 
-
     const progressText =
         document.getElementById(
             "progress-text"
         );
-
 
     const completionArea =
         document.getElementById(
             "completionArea"
         );
 
-
-    const nextPlanButton =
-        document.getElementById(
-            "nextPlanButton"
-        );
-
-
     let progress = 0;
-
 
     if (allTasks.length > 0) {
 
@@ -782,10 +694,8 @@ function checkAllTasks() {
 
     }
 
-
     progressFill.style.width =
         progress + "%";
-
 
     progressText.textContent =
         "Progress: " + progress + "%";
@@ -801,14 +711,10 @@ function checkAllTasks() {
         completionArea.style.display =
             "block";
 
-        nextPlanButton.disabled = false;
-
     } else {
 
         completionArea.style.display =
             "none";
-
-        nextPlanButton.disabled = true;
 
         document.getElementById(
             "message"
@@ -840,4 +746,3 @@ document.getElementById(
 
 </body>
 </html>
-
