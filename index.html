@@ -1,1 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Planner</title>
 
+<style>
+*{box-sizing:border-box}
+
+body{
+font-family:Arial,sans-serif;
+text-align:center;
+background:linear-gradient(135deg,#ffd6e7,#e6d6ff);
+min-height:100vh;
+margin:0;
+padding:30px 15px;
+transition:.3s;
+color:#333
+}
+
+body.dark{
+background:linear-gradient(135deg,#1e1b2e,#302040);
+color:white
+}
+
+body.blue{background:linear-gradient(135deg,#dff4ff,#d9e4ff)}
+body.green{background:linear-gradient(135deg,#dcfce7,#d1fae5)}
+body.peach{background:linear-gradient(135deg,#ffe5d0,#ffd6d6)}
+
+.planner{
+background:white;
+max-width:650px;
+margin:auto;
+padding:30px;
+border-radius:25px;
+box-shadow:0 10px 30px #0002
+}
+
+body.dark .planner{
+background:#242033;
+color:white
+}
+
+h1{color:#8e44ad}
+h2{color:#6c3483}
+h3{color:#8e44ad}
+
+body.dark h2,
+body.dark h3{
+color:#e0aaff
+}
+
+p{
+color:#666;
+font-size:18px
+}
+
+body.dark p{color:#ccc}
+
+button{
+background:#8e44ad;
+color:white;
+border:0;
+padding:12px 20px;
+border-radius:15px;
+font-size:16px;
+cursor:pointer;
+margin:7px;
+transition:.2s
+}
+
+button:hover{
+background:#6c3483;
+transform:scale(1.03)
+}
+
+button:disabled{
+opacity:.5;
+cursor:not-allowed;
+transform:none
+}
+
+#app{display:none}
+
+.top{
+display:flex;
+justify-content:flex-end;
+position:relative
+}
+
+.dots{
+background:transparent;
+color:#8e44ad;
+font-size:30px;
+padding:0 10px;
+margin:0
+}
+
+.dots:hover{
+background:#f3e5f5;
+transform:none
+}
+
+body.dark .dots{color:#e0aaff}
+
+.menu{
+display:none;
+position:absolute;
+right:0;
+top:42px;
+background:white;
+width:220px;
+padding:8px;
+border-radius:15px;
+box-shadow:0 8px 25px #0003;
+z-index:100
+}
+
+.menu.show{display:block}
+
+body.dark .menu{background:#302b43}
+
+.menu button{
+display:block;
+width:100%;
+margin:0;
+background:transparent;
+color:#6c3483;
+text-align:left
+}
+
+.menu button:hover{
+background:#f3e5f5;
+transform:none
+}
+
+body.dark .menu button{color:#f0d9ff}
+body.dark .menu button:hover{background:#40394f}
+
+.theme-title{
+font-weight:bold;
+padding:10px 8px;
+color:#8e44ad
+}
+
+.theme-buttons{
+display:flex;
+gap:5px;
+flex-wrap:wrap
+}
+
+.theme-buttons button{
+font-size:13px;
+padding:8px 10px;
+margin:2px
+}
+
+.page{
+display:none;
+animation:fade .3s ease
+}
+
+.page.active{display:block}
+
+.task{
+display:flex;
+align-items:center;
+gap:10px;
+background:#f8eaf4;
+margin:10px 0;
+padding:13px;
+border-radius:12px;
+text-align:left;
+font-size:17px
+}
+
+body.dark .task{background:#342d46}
+
+.task input[type="checkbox"]{
+width:20px;
+height:20px;
+cursor:pointer;
+accent-color:#8e44ad;
+flex-shrink:0
+}
+
+.task span{
+flex:1;
+word-break:break-word
+}
+
+.task input:checked+span{
+text-decoration:line-through;
+opacity:.5
+}
+
+.task-time{
+color:#8e44ad;
+font-size:14px;
+font-weight:bold;
+white-space:nowrap
+}
+
+body.dark .task-time{color:#e0aaff}
+
+.priority{
+font-size:12px;
+font-weight:bold;
+padding:5px 8px;
+border-radius:8px;
+white-space:nowrap
+}
+
+.priority-low{
+background:#d5f5e3;
+color:#1e8449
+}
+
+.priority-medium{
+background:#fcf3cf;
+color:#9a7d0a
+}
+
+.priority-high{
+background:#fadbd8;
+color:#c0392b
+}
+
+body.dark .priority-low{
+background:#214d35;
+color:#8ff0b2
+}
+
+body.dark .priority-medium{
+background:#574d22;
+color:#ffe98a
+}
+
+body.dark .priority-high{
+background:#592b2b;
+color:#ffaaa5
+}
+
+.add{
+margin:25px 0;
+display:flex;
+justify-content:center;
+gap:8px;
+flex-wrap:wrap
+}
+
+.add input,
+.add select{
+padding:12px;
+border:2px solid #e6d6ff;
+border-radius:12px;
+font-size:16px;
+outline:none
+}
+
+.add input[type="text"]{width:40%}
+.add input[type="time"]{width:120px}
+
+.add select{
+width:130px;
+background:white
+}
+
+.add input:focus,
+.add select:focus{
+border-color:#8e44ad;
+box-shadow:0 0 5px #8e44ad55
+}
+
+body.dark .add input,
+body.dark .add select{
+background:#302b43;
+color:white;
+border-color:#6c3483
+}
+
+body.dark .add input::placeholder{
+color:#bbb
+}
+
+.delete{
+background:#ff7675;
+padding:7px 10px;
+margin:0
+}
+
+.delete:hover{background:#d63031}
+
+.nav{
+display:flex;
+justify-content:space-between;
+margin-top:25px
+}
+
+.nav button{
+background:linear-gradient(135deg,#8e44ad,#e84393)
+}
+
+.report{
+background:#f8eaf4;
+padding:20px;
+border-radius:18px;
+margin-top:20px;
+text-align:left
+}
+
+body.dark .report{background:#342d46}
+
+.item{
+padding:13px;
+margin:8px 0;
+background:white;
+border-radius:12px
+}
+
+body.dark .item{background:#242033}
+
+.date{
+margin:15px 0 25px
+}
+
+.date input{
+padding:10px;
+border:2px solid #e6d6ff;
+border-radius:10px;
+font-size:16px
+}
+
+body.dark .date input{
+background:#302b43;
+color:white;
+border-color:#6c3483
+}
+
+.notes-box{
+margin:25px 0;
+text-align:left
+}
+
+.notes-box label{
+display:block;
+font-weight:bold;
+color:#8e44ad;
+margin-bottom:8px
+}
+
+.notes-box textarea{
+width:100%;
+min-height:110px;
+padding:12px;
+border:2px solid #e6d6ff;
+border-radius:12px;
+font-family:Arial,sans-serif;
+font-size:16px;
+resize:vertical;
+outline:none
+}
+
+body.dark .notes-box textarea{
+background:#302b43;
+color:white;
+border-color:#6c3483
+}
+
+body.dark .notes-box textarea::placeholder{
+color:#bbb
+}
+
+.progress{margin:25px 0}
+
+.bar{
+height:20px;
+background:#eee;
+border-radius:15px;
+overflow:hidden
+}
+
+body.dark .bar{background:#40394f}
+
+.fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#8e44ad,#e84393);
+transition:.4s
+}
+
+.streak{
+background:#fff3cd;
+color:#856404;
+padding:15px;
+border-radius:15px;
+margin-top:15px;
+font-weight:bold
+}
+
+body.dark .streak{
+background:#493d28;
+color:#ffd86b
+}
+
+#done{display:none}
+
+#message{
+display:none;
+color:#8e44ad;
+font-size:22px;
+font-weight:bold;
+margin:20px
+}
+
+body.dark #message{color:#e0aaff}
+
+
+/* ================= ACHIEVEMENTS ================= */
+
+.achievements{
+margin-top:25px;
+text-align:left
+}
+
+.achievements-title{
+font-size:22px;
+font-weight:bold;
+color:#8e44ad;
+margin-bottom:12px;
+text-align:center
+}
+
+body.dark .achievements-title{
+color:#e0aaff
+}
+
+.achievement-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px
+}
+
+.achievement{
+background:white;
+border:2px solid #eee;
+padding:15px;
+border-radius:16px;
+display:flex;
+align-items:center;
+gap:12px;
+transition:.25s
+}
+
+body.dark .achievement{
+background:#242033;
+border-color:#40394f
+}
+
+.achievement.unlocked{
+border-color:#8e44ad;
+box-shadow:0 5px 15px #8e44ad22
+}
+
+.achievement.locked{
+opacity:.55;
+filter:grayscale(.6)
+}
+
+.achievement-icon{
+font-size:35px;
+width:45px;
+text-align:center
+}
+
+.achievement-name{
+font-weight:bold;
+font-size:16px;
+color:#6c3483
+}
+
+body.dark .achievement-name{
+color:#e0aaff
+}
+
+.achievement-description{
+font-size:13px;
+color:#666;
+margin-top:4px
+}
+
+body.dark .achievement-description{
+color:#ccc
+}
+
+.achievement-status{
+font-size:12px;
+font-weight:bold;
+margin-top:5px
+}
+
+.achievement.unlocked .achievement-status{
+color:#27ae60
+}
+
+.achievement.locked .achievement-status{
+color:#888
+}
+
+
+/* ================= FOCUS CENTER ================= */
+
+.focus-box{
+background:#f8e
