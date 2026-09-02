@@ -1,1 +1,3128 @@
 
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Planner</title>
+
+<!-- PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+font-family:Arial,sans-serif;text-align:center;
+background:linear-gradient(135deg,#ffd6e7,#e6d6ff);
+min-height:100vh;margin:0;padding:30px 15px;
+transition:.3s;color:#333
+}
+body.dark{background:linear-gradient(135deg,#1e1b2e,#302040);color:white}
+body.blue{background:linear-gradient(135deg,#dff4ff,#d9e4ff)}
+body.green{background:linear-gradient(135deg,#dcfce7,#d1fae5)}
+body.peach{background:linear-gradient(135deg,#ffe5d0,#ffd6d6)}
+
+.planner{
+background:white;max-width:650px;margin:auto;padding:30px;
+border-radius:25px;box-shadow:0 10px 30px #0002
+}
+body.dark .planner{background:#242033;color:white}
+
+h1{color:#8e44ad}
+h2{color:#6c3483}
+h3{color:#8e44ad}
+body.dark h2,body.dark h3{color:#e0aaff}
+
+p{color:#666;font-size:18px}
+body.dark p{color:#ccc}
+
+button{
+background:#8e44ad;color:white;border:0;padding:12px 20px;
+border-radius:15px;font-size:16px;cursor:pointer;margin:7px;
+transition:.2s
+}
+button:hover{background:#6c3483;transform:scale(1.03)}
+
+#app{display:none}
+
+.top{
+display:flex;justify-content:flex-end;position:relative
+}
+
+.dots{
+background:transparent;color:#8e44ad;font-size:30px;
+padding:0 10px;margin:0
+}
+.dots:hover{background:#f3e5f5;transform:none}
+body.dark .dots{color:#e0aaff}
+
+.menu{
+display:none;position:absolute;right:0;top:42px;
+background:white;width:220px;padding:8px;border-radius:15px;
+box-shadow:0 8px 25px #0003;z-index:100
+}
+.menu.show{display:block}
+body.dark .menu{background:#302b43}
+
+.menu button{
+display:block;width:100%;margin:0;background:transparent;
+color:#6c3483;text-align:left
+}
+.menu button:hover{background:#f3e5f5;transform:none}
+body.dark .menu button{color:#f0d9ff}
+body.dark .menu button:hover{background:#40394f}
+
+.theme-title{
+font-weight:bold;padding:10px 8px;color:#8e44ad
+}
+
+.theme-buttons{
+display:flex;gap:5px;flex-wrap:wrap
+}
+.theme-buttons button{
+font-size:13px;padding:8px 10px;margin:2px
+}
+
+.page{
+display:none;animation:fade .3s ease
+}
+.page.active{display:block}
+
+.task{
+display:flex;align-items:center;gap:10px;
+background:#f8eaf4;margin:10px 0;padding:13px;
+border-radius:12px;text-align:left;font-size:17px
+}
+body.dark .task{background:#342d46}
+
+.task input[type="checkbox"]{
+width:20px;height:20px;cursor:pointer;
+accent-color:#8e44ad;flex-shrink:0
+}
+
+.task span{
+flex:1;word-break:break-word
+}
+
+.task input:checked+span{
+text-decoration:line-through;opacity:.5
+}
+
+.task-time{
+color:#8e44ad;font-size:14px;font-weight:bold;
+white-space:nowrap
+}
+body.dark .task-time{color:#e0aaff}
+
+.priority{
+font-size:12px;font-weight:bold;padding:5px 8px;
+border-radius:8px;white-space:nowrap
+}
+
+.priority-low{background:#d5f5e3;color:#1e8449}
+.priority-medium{background:#fcf3cf;color:#9a7d0a}
+.priority-high{background:#fadbd8;color:#c0392b}
+
+body.dark .priority-low{background:#214d35;color:#8ff0b2}
+body.dark .priority-medium{background:#574d22;color:#ffe98a}
+body.dark .priority-high{background:#592b2b;color:#ffaaa5}
+
+.add{
+margin:25px 0;display:flex;justify-content:center;
+gap:8px;flex-wrap:wrap
+}
+
+.add input,.add select{
+padding:12px;border:2px solid #e6d6ff;
+border-radius:12px;font-size:16px;outline:none
+}
+
+.add input[type="text"]{width:40%}
+.add input[type="time"]{width:120px}
+.add select{width:130px;background:white}
+
+.add input:focus,.add select:focus{
+border-color:#8e44ad;box-shadow:0 0 5px #8e44ad55
+}
+
+body.dark .add input,body.dark .add select{
+background:#302b43;color:white;border-color:#6c3483
+}
+body.dark .add input::placeholder{color:#bbb}
+
+.delete{
+background:#ff7675;padding:7px 10px;margin:0
+}
+.delete:hover{background:#d63031}
+
+.nav{
+display:flex;justify-content:space-between;margin-top:25px
+}
+.nav button{
+background:linear-gradient(135deg,#8e44ad,#e84393)
+}
+
+.report{
+background:#f8eaf4;padding:20px;border-radius:18px;
+margin-top:20px;text-align:left
+}
+body.dark .report{background:#342d46}
+
+.item{
+padding:13px;margin:8px 0;background:white;border-radius:12px
+}
+body.dark .item{background:#242033}
+
+.date{margin:15px 0 25px}
+
+.date input{
+padding:10px;border:2px solid #e6d6ff;
+border-radius:10px;font-size:16px
+}
+
+body.dark .date input{
+background:#302b43;color:white;border-color:#6c3483
+}
+
+.notes-box{
+margin:25px 0;text-align:left
+}
+
+.notes-box label{
+display:block;font-weight:bold;color:#8e44ad;margin-bottom:8px
+}
+
+.notes-box textarea{
+width:100%;min-height:110px;padding:12px;
+border:2px solid #e6d6ff;border-radius:12px;
+font-family:Arial,sans-serif;font-size:16px;
+resize:vertical;outline:none
+}
+
+.notes-box textarea:focus{
+border-color:#8e44ad;box-shadow:0 0 5px #8e44ad55
+}
+
+body.dark .notes-box textarea{
+background:#302b43;color:white;border-color:#6c3483
+}
+body.dark .notes-box textarea::placeholder{color:#bbb}
+
+.progress{margin:25px 0}
+
+.bar{
+height:20px;background:#eee;border-radius:15px;overflow:hidden
+}
+body.dark .bar{background:#40394f}
+
+.fill{
+height:100%;width:0%;
+background:linear-gradient(90deg,#8e44ad,#e84393);
+transition:.4s
+}
+
+.streak{
+background:#fff3cd;color:#856404;padding:15px;
+border-radius:15px;margin-top:15px;font-weight:bold
+}
+body.dark .streak{background:#493d28;color:#ffd86b}
+
+#done{display:none}
+
+#message{
+display:none;color:#8e44ad;font-size:22px;
+font-weight:bold;margin:20px
+}
+body.dark #message{color:#e0aaff}
+
+
+/* =========================
+   QUIZ PAGE
+========================= */
+
+.quiz-box{
+margin-top:20px;
+text-align:left
+}
+
+.quiz-card{
+background:#f8eaf4;
+padding:20px;
+border-radius:18px;
+margin:15px 0
+}
+
+body.dark .quiz-card{
+background:#342d46
+}
+
+.quiz-controls{
+display:flex;
+flex-direction:column;
+gap:12px;
+margin:20px 0
+}
+
+.quiz-controls label{
+font-weight:bold;
+color:#8e44ad
+}
+
+.quiz-controls input,
+.quiz-controls select{
+width:100%;
+padding:12px;
+border:2px solid #e6d6ff;
+border-radius:12px;
+font-size:16px;
+outline:none;
+background:white
+}
+
+body.dark .quiz-controls input,
+body.dark .quiz-controls select{
+background:#302b43;
+color:white;
+border-color:#6c3483
+}
+
+.file-box{
+background:#f8eaf4;
+padding:20px;
+border-radius:18px;
+text-align:center;
+margin:20px 0
+}
+
+body.dark .file-box{
+background:#342d46
+}
+
+.file-box input[type="file"]{
+width:100%;
+padding:12px;
+border:2px dashed #8e44ad;
+border-radius:12px;
+background:white;
+cursor:pointer
+}
+
+body.dark .file-box input[type="file"]{
+background:#302b43;
+color:white
+}
+
+.pdf-status{
+font-weight:bold;
+color:#8e44ad;
+margin-top:12px
+}
+
+.quiz-question{
+background:white;
+padding:18px;
+border-radius:15px;
+margin:15px 0;
+text-align:left
+}
+
+body.dark .quiz-question{
+background:#242033
+}
+
+.quiz-question h3{
+margin-top:0
+}
+
+.quiz-option{
+display:block;
+padding:10px;
+margin:8px 0;
+background:#f8eaf4;
+border-radius:10px;
+cursor:pointer
+}
+
+body.dark .quiz-option{
+background:#342d46
+}
+
+.quiz-option:hover{
+background:#ead7ed
+}
+
+body.dark .quiz-option:hover{
+background:#40394f
+}
+
+.answer-box{
+margin-top:12px;
+padding:12px;
+background:#fff3cd;
+border-radius:10px;
+color:#856404
+}
+
+body.dark .answer-box{
+background:#493d28;
+color:#ffd86b
+}
+
+.quiz-score{
+font-size:22px;
+font-weight:bold;
+color:#8e44ad;
+margin:20px
+}
+
+.loading{
+display:none;
+font-weight:bold;
+color:#8e44ad;
+margin:15px
+}
+
+
+/* =========================
+   QUIZ RESULT
+========================= */
+
+.submit-box{
+text-align:center;
+margin:25px 0
+}
+
+.submit-button{
+background:linear-gradient(135deg,#8e44ad,#e84393);
+font-size:18px;
+padding:14px 28px
+}
+
+.submit-button:hover{
+background:linear-gradient(135deg,#6c3483,#c2185b)
+}
+
+.quiz-final-result{
+background:#f8eaf4;
+padding:25px;
+border-radius:20px;
+margin-top:25px;
+text-align:center
+}
+
+body.dark .quiz-final-result{
+background:#342d46
+}
+
+.final-score{
+font-size:34px;
+font-weight:bold;
+color:#8e44ad;
+margin:10px
+}
+
+.final-percentage{
+font-size:26px;
+font-weight:bold;
+margin:10px
+}
+
+.result-good{
+color:#1e8449;
+font-weight:bold
+}
+
+.result-bad{
+color:#c0392b;
+font-weight:bold
+}
+
+.result-item{
+text-align:left;
+background:white;
+padding:16px;
+border-radius:15px;
+margin:12px 0
+}
+
+body.dark .result-item{
+background:#242033
+}
+
+.result-correct{
+border-left:6px solid #27ae60
+}
+
+.result-wrong{
+border-left:6px solid #e74c3c
+}
+
+.your-answer{
+margin-top:8px;
+font-size:15px
+}
+
+.correct-answer{
+margin-top:8px;
+font-weight:bold;
+color:#1e8449
+}
+
+body.dark .correct-answer{
+color:#8ff0b2
+}
+
+@media(max-width:500px){
+.planner{padding:22px 16px}
+.add{flex-direction:column}
+.add input,.add select,.add button{width:100%!important}
+.nav{flex-direction:column}
+.task{flex-wrap:wrap}
+.task-time,.priority{margin-left:30px}
+}
+
+@keyframes fade{
+from{opacity:0;transform:translateY(8px)}
+to{opacity:1;transform:translateY(0)}
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="planner">
+
+<!-- WELCOME PAGE -->
+
+<div id="welcome">
+
+<div class="top">
+
+<button
+class="dots"
+id="dotsButton"
+type="button"
+onclick="toggleMenu()">⋮</button>
+
+<div id="menu" class="menu">
+
+<button type="button" onclick="toggleDarkMode()">
+🌙 Dark Mode
+</button>
+
+<div class="theme-title">🎨 Theme Options</div>
+
+<div class="theme-buttons">
+
+<button type="button" onclick="setTheme('purple')">
+💜 Purple
+</button>
+
+<button type="button" onclick="setTheme('blue')">
+💙 Blue
+</button>
+
+<button type="button" onclick="setTheme('green')">
+💚 Green
+</button>
+
+<button type="button" onclick="setTheme('peach')">
+🧡 Peach
+</button>
+
+</div>
+</div>
+</div>
+
+<h1>🌸 Hi! This Is The Daily Planner 🌸</h1>
+
+<p>Let's make today a beautiful day! 💖</p>
+
+<button type="button" onclick="startPlanner()">
+Let's Start ✨
+</button>
+
+</div>
+
+
+<!-- APP -->
+
+<div id="app">
+
+
+<!-- MORNING -->
+
+<div class="page active" id="page0">
+
+<h2>🌅 Morning Plan</h2>
+
+<div id="tasks0"></div>
+
+<h3>➕ Add Your Own Task</h3>
+
+<div class="add">
+
+<input type="text" id="input0"
+placeholder="Write a new task..." autocomplete="off">
+
+<input type="time" id="time0">
+
+<select id="priority0">
+<option value="low">Low</option>
+<option value="medium" selected>Medium</option>
+<option value="high">High</option>
+</select>
+
+<button type="button" onclick="addTask(0)">
+✨ Add Task
+</button>
+
+</div>
+
+<div id="custom0"></div>
+
+<div class="nav">
+
+<button type="button" onclick="goToPage(1)">
+☀️ Afternoon →
+</button>
+
+</div>
+
+</div>
+
+
+<!-- AFTERNOON -->
+
+<div class="page" id="page1">
+
+<h2>☀️ Afternoon Plan</h2>
+
+<div id="tasks1"></div>
+
+<h3>➕ Add Your Own Task</h3>
+
+<div class="add">
+
+<input type="text" id="input1"
+placeholder="Write a new task..." autocomplete="off">
+
+<input type="time" id="time1">
+
+<select id="priority1">
+<option value="low">Low</option>
+<option value="medium" selected>Medium</option>
+<option value="high">High</option>
+</select>
+
+<button type="button" onclick="addTask(1)">
+✨ Add Task
+</button>
+
+</div>
+
+<div id="custom1"></div>
+
+<div class="nav">
+
+<button type="button" onclick="goToPage(0)">
+← 🌅 Morning
+</button>
+
+<button type="button" onclick="goToPage(2)">
+🌆 Evening →
+</button>
+
+</div>
+
+</div>
+
+
+<!-- EVENING -->
+
+<div class="page" id="page2">
+
+<h2>🌆 Evening Plan</h2>
+
+<div id="tasks2"></div>
+
+<h3>➕ Add Your Own Task</h3>
+
+<div class="add">
+
+<input type="text" id="input2"
+placeholder="Write a new task..." autocomplete="off">
+
+<input type="time" id="time2">
+
+<select id="priority2">
+<option value="low">Low</option>
+<option value="medium" selected>Medium</option>
+<option value="high">High</option>
+</select>
+
+<button type="button" onclick="addTask(2)">
+✨ Add Task
+</button>
+
+</div>
+
+<div id="custom2"></div>
+
+<div class="nav">
+
+<button type="button" onclick="goToPage(1)">
+← ☀️ Afternoon
+</button>
+
+<button type="button" onclick="goToPage(3)">
+🌙 Night →
+</button>
+
+</div>
+
+</div>
+
+
+<!-- NIGHT -->
+
+<div class="page" id="page3">
+
+<h2>🌙 Night Plan</h2>
+
+<div id="tasks3"></div>
+
+<h3>➕ Add Your Own Task</h3>
+
+<div class="add">
+
+<input type="text" id="input3"
+placeholder="Write a new task..." autocomplete="off">
+
+<input type="time" id="time3">
+
+<select id="priority3">
+<option value="low">Low</option>
+<option value="medium" selected>Medium</option>
+<option value="high">High</option>
+</select>
+
+<button type="button" onclick="addTask(3)">
+✨ Add Task
+</button>
+
+</div>
+
+<div id="custom3"></div>
+
+<div class="nav">
+
+<button type="button" onclick="goToPage(2)">
+← 🌆 Evening
+</button>
+
+<button type="button" onclick="goToPage(4)">
+📊 Daily Report →
+</button>
+
+</div>
+
+</div>
+
+
+<!-- DAILY REPORT -->
+
+<div class="page" id="page4">
+
+<h2>📊 Daily Report</h2>
+
+<div class="date">
+📅 Date:
+<input type="date" id="plannerDate">
+</div>
+
+<div class="notes-box">
+
+<label for="dailyNotes">📝 Daily Notes</label>
+
+<textarea
+id="dailyNotes"
+placeholder="Write something about your day..."></textarea>
+
+</div>
+
+<div class="report">
+
+<div class="item">
+📝 Total Tasks:
+<b id="reportTotal">0</b>
+</div>
+
+<div class="item">
+✅ Completed:
+<b id="reportCompleted">0</b>
+</div>
+
+<div class="item">
+⏳ Remaining:
+<b id="reportRemaining">0</b>
+</div>
+
+<div class="item">
+📈 Progress:
+<b id="reportPercent">0%</b>
+</div>
+
+<div class="streak">
+🔥 Daily Streak:
+<span id="reportStreak">0</span> days
+</div>
+
+</div>
+
+<div class="progress">
+
+<b>Progress: <span id="progressText">0%</span></b>
+
+<div class="bar">
+<div class="fill" id="progressFill"></div>
+</div>
+
+</div>
+
+<div id="done">
+
+<div style="font-size:55px">⭐</div>
+
+<button type="button" onclick="finishDay()">
+🎉 Done!
+</button>
+
+</div>
+
+<div id="message">
+🌸 Done! Have a good day! 💖
+</div>
+
+<div class="nav">
+
+<button type="button" onclick="goToPage(3)">
+← 🌙 Night Plan
+</button>
+
+<button type="button" onclick="goToPage(5)">
+📚 Quiz →
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     PAGE 5 - QUIZ
+========================= -->
+
+<div class="page" id="page5">
+
+<h2>📚 PDF Study Quiz</h2>
+
+<p>
+Choose a PDF, select the pages you want to study,
+and generate a quiz from those pages.
+</p>
+
+
+<!-- FILE -->
+
+<div class="file-box">
+
+<h3>📄 Choose Your PDF</h3>
+
+<input
+type="file"
+id="pdfFile"
+accept="application/pdf">
+
+<div class="pdf-status" id="pdfStatus">
+No PDF selected.
+</div>
+
+</div>
+
+
+<!-- CONTROLS -->
+
+<div class="quiz-box">
+
+<div class="quiz-controls">
+
+<label for="startPage">
+📖 Start Page
+</label>
+
+<input
+type="number"
+id="startPage"
+min="1"
+value="1">
+
+<label for="endPage">
+📖 End Page
+</label>
+
+<input
+type="number"
+id="endPage"
+min="1"
+value="1">
+
+<label for="questionCount">
+❓ Number of Questions
+</label>
+
+<select id="questionCount">
+
+<option value="5">5 Questions</option>
+<option value="10" selected>10 Questions</option>
+<option value="15">15 Questions</option>
+<option value="20">20 Questions</option>
+
+</select>
+
+<label for="quizType">
+📝 Quiz Type
+</label>
+
+<select id="quizType">
+
+<option value="mcq">
+Multiple Choice
+</option>
+
+<option value="qa">
+Normal Q&A
+</option>
+
+</select>
+
+</div>
+
+<button
+type="button"
+onclick="generateQuiz()">
+✨ Generate Quiz
+</button>
+
+<div class="loading" id="quizLoading">
+📖 Reading your selected pages...
+</div>
+
+</div>
+
+
+<!-- QUESTIONS -->
+
+<div id="quizResult"></div>
+
+
+<div class="nav">
+
+<button type="button" onclick="goToPage(4)">
+← 📊 Daily Report
+</button>
+
+</div>
+
+</div>
+
+
+</div>
+</div>
+
+
+<script>
+
+/* =========================================
+   PLANS
+========================================= */
+
+const plans=[
+[
+"Wake up","Make my bed","Pray","Important meeting",
+"Breakfast","Skincare","Review homework",
+"Wear uniform","Go to school"
+],
+[
+"Change your clothes","Wash your face","Eat lunch",
+"Check your school schedule for the next day",
+"Pray","Iron your uniform","Study","Rest"
+],
+[
+"Review","Pray","Dinner"
+],
+[
+"Game","Review","Pray",
+"Night routine","Get ready for bed"
+]
+];
+
+
+/* =========================================
+   VARIABLES
+========================================= */
+
+let selectedDate=new Date().toISOString().split("T")[0];
+
+let customTasks=[[],[],[],[]];
+
+let selectedPDF=null;
+let pdfDocument=null;
+let pdfTextByPage=[];
+
+let currentQuizQuestions=[];
+let currentQuizType="";
+let quizSubmitted=false;
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const welcome=document.getElementById("welcome");
+const app=document.getElementById("app");
+const dateInput=document.getElementById("plannerDate");
+const notesInput=document.getElementById("dailyNotes");
+const menuBox=document.getElementById("menu");
+
+const pdfFile=document.getElementById("pdfFile");
+const pdfStatus=document.getElementById("pdfStatus");
+const startPageInput=document.getElementById("startPage");
+const endPageInput=document.getElementById("endPage");
+const quizLoading=document.getElementById("quizLoading");
+const quizResult=document.getElementById("quizResult");
+
+
+/* =========================================
+   STORAGE
+========================================= */
+
+function storageKey(){
+return "dailyPlanner_"+selectedDate;
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+function startPlanner(){
+
+welcome.style.display="none";
+app.style.display="block";
+
+dateInput.value=selectedDate;
+
+loadData();
+renderAll();
+
+}
+
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+function goToPage(number){
+
+document.querySelectorAll(".page").forEach(page=>{
+page.classList.remove("active");
+});
+
+document.getElementById("page"+number).classList.add("active");
+
+renderAll();
+
+}
+
+
+/* =========================================
+   MENU
+========================================= */
+
+function toggleMenu(){
+menuBox.classList.toggle("show");
+}
+
+
+/* =========================================
+   DARK MODE
+========================================= */
+
+function toggleDarkMode(){
+
+const dark=document.body.classList.toggle("dark");
+
+document.body.classList.remove("blue","green","peach");
+
+localStorage.setItem(
+"dailyPlannerTheme",
+dark?"dark":"purple"
+);
+
+menuBox.classList.remove("show");
+
+}
+
+
+/* =========================================
+   THEMES
+========================================= */
+
+function setTheme(theme){
+
+document.body.classList.remove(
+"dark","blue","green","peach"
+);
+
+if(theme!=="purple"){
+document.body.classList.add(theme);
+}
+
+localStorage.setItem(
+"dailyPlannerTheme",
+theme
+);
+
+menuBox.classList.remove("show");
+
+}
+
+
+/* =========================================
+   LOAD THEME
+========================================= */
+
+function loadTheme(){
+
+const theme=localStorage.getItem("dailyPlannerTheme");
+
+if(theme==="dark"){
+document.body.classList.add("dark");
+}
+else if(
+theme==="blue" ||
+theme==="green" ||
+theme==="peach"
+){
+document.body.classList.add(theme);
+}
+
+}
+
+loadTheme();
+
+
+/* =========================================
+   LOAD DATA
+========================================= */
+
+function loadData(){
+
+const saved=localStorage.getItem(storageKey());
+
+if(!saved){
+
+customTasks=[[],[],[],[]];
+notesInput.value="";
+return;
+
+}
+
+try{
+
+const data=JSON.parse(saved);
+
+customTasks=data.customTasks || [[],[],[],[]];
+
+notesInput.value=data.notes || "";
+
+}
+catch(error){
+
+customTasks=[[],[],[],[]];
+
+notesInput.value="";
+
+}
+
+while(customTasks.length<4){
+customTasks.push([]);
+}
+
+}
+
+
+/* =========================================
+   SAVE DATA
+========================================= */
+
+function saveData(){
+
+localStorage.setItem(
+storageKey(),
+JSON.stringify({
+customTasks:customTasks,
+notes:notesInput.value
+})
+);
+
+}
+
+
+/* =========================================
+   SAVE NOTES
+========================================= */
+
+notesInput.addEventListener("input",saveData);
+
+
+/* =========================================
+   PLAN STATE
+========================================= */
+
+function getPlanState(page,index){
+
+return localStorage.getItem(
+storageKey()+"_plan_"+page+"_"+index
+)==="1";
+
+}
+
+
+function setPlanState(page,index,checked){
+
+localStorage.setItem(
+storageKey()+"_plan_"+page+"_"+index,
+checked?"1":"0"
+);
+
+}
+
+
+/* =========================================
+   RENDER PLAN
+========================================= */
+
+function renderPlan(page){
+
+const box=document.getElementById("tasks"+page);
+
+box.innerHTML="";
+
+plans[page].forEach((text,index)=>{
+
+const row=document.createElement("label");
+
+row.className="task";
+
+const checkbox=document.createElement("input");
+
+checkbox.type="checkbox";
+
+checkbox.checked=getPlanState(page,index);
+
+const span=document.createElement("span");
+
+span.textContent=text;
+
+checkbox.addEventListener("change",()=>{
+
+setPlanState(
+page,
+index,
+checkbox.checked
+);
+
+updateReport();
+
+});
+
+row.appendChild(checkbox);
+
+row.appendChild(span);
+
+box.appendChild(row);
+
+});
+
+}
+
+
+/* =========================================
+   RENDER CUSTOM TASKS
+========================================= */
+
+function renderCustomTasks(page){
+
+const box=document.getElementById("custom"+page);
+
+box.innerHTML="";
+
+customTasks[page].forEach((task,index)=>{
+
+const row=document.createElement("div");
+
+row.className="task";
+
+const checkbox=document.createElement("input");
+
+checkbox.type="checkbox";
+
+checkbox.checked=task.done===true;
+
+const span=document.createElement("span");
+
+span.textContent=task.text;
+
+checkbox.addEventListener("change",()=>{
+
+customTasks[page][index].done=checkbox.checked;
+
+saveData();
+
+updateReport();
+
+});
+
+
+/* TIME */
+
+if(task.time){
+
+const time=document.createElement("span");
+
+time.className="task-time";
+
+time.textContent="⏰ "+task.time;
+
+row.appendChild(checkbox);
+
+row.appendChild(span);
+
+row.appendChild(time);
+
+}
+else{
+
+row.appendChild(checkbox);
+
+row.appendChild(span);
+
+}
+
+
+/* PRIORITY */
+
+if(task.priority){
+
+const priority=document.createElement("span");
+
+priority.className=
+"priority priority-"+task.priority;
+
+priority.textContent=
+task.priority.charAt(0).toUpperCase()+
+task.priority.slice(1);
+
+row.appendChild(priority);
+
+}
+
+
+/* DELETE */
+
+const deleteButton=document.createElement("button");
+
+deleteButton.type="button";
+
+deleteButton.className="delete";
+
+deleteButton.textContent="🗑️";
+
+deleteButton.addEventListener("click",()=>{
+
+customTasks[page].splice(index,1);
+
+saveData();
+
+renderAll();
+
+});
+
+row.appendChild(deleteButton);
+
+box.appendChild(row);
+
+});
+
+}
+
+
+/* =========================================
+   ADD TASK
+========================================= */
+
+function addTask(page){
+
+const input=document.getElementById("input"+page);
+
+const timeInput=document.getElementById("time"+page);
+
+const priorityInput=document.getElementById("priority"+page);
+
+const text=input.value.trim();
+
+if(text===""){
+
+input.focus();
+
+return;
+
+}
+
+customTasks[page].push({
+
+text:text,
+
+time:timeInput.value,
+
+priority:priorityInput.value,
+
+done:false
+
+});
+
+input.value="";
+
+timeInput.value="";
+
+priorityInput.value="medium";
+
+saveData();
+
+renderAll();
+
+input.focus();
+
+}
+
+
+/* =========================================
+   ENTER KEY
+========================================= */
+
+for(let page=0;page<4;page++){
+
+const input=document.getElementById("input"+page);
+
+input.addEventListener("keydown",event=>{
+
+if(event.key==="Enter"){
+
+event.preventDefault();
+
+addTask(page);
+
+}
+
+});
+
+}
+
+
+/* =========================================
+   COUNTS
+========================================= */
+
+function getCounts(){
+
+let total=0;
+
+let completed=0;
+
+for(let page=0;page<4;page++){
+
+total+=plans[page].length;
+
+plans[page].forEach((_,index)=>{
+
+if(getPlanState(page,index)){
+
+completed++;
+
+}
+
+});
+
+total+=customTasks[page].length;
+
+customTasks[page].forEach(task=>{
+
+if(task.done){
+
+completed++;
+
+}
+
+});
+
+}
+
+return{total,completed};
+
+}
+
+
+/* =========================================
+   REPORT
+========================================= */
+
+function updateReport(){
+
+const counts=getCounts();
+
+const progress=counts.total
+?Math.round(
+counts.completed/counts.total*100
+)
+:0;
+
+document.getElementById("reportTotal").textContent=
+counts.total;
+
+document.getElementById("reportCompleted").textContent=
+counts.completed;
+
+document.getElementById("reportRemaining").textContent=
+counts.total-counts.completed;
+
+document.getElementById("reportPercent").textContent=
+progress+"%";
+
+document.getElementById("progressText").textContent=
+progress+"%";
+
+document.getElementById("progressFill").style.width=
+progress+"%";
+
+document.getElementById("reportStreak").textContent=
+calculateStreak();
+
+const doneBox=document.getElementById("done");
+
+if(
+counts.total>0 &&
+counts.completed===counts.total
+){
+
+doneBox.style.display="block";
+
+}
+else{
+
+doneBox.style.display="none";
+
+document.getElementById("message").style.display=
+"none";
+
+}
+
+}
+
+
+/* =========================================
+   FINISH
+========================================= */
+
+function finishDay(){
+
+document.getElementById("message").style.display=
+"block";
+
+}
+
+
+/* =========================================
+   CHECK COMPLETED DAY
+========================================= */
+
+function isDayCompleted(date){
+
+let total=0;
+
+let completed=0;
+
+
+/* NORMAL TASKS */
+
+for(let page=0;page<4;page++){
+
+total+=plans[page].length;
+
+plans[page].forEach((_,index)=>{
+
+if(
+localStorage.getItem(
+"dailyPlanner_"+date+
+"_plan_"+page+"_"+index
+)==="1"
+){
+
+completed++;
+
+}
+
+});
+
+}
+
+
+/* CUSTOM TASKS */
+
+const saved=
+localStorage.getItem(
+"dailyPlanner_"+date
+);
+
+if(saved){
+
+try{
+
+const data=JSON.parse(saved);
+
+const tasks=
+data.customTasks ||
+[[],[],[],[]];
+
+for(let page=0;page<4;page++){
+
+const list=tasks[page] || [];
+
+total+=list.length;
+
+list.forEach(task=>{
+
+if(task.done){
+
+completed++;
+
+}
+
+});
+
+}
+
+}
+catch(error){}
+
+}
+
+return total>0 && completed===total;
+
+}
+
+
+/* =========================================
+   STREAK
+========================================= */
+
+function calculateStreak(){
+
+let streak=0;
+
+const today=new Date();
+
+for(let i=0;i<365;i++){
+
+const date=new Date(today);
+
+date.setDate(
+today.getDate()-i
+);
+
+const dateString=
+date.toISOString().split("T")[0];
+
+if(isDayCompleted(dateString)){
+
+streak++;
+
+}
+else{
+
+break;
+
+}
+
+}
+
+return streak;
+
+}
+
+
+/* =========================================
+   DATE CHANGE
+========================================= */
+
+dateInput.addEventListener(
+"change",
+function(){
+
+if(!this.value)return;
+
+selectedDate=this.value;
+
+loadData();
+
+renderAll();
+
+}
+);
+
+
+/* =========================================
+   RENDER EVERYTHING
+========================================= */
+
+function renderAll(){
+
+for(let page=0;page<4;page++){
+
+renderPlan(page);
+
+renderCustomTasks(page);
+
+}
+
+updateReport();
+
+}
+
+
+/* =========================================
+   CLOSE MENU
+========================================= */
+
+document.addEventListener(
+"click",
+event=>{
+
+const dots=
+document.getElementById("dotsButton");
+
+if(
+!menuBox.contains(event.target) &&
+event.target!==dots
+){
+
+menuBox.classList.remove("show");
+
+}
+
+}
+);
+
+
+/* =====================================================
+   ================= PDF QUIZ SYSTEM ===================
+===================================================== */
+
+
+/* =========================================
+   PDF FILE SELECTED
+========================================= */
+
+pdfFile.addEventListener(
+"change",
+async function(){
+
+const file=this.files[0];
+
+if(!file){
+
+selectedPDF=null;
+
+pdfDocument=null;
+
+pdfTextByPage=[];
+
+pdfStatus.textContent=
+"No PDF selected.";
+
+return;
+
+}
+
+if(file.type!=="application/pdf"){
+
+pdfStatus.textContent=
+"❌ Please choose a PDF file.";
+
+this.value="";
+
+return;
+
+}
+
+selectedPDF=file;
+
+pdfStatus.textContent=
+"⏳ Loading PDF...";
+
+try{
+
+const arrayBuffer=
+await file.arrayBuffer();
+
+const typedArray=
+new Uint8Array(arrayBuffer);
+
+pdfDocument=
+await pdfjsLib.getDocument({
+data:typedArray
+}).promise;
+
+startPageInput.max=
+pdfDocument.numPages;
+
+endPageInput.max=
+pdfDocument.numPages;
+
+startPageInput.value=1;
+
+endPageInput.value=
+Math.min(
+pdfDocument.numPages,
+5
+);
+
+pdfStatus.textContent=
+"✅ "+file.name+
+" — "+pdfDocument.numPages+
+" pages";
+
+}
+catch(error){
+
+console.error(error);
+
+pdfStatus.textContent=
+"❌ Could not read this PDF.";
+
+pdfDocument=null;
+
+}
+
+}
+);
+
+
+/* =========================================
+   EXTRACT PDF TEXT
+========================================= */
+
+async function extractPDFPages(start,end){
+
+pdfTextByPage=[];
+
+for(
+let pageNumber=start;
+pageNumber<=end;
+pageNumber++
+){
+
+const page=
+await pdfDocument.getPage(pageNumber);
+
+const content=
+await page.getTextContent();
+
+const text=
+content.items
+.map(item=>item.str)
+.join(" ")
+.replace(/\s+/g," ")
+.trim();
+
+pdfTextByPage.push({
+
+page:pageNumber,
+
+text:text
+
+});
+
+}
+
+return pdfTextByPage;
+
+}
+
+
+/* =========================================
+   CLEAN TEXT
+========================================= */
+
+function cleanText(text){
+
+return text
+.replace(/\s+/g," ")
+.replace(/\u00ad/g,"")
+.trim();
+
+}
+
+
+/* =========================================
+   SPLIT INTO SENTENCES
+========================================= */
+
+function splitSentences(text){
+
+return text
+.split(/(?<=[.!?؟؛])\s+/)
+.map(s=>cleanText(s))
+.filter(s=>{
+
+const words=
+s.split(/\s+/);
+
+return words.length>=6 &&
+words.length<=60;
+
+});
+
+}
+
+
+/* =========================================
+   GET IMPORTANT SENTENCES
+========================================= */
+
+function getUsefulSentences(text){
+
+const sentences=
+splitSentences(text);
+
+return sentences.filter(sentence=>{
+
+const words=
+sentence.split(/\s+/);
+
+return words.length>=8;
+
+});
+
+}
+
+
+/* =========================================
+   EXTRACT KEYWORDS
+========================================= */
+
+function getKeywords(sentence){
+
+const words=
+sentence
+.split(/[^\p{L}\p{N}'-]+/u)
+.map(word=>word.trim())
+.filter(Boolean);
+
+const stopWords=new Set([
+
+"the","and","that","this","with",
+"from","which","their","there",
+"about","into","have","has",
+"are","was","were","for",
+"not","but","they","you",
+"your","his","her","its",
+"our","can","will","would",
+"could","should","been",
+"being","than","then",
+"also","these","those",
+"what","when","where",
+"who","why","how",
+"because","through","during",
+"between","after","before",
+"very","more","most",
+"some","such","only",
+"one","two","three",
+"four","five","six",
+"seven","eight","nine",
+"ten","their","them","then"
+
+]);
+
+return words.filter(word=>{
+
+const lower=
+word.toLowerCase();
+
+return word.length>=4 &&
+!stopWords.has(lower);
+
+});
+
+}
+
+
+/* =========================================
+   CREATE WRONG ANSWERS
+========================================= */
+
+function createWrongAnswers(correct,allSentences){
+
+const answers=[];
+
+for(const sentence of allSentences){
+
+const keywords=
+getKeywords(sentence);
+
+for(const word of keywords){
+
+if(
+word.toLowerCase()!==
+correct.toLowerCase() &&
+word.length>=4
+){
+
+if(!answers.some(
+a=>a.toLowerCase()===word.toLowerCase()
+)){
+
+answers.push(word);
+
+}
+
+}
+
+if(answers.length>=3){
+
+return answers;
+
+}
+
+}
+
+}
+
+return answers;
+
+}
+
+
+/* =========================================
+   CREATE MCQ
+========================================= */
+
+function createMCQ(sentences){
+
+if(sentences.length===0){
+
+return null;
+
+}
+
+const sentence=
+sentences[
+Math.floor(
+Math.random()*sentences.length
+)
+];
+
+const keywords=
+getKeywords(sentence);
+
+if(keywords.length===0){
+
+return null;
+
+}
+
+const correct=
+keywords[
+Math.floor(
+Math.random()*keywords.length
+)
+];
+
+const escaped=
+correct.replace(
+/[.*+?^${}()|[\]\\]/g,
+"\\$&"
+);
+
+
+/*
+   Unicode-aware replacement.
+   This works better for English,
+   Arabic and Kurdish text.
+*/
+
+const questionText=
+sentence.replace(
+new RegExp(
+"(^|[^\\p{L}\\p{N}])"+
+escaped+
+"(?=$|[^\\p{L}\\p{N}])",
+"iu"
+),
+"$1________"
+);
+
+let wrongAnswers=
+createWrongAnswers(
+correct,
+sentences
+);
+
+if(wrongAnswers.length<3){
+
+return null;
+
+}
+
+let options=[
+correct,
+wrongAnswers[0],
+wrongAnswers[1],
+wrongAnswers[2]
+];
+
+options=
+options.sort(
+()=>Math.random()-0.5
+);
+
+return{
+
+question:
+"What word best completes this sentence?\n\n"+
+questionText,
+
+options:options,
+
+answer:correct
+
+};
+
+}
+
+
+/* =========================================
+   CREATE Q&A
+========================================= */
+
+function createQA(sentences){
+
+if(sentences.length===0){
+
+return null;
+
+}
+
+const sentence=
+sentences[
+Math.floor(
+Math.random()*sentences.length
+)
+];
+
+const keywords=
+getKeywords(sentence);
+
+if(keywords.length===0){
+
+return null;
+
+}
+
+const keyword=
+keywords[
+Math.floor(
+Math.random()*keywords.length
+)
+];
+
+return{
+
+question:
+"What does the selected text say about \""+
+keyword+
+"\"?",
+
+answer:
+sentence
+
+};
+
+}
+
+
+/* =========================================
+   GENERATE QUIZ
+========================================= */
+
+async function generateQuiz(){
+
+if(!pdfDocument){
+
+alert(
+"Please choose a PDF first."
+);
+
+return;
+
+}
+
+const start=
+parseInt(
+startPageInput.value
+);
+
+const end=
+parseInt(
+endPageInput.value
+);
+
+const count=
+parseInt(
+document.getElementById(
+"questionCount"
+).value
+);
+
+const type=
+document.getElementById(
+"quizType"
+).value;
+
+
+if(
+isNaN(start) ||
+isNaN(end) ||
+start<1 ||
+end<start ||
+end>pdfDocument.numPages
+){
+
+alert(
+"Please enter valid start and end pages."
+);
+
+return;
+
+}
+
+
+/*
+   Reset quiz state
+*/
+
+currentQuizQuestions=[];
+currentQuizType=type;
+quizSubmitted=false;
+
+quizLoading.style.display="block";
+
+quizResult.innerHTML="";
+
+
+try{
+
+const pages=
+await extractPDFPages(start,end);
+
+const combinedText=
+pages
+.map(p=>p.text)
+.join(" ");
+
+if(
+combinedText.trim().length<100
+){
+
+quizLoading.style.display="none";
+
+quizResult.innerHTML=`
+
+<div class="quiz-card">
+
+<h3>⚠️ Not Enough Text</h3>
+
+<p>
+The selected pages do not contain enough
+extractable text to create a quiz.
+</p>
+
+<p>
+If your PDF is scanned like a picture,
+this version cannot read it yet.
+OCR can be added later.
+</p>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+const sentences=
+getUsefulSentences(
+cleanText(combinedText)
+);
+
+
+if(sentences.length===0){
+
+quizLoading.style.display="none";
+
+quizResult.innerHTML=`
+
+<div class="quiz-card">
+
+<h3>⚠️ No Suitable Text Found</h3>
+
+<p>
+Try selecting pages that contain normal
+selectable text.
+</p>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+const questions=[];
+
+let attempts=0;
+
+while(
+questions.length<count &&
+attempts<count*15
+){
+
+attempts++;
+
+let question;
+
+if(type==="mcq"){
+
+question=
+createMCQ(sentences);
+
+}
+else{
+
+question=
+createQA(sentences);
+
+}
+
+if(!question){
+
+continue;
+
+}
+
+const duplicate=
+questions.some(
+q=>q.question===question.question
+);
+
+if(!duplicate){
+
+questions.push(question);
+
+}
+
+}
+
+
+quizLoading.style.display="none";
+
+
+if(questions.length===0){
+
+quizResult.innerHTML=`
+
+<div class="quiz-card">
+
+<h3>⚠️ Couldn't Create Questions</h3>
+
+<p>
+Try selecting different pages with more
+text.
+</p>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+/*
+   Save the questions so we can grade
+   them later.
+*/
+
+currentQuizQuestions=questions;
+currentQuizType=type;
+quizSubmitted=false;
+
+
+displayQuiz(
+questions,
+start,
+end,
+type
+);
+
+}
+catch(error){
+
+console.error(error);
+
+quizLoading.style.display="none";
+
+quizResult.innerHTML=`
+
+<div class="quiz-card">
+
+<h3>❌ Something Went Wrong</h3>
+
+<p>
+The PDF could not be processed.
+Please try another PDF or another page range.
+</p>
+
+</div>
+
+`;
+
+}
+
+}
+
+
+/* =========================================
+   DISPLAY QUIZ
+========================================= */
+
+function displayQuiz(
+questions,
+start,
+end,
+type
+){
+
+quizResult.innerHTML="";
+
+const title=
+document.createElement("h2");
+
+title.textContent=
+"✨ Your Quiz";
+
+quizResult.appendChild(title);
+
+
+const info=
+document.createElement("p");
+
+info.textContent=
+"Questions from PDF pages "+
+start+"–"+end;
+
+quizResult.appendChild(info);
+
+
+/*
+   Question cards
+*/
+
+questions.forEach(
+(question,index)=>{
+
+const card=
+document.createElement("div");
+
+card.className=
+"quiz-question";
+
+const heading=
+document.createElement("h3");
+
+heading.textContent=
+(index+1)+". "+
+question.question;
+
+card.appendChild(heading);
+
+
+if(type==="mcq"){
+
+question.options.forEach(
+(option)=>{
+
+const label=
+document.createElement("label");
+
+label.className=
+"quiz-option";
+
+const radio=
+document.createElement("input");
+
+radio.type="radio";
+
+radio.name=
+"question_"+index;
+
+radio.value=option;
+
+radio.style.marginRight=
+"8px";
+
+
+/*
+   No answer checking here.
+   The quiz is graded only after
+   the user clicks Submit Quiz.
+*/
+
+label.appendChild(radio);
+
+label.appendChild(
+document.createTextNode(option)
+);
+
+card.appendChild(label);
+
+});
+
+}
+else{
+
+const answerInput=
+document.createElement("textarea");
+
+answerInput.className=
+"qa-answer-input";
+
+answerInput.style.width="100%";
+
+answerInput.style.minHeight="100px";
+
+answerInput.style.padding="10px";
+
+answerInput.style.borderRadius="10px";
+
+answerInput.style.border=
+"2px solid #e6d6ff";
+
+answerInput.style.fontSize="16px";
+
+answerInput.style.resize="vertical";
+
+answerInput.placeholder=
+"Write your answer here...";
+
+card.appendChild(answerInput);
+
+}
+
+quizResult.appendChild(card);
+
+});
+
+
+/*
+   Submit button
+*/
+
+const submitBox=
+document.createElement("div");
+
+submitBox.className=
+"submit-box";
+
+const submitButton=
+document.createElement("button");
+
+submitButton.type="button";
+
+submitButton.className=
+"submit-button";
+
+submitButton.textContent=
+"✅ Submit Quiz";
+
+submitButton.onclick=
+submitQuiz;
+
+submitBox.appendChild(
+submitButton
+);
+
+quizResult.appendChild(
+submitBox
+);
+
+}
+
+
+/* =========================================
+   NORMALIZE ANSWER
+========================================= */
+
+function normalizeAnswer(text){
+
+return String(text || "")
+.toLowerCase()
+.replace(
+/[^\p{L}\p{N}\s'-]+/gu,
+" "
+)
+.replace(/\s+/g," ")
+.trim();
+
+}
+
+
+/* =========================================
+   CHECK Q&A ANSWER
+========================================= */
+
+function checkQAAnswer(
+userAnswer,
+correctAnswer
+){
+
+const user=
+normalizeAnswer(userAnswer);
+
+const correct=
+normalizeAnswer(correctAnswer);
+
+if(!user || !correct){
+
+return false;
+
+}
+
+
+/*
+   Split into words.
+*/
+
+const correctWords=
+correct
+.split(/\s+/)
+.filter(word=>word.length>=3);
+
+const userWords=
+new Set(
+user
+.split(/\s+/)
+.filter(word=>word.length>=3)
+);
+
+
+/*
+   If the exact answer is included,
+   count it as correct.
+*/
+
+if(
+user.includes(correct)
+){
+
+return true;
+
+}
+
+
+/*
+   Keyword matching.
+   At least 40% of important words
+   from the correct answer should
+   appear in the student's answer.
+*/
+
+let matched=0;
+
+correctWords.forEach(word=>{
+
+if(userWords.has(word)){
+
+matched++;
+
+}
+
+});
+
+
+if(correctWords.length===0){
+
+return false;
+
+}
+
+const percentage=
+matched/correctWords.length;
+
+return percentage>=0.4;
+
+}
+
+
+/* =========================================
+   SUBMIT QUIZ
+========================================= */
+
+function submitQuiz(){
+
+if(quizSubmitted){
+
+return;
+
+}
+
+if(
+!currentQuizQuestions ||
+currentQuizQuestions.length===0
+){
+
+return;
+
+}
+
+quizSubmitted=true;
+
+
+let correctCount=0;
+
+const results=[];
+
+
+currentQuizQuestions.forEach(
+(question,index)=>{
+
+let userAnswer="";
+
+let isCorrect=false;
+
+
+/* MCQ */
+
+if(currentQuizType==="mcq"){
+
+const selected=
+document.querySelector(
+'input[name="question_'+
+index+
+'"]:checked'
+);
+
+if(selected){
+
+userAnswer=
+selected.value;
+
+isCorrect=
+selected.value===
+question.answer;
+
+}
+else{
+
+userAnswer=
+"No answer";
+
+isCorrect=false;
+
+}
+
+}
+
+
+/* Q&A */
+
+else{
+
+const answerInput=
+document.querySelectorAll(
+".qa-answer-input"
+)[index];
+
+if(answerInput){
+
+userAnswer=
+answerInput.value.trim();
+
+}
+
+isCorrect=
+checkQAAnswer(
+userAnswer,
+question.answer
+);
+
+if(!userAnswer){
+
+userAnswer=
+"No answer";
+
+}
+
+}
+
+
+/* Count */
+
+if(isCorrect){
+
+correctCount++;
+
+}
+
+
+/* Save result */
+
+results.push({
+
+questionNumber:index+1,
+
+question:question.question,
+
+userAnswer:userAnswer,
+
+correctAnswer:question.answer,
+
+correct:isCorrect
+
+});
+
+});
+
+
+const total=
+currentQuizQuestions.length;
+
+const wrongCount=
+total-correctCount;
+
+const percentage=
+Math.round(
+(correctCount/total)*100
+);
+
+
+/*
+   Motivation message
+*/
+
+let message="";
+let messageClass="";
+
+if(percentage>=90){
+
+message=
+"🌟 Excellent! Amazing work!";
+
+messageClass=
+"result-good";
+
+}
+else if(percentage>=70){
+
+message=
+"🎉 Great job! Keep it up!";
+
+messageClass=
+"result-good";
+
+}
+else if(percentage>=50){
+
+message=
+"💪 Good effort! You can improve!";
+
+messageClass=
+"result-good";
+
+}
+else{
+
+message=
+"📚 Keep studying and try again!";
+
+messageClass=
+"result-bad";
+
+}
+
+
+/*
+   Results screen
+*/
+
+quizResult.innerHTML="";
+
+
+const resultBox=
+document.createElement("div");
+
+resultBox.className=
+"quiz-final-result";
+
+
+const title=
+document.createElement("h2");
+
+title.textContent=
+"🏆 Quiz Result";
+
+resultBox.appendChild(title);
+
+
+const score=
+document.createElement("div");
+
+score.className=
+"final-score";
+
+score.textContent=
+"Score: "+
+correctCount+
+" / "+
+total;
+
+resultBox.appendChild(score);
+
+
+const percent=
+document.createElement("div");
+
+percent.className=
+"final-percentage";
+
+percent.textContent=
+percentage+"%";
+
+resultBox.appendChild(percent);
+
+
+const summary=
+document.createElement("p");
+
+summary.innerHTML=
+"✅ Correct: <b>"+
+correctCount+
+"</b><br>"+
+"❌ Wrong: <b>"+
+wrongCount+
+"</b>";
+
+resultBox.appendChild(summary);
+
+
+const motivation=
+document.createElement("p");
+
+motivation.className=
+messageClass;
+
+motivation.textContent=
+message;
+
+resultBox.appendChild(motivation);
+
+
+/*
+   Detailed answers
+*/
+
+const detailsTitle=
+document.createElement("h3");
+
+detailsTitle.textContent=
+"📖 Answer Review";
+
+resultBox.appendChild(
+detailsTitle
+);
+
+
+results.forEach(result=>{
+
+const item=
+document.createElement("div");
+
+item.className=
+"result-item "+
+(
+result.correct
+?"result-correct"
+:"result-wrong"
+);
+
+
+const questionTitle=
+document.createElement("b");
+
+questionTitle.textContent=
+result.questionNumber+
+". "+
+result.question;
+
+item.appendChild(
+questionTitle
+);
+
+
+const yourAnswer=
+document.createElement("div");
+
+yourAnswer.className=
+"your-answer";
+
+yourAnswer.innerHTML=
+"📝 Your answer: <b>"+
+escapeHTML(result.userAnswer)+
+"</b>";
+
+item.appendChild(
+yourAnswer
+);
+
+
+if(result.correct){
+
+const correctStatus=
+document.createElement("div");
+
+correctStatus.className=
+"result-good";
+
+correctStatus.textContent=
+"✅ Correct";
+
+item.appendChild(
+correctStatus
+);
+
+}
+else{
+
+const wrongStatus=
+document.createElement("div");
+
+wrongStatus.className=
+"result-bad";
+
+wrongStatus.textContent=
+"❌ Incorrect";
+
+item.appendChild(
+wrongStatus
+);
+
+
+const correctAnswer=
+document.createElement("div");
+
+correctAnswer.className=
+"correct-answer";
+
+correctAnswer.innerHTML=
+"📖 Correct answer: <b>"+
+escapeHTML(result.correctAnswer)+
+"</b>";
+
+item.appendChild(
+correctAnswer
+);
+
+}
+
+resultBox.appendChild(item);
+
+});
+
+
+/*
+   Generate another quiz
+*/
+
+const anotherButton=
+document.createElement("button");
+
+anotherButton.type="button";
+
+anotherButton.textContent=
+"🔄 Generate Another Quiz";
+
+anotherButton.onclick=
+generateQuiz;
+
+resultBox.appendChild(
+anotherButton
+);
+
+
+quizResult.appendChild(
+resultBox
+);
+
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHTML(text){
+
+return String(text || "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+</script>
+
+</body>
+</html>
+```
+
