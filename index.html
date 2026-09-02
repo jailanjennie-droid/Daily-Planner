@@ -1,1 +1,3156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Planner</title>
 
+<style>
+*{box-sizing:border-box}
+
+body{
+font-family:Arial,sans-serif;
+text-align:center;
+background:linear-gradient(135deg,#ffd6e7,#e6d6ff);
+min-height:100vh;
+margin:0;
+padding:30px 15px;
+transition:.3s;
+color:#333
+}
+
+body.dark{
+background:linear-gradient(135deg,#1e1b2e,#302040);
+color:white
+}
+
+body.blue{background:linear-gradient(135deg,#dff4ff,#d9e4ff)}
+body.green{background:linear-gradient(135deg,#dcfce7,#d1fae5)}
+body.peach{background:linear-gradient(135deg,#ffe5d0,#ffd6d6)}
+
+.planner{
+background:white;
+max-width:650px;
+margin:auto;
+padding:30px;
+border-radius:25px;
+box-shadow:0 10px 30px #0002
+}
+
+body.dark .planner{
+background:#242033;
+color:white
+}
+
+h1{color:#8e44ad}
+h2{color:#6c3483}
+h3{color:#8e44ad}
+
+body.dark h2,
+body.dark h3{
+color:#e0aaff
+}
+
+p{
+color:#666;
+font-size:18px
+}
+
+body.dark p{color:#ccc}
+
+button{
+background:#8e44ad;
+color:white;
+border:0;
+padding:12px 20px;
+border-radius:15px;
+font-size:16px;
+cursor:pointer;
+margin:7px;
+transition:.2s
+}
+
+button:hover{
+background:#6c3483;
+transform:scale(1.03)
+}
+
+button:disabled{
+opacity:.5;
+cursor:not-allowed;
+transform:none
+}
+
+#app{display:none}
+
+.top{
+display:flex;
+justify-content:flex-end;
+position:relative
+}
+
+.dots{
+background:transparent;
+color:#8e44ad;
+font-size:30px;
+padding:0 10px;
+margin:0
+}
+
+.dots:hover{
+background:#f3e5f5;
+transform:none
+}
+
+body.dark .dots{color:#e0aaff}
+
+.menu{
+display:none;
+position:absolute;
+right:0;
+top:42px;
+background:white;
+width:220px;
+padding:8px;
+border-radius:15px;
+box-shadow:0 8px 25px #0003;
+z-index:100
+}
+
+.menu.show{display:block}
+
+body.dark .menu{background:#302b43}
+
+.menu button{
+display:block;
+width:100%;
+margin:0;
+background:transparent;
+color:#6c3483;
+text-align:left
+}
+
+.menu button:hover{
+background:#f3e5f5;
+transform:none
+}
+
+body.dark .menu button{color:#f0d9ff}
+body.dark .menu button:hover{background:#40394f}
+
+.theme-title{
+font-weight:bold;
+padding:10px 8px;
+color:#8e44ad
+}
+
+.theme-buttons{
+display:flex;
+gap:5px;
+flex-wrap:wrap
+}
+
+.theme-buttons button{
+font-size:13px;
+padding:8px 10px;
+margin:2px
+}
+
+.page{
+display:none;
+animation:fade .3s ease
+}
+
+.page.active{display:block}
+
+.task{
+display:flex;
+align-items:center;
+gap:10px;
+background:#f8eaf4;
+margin:10px 0;
+padding:13px;
+border-radius:12px;
+text-align:left;
+font-size:17px
+}
+
+body.dark .task{background:#342d46}
+
+.task input[type="checkbox"]{
+width:20px;
+height:20px;
+cursor:pointer;
+accent-color:#8e44ad;
+flex-shrink:0
+}
+
+.task span{
+flex:1;
+word-break:break-word
+}
+
+.task input:checked+span{
+text-decoration:line-through;
+opacity:.5
+}
+
+.task-time{
+color:#8e44ad;
+font-size:14px;
+font-weight:bold;
+white-space:nowrap
+}
+
+body.dark .task-time{color:#e0aaff}
+
+.priority{
+font-size:12px;
+font-weight:bold;
+padding:5px 8px;
+border-radius:8px;
+white-space:nowrap
+}
+
+.priority-low{
+background:#d5f5e3;
+color:#1e8449
+}
+
+.priority-medium{
+background:#fcf3cf;
+color:#9a7d0a
+}
+
+.priority-high{
+background:#fadbd8;
+color:#c0392b
+}
+
+body.dark .priority-low{
+background:#214d35;
+color:#8ff0b2
+}
+
+body.dark .priority-medium{
+background:#574d22;
+color:#ffe98a
+}
+
+body.dark .priority-high{
+background:#592b2b;
+color:#ffaaa5
+}
+
+.add{
+margin:25px 0;
+display:flex;
+justify-content:center;
+gap:8px;
+flex-wrap:wrap
+}
+
+.add input,
+.add select{
+padding:12px;
+border:2px solid #e6d6ff;
+border-radius:12px;
+font-size:16px;
+outline:none
+}
+
+.add input[type="text"]{width:40%}
+.add input[type="time"]{width:120px}
+
+.add select{
+width:130px;
+background:white
+}
+
+.add input:focus,
+.add select:focus{
+border-color:#8e44ad;
+box-shadow:0 0 5px #8e44ad55
+}
+
+body.dark .add input,
+body.dark .add select{
+background:#302b43;
+color:white;
+border-color:#6c3483
+}
+
+body.dark .add input::placeholder{
+color:#bbb
+}
+
+.delete{
+background:#ff7675;
+padding:7px 10px;
+margin:0
+}
+
+.delete:hover{background:#d63031}
+
+.nav{
+display:flex;
+justify-content:space-between;
+margin-top:25px
+}
+
+.nav button{
+background:linear-gradient(135deg,#8e44ad,#e84393)
+}
+
+.report{
+background:#f8eaf4;
+padding:20px;
+border-radius:18px;
+margin-top:20px;
+text-align:left
+}
+
+body.dark .report{background:#342d46}
+
+.item{
+padding:13px;
+margin:8px 0;
+background:white;
+border-radius:12px
+}
+
+body.dark .item{background:#242033}
+
+.date{
+margin:15px 0 25px
+}
+
+.date input{
+padding:10px;
+border:2px solid #e6d6ff;
+border-radius:10px;
+font-size:16px
+}
+
+body.dark .date input{
+background:#302b43;
+color:white;
+border-color:#6c3483
+}
+
+.notes-box{
+margin:25px 0;
+text-align:left
+}
+
+.notes-box label{
+display:block;
+font-weight:bold;
+color:#8e44ad;
+margin-bottom:8px
+}
+
+.notes-box textarea{
+width:100%;
+min-height:110px;
+padding:12px;
+border:2px solid #e6d6ff;
+border-radius:12px;
+font-family:Arial,sans-serif;
+font-size:16px;
+resize:vertical;
+outline:none
+}
+
+body.dark .notes-box textarea{
+background:#302b43;
+color:white;
+border-color:#6c3483
+}
+
+body.dark .notes-box textarea::placeholder{
+color:#bbb
+}
+
+.progress{margin:25px 0}
+
+.bar{
+height:20px;
+background:#eee;
+border-radius:15px;
+overflow:hidden
+}
+
+body.dark .bar{background:#40394f}
+
+.fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#8e44ad,#e84393);
+transition:.4s
+}
+
+.streak{
+background:#fff3cd;
+color:#856404;
+padding:15px;
+border-radius:15px;
+margin-top:15px;
+font-weight:bold
+}
+
+body.dark .streak{
+background:#493d28;
+color:#ffd86b
+}
+
+#done{
+display:none;
+margin-top:15px
+}
+
+#message{
+display:none;
+color:#8e44ad;
+font-size:22px;
+font-weight:bold;
+margin:20px
+}
+
+body.dark #message{color:#e0aaff}
+
+
+/* ================= ACHIEVEMENTS ================= */
+
+.achievements{
+margin-top:25px;
+text-align:left
+}
+
+.achievements-title{
+font-size:22px;
+font-weight:bold;
+color:#8e44ad;
+margin-bottom:12px;
+text-align:center
+}
+
+body.dark .achievements-title{
+color:#e0aaff
+}
+
+.achievement-count{
+text-align:center;
+font-size:14px;
+color:#777;
+margin-bottom:15px
+}
+
+body.dark .achievement-count{
+color:#ccc
+}
+
+.achievement-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px
+}
+
+.achievement{
+background:white;
+border:2px solid #eee;
+padding:15px;
+border-radius:16px;
+display:flex;
+align-items:center;
+gap:12px;
+transition:.25s
+}
+
+body.dark .achievement{
+background:#242033;
+border-color:#40394f
+}
+
+.achievement.unlocked{
+border-color:#8e44ad;
+box-shadow:0 5px 15px #8e44ad22
+}
+
+.achievement.locked{
+opacity:.55;
+filter:grayscale(.6)
+}
+
+.achievement-icon{
+font-size:35px;
+width:45px;
+text-align:center
+}
+
+.achievement-name{
+font-weight:bold;
+font-size:16px;
+color:#6c3483
+}
+
+body.dark .achievement-name{
+color:#e0aaff
+}
+
+.achievement-description{
+font-size:13px;
+color:#666;
+margin-top:4px
+}
+
+body.dark .achievement-description{
+color:#ccc
+}
+
+.achievement-status{
+font-size:12px;
+font-weight:bold;
+margin-top:5px
+}
+
+.achievement.unlocked .achievement-status{
+color:#27ae60
+}
+
+.achievement.locked .achievement-status{
+color:#888
+}
+
+
+/* ================= FOCUS CENTER ================= */
+
+.focus-box{
+background:#f8eaf4;
+padding:25px;
+border-radius:20px;
+margin-top:20px
+}
+
+body.dark .focus-box{
+background:#342d46
+}
+
+.focus-title{
+font-size:26px;
+font-weight:bold;
+color:#8e44ad;
+margin-bottom:8px
+}
+
+body.dark .focus-title{
+color:#e0aaff
+}
+
+.focus-subtitle{
+font-size:15px;
+color:#666;
+margin-bottom:20px
+}
+
+body.dark .focus-subtitle{
+color:#ccc
+}
+
+.focus-controls{
+display:flex;
+justify-content:center;
+gap:10px;
+flex-wrap:wrap;
+margin:20px 0
+}
+
+.focus-controls select,
+.focus-controls input{
+padding:11px;
+border:2px solid #e6d6ff;
+border-radius:12px;
+font-size:15px;
+outline:none
+}
+
+body.dark .focus-controls select,
+body.dark .focus-controls input{
+background:#302b43;
+color:white;
+border-color:#6c3483
+}
+
+.timer{
+font-size:64px;
+font-weight:bold;
+color:#8e44ad;
+margin:20px 0
+}
+
+body.dark .timer{
+color:#e0aaff
+}
+
+.timer-buttons{
+display:flex;
+justify-content:center;
+gap:8px;
+flex-wrap:wrap
+}
+
+.timer-buttons button{
+min-width:100px
+}
+
+.focus-stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin-top:25px
+}
+
+.focus-stat{
+background:white;
+padding:15px;
+border-radius:15px
+}
+
+body.dark .focus-stat{
+background:#242033
+}
+
+.focus-stat-number{
+font-size:25px;
+font-weight:bold;
+color:#8e44ad
+}
+
+body.dark .focus-stat-number{
+color:#e0aaff
+}
+
+.focus-stat-label{
+font-size:12px;
+color:#666;
+margin-top:4px
+}
+
+body.dark .focus-stat-label{
+color:#ccc
+}
+
+.goal-box{
+margin-top:20px;
+background:white;
+padding:18px;
+border-radius:15px;
+text-align:left
+}
+
+body.dark .goal-box{
+background:#242033
+}
+
+.goal-title{
+font-weight:bold;
+color:#8e44ad;
+margin-bottom:8px
+}
+
+body.dark .goal-title{
+color:#e0aaff
+}
+
+.goal-progress{
+height:14px;
+background:#eee;
+border-radius:10px;
+overflow:hidden;
+margin-top:10px
+}
+
+body.dark .goal-progress{
+background:#40394f
+}
+
+.goal-fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#8e44ad,#e84393);
+transition:.4s
+}
+
+.focus-message{
+display:none;
+font-weight:bold;
+color:#27ae60;
+margin-top:15px
+}
+
+.study-log{
+margin-top:20px;
+text-align:left
+}
+
+.study-log h3{
+text-align:center
+}
+
+.log-item{
+background:white;
+padding:12px;
+border-radius:12px;
+margin:8px 0;
+font-size:14px
+}
+
+body.dark .log-item{
+background:#242033
+}
+
+.empty-log{
+color:#777;
+text-align:center;
+font-size:14px
+}
+
+body.dark .empty-log{
+color:#bbb
+}
+
+
+/* ================= ANIMATION ================= */
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(5px)
+}
+to{
+opacity:1;
+transform:translateY(0)
+}
+}
+
+
+/* ================= MOBILE ================= */
+
+@media(max-width:500px){
+
+body{
+padding:15px 8px
+}
+
+.planner{
+padding:20px 15px;
+border-radius:18px
+}
+
+.task{
+font-size:15px;
+gap:7px;
+padding:11px
+}
+
+.task-time{
+font-size:12px
+}
+
+.priority{
+font-size:10px;
+padding:4px 6px
+}
+
+.add input[type="text"]{
+width:100%
+}
+
+.add input[type="time"],
+.add select{
+width:46%
+}
+
+.achievement-grid{
+grid-template-columns:1fr
+}
+
+.focus-stats{
+grid-template-columns:1fr
+}
+
+.timer{
+font-size:50px
+}
+
+.nav{
+gap:5px
+}
+
+.nav button{
+font-size:14px;
+padding:10px 12px
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= WELCOME ================= -->
+
+<div class="planner" id="welcome">
+
+<div class="top">
+
+<button class="dots" onclick="toggleMenu()">⋮</button>
+
+<div class="menu" id="menu">
+
+<button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+
+<div class="theme-title">🎨 Theme</div>
+
+<div class="theme-buttons">
+<button onclick="setTheme('purple')">Purple</button>
+<button onclick="setTheme('blue')">Blue</button>
+<button onclick="setTheme('green')">Green</button>
+<button onclick="setTheme('peach')">Peach</button>
+</div>
+
+</div>
+</div>
+
+<h1>📅 My Daily Planner</h1>
+
+<p>Plan your day, stay organized, and reach your goals.</p>
+
+<button onclick="startPlanner()">Start Planner</button>
+
+</div>
+
+
+<!-- ================= APP ================= -->
+
+<div class="planner" id="app">
+
+<div class="top">
+
+<button class="dots" onclick="toggleMenu()">⋮</button>
+
+<div class="menu" id="menuApp">
+
+<button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+
+<div class="theme-title">🎨 Theme</div>
+
+<div class="theme-buttons">
+<button onclick="setTheme('purple')">Purple</button>
+<button onclick="setTheme('blue')">Blue</button>
+<button onclick="setTheme('green')">Green</button>
+<button onclick="setTheme('peach')">Peach</button>
+</div>
+
+<button onclick="showPage(4)">📊 Daily Report</button>
+<button onclick="showPage(5)">🎯 Focus Center</button>
+
+</div>
+</div>
+
+
+<!-- ================= PAGE 0 ================= -->
+
+<div class="page active" id="page0">
+
+<h2>🌅 Morning Plan</h2>
+
+<div class="date">
+<input type="date" id="dateInput">
+</div>
+
+<div id="tasks0"></div>
+
+<div class="add">
+
+<input type="text" id="customInput0" placeholder="Add a task...">
+
+<input type="time" id="customTime0">
+
+<select id="customPriority0">
+<option value="Low">Low</option>
+<option value="Medium" selected>Medium</option>
+<option value="High">High</option>
+</select>
+
+<button onclick="addCustomTask(0)">Add</button>
+
+</div>
+
+<div class="nav">
+<button onclick="showPage(1)">Afternoon →</button>
+</div>
+
+</div>
+
+
+<!-- ================= PAGE 1 ================= -->
+
+<div class="page" id="page1">
+
+<h2>☀️ Afternoon Plan</h2>
+
+<div class="date">
+<input type="date" id="dateInput2">
+</div>
+
+<div id="tasks1"></div>
+
+<div class="add">
+
+<input type="text" id="customInput1" placeholder="Add a task...">
+
+<input type="time" id="customTime1">
+
+<select id="customPriority1">
+<option value="Low">Low</option>
+<option value="Medium" selected>Medium</option>
+<option value="High">High</option>
+</select>
+
+<button onclick="addCustomTask(1)">Add</button>
+
+</div>
+
+<div class="nav">
+<button onclick="showPage(0)">← Morning</button>
+<button onclick="showPage(2)">Evening →</button>
+</div>
+
+</div>
+
+
+<!-- ================= PAGE 2 ================= -->
+
+<div class="page" id="page2">
+
+<h2>🌆 Evening Plan</h2>
+
+<div class="date">
+<input type="date" id="dateInput3">
+</div>
+
+<div id="tasks2"></div>
+
+<div class="add">
+
+<input type="text" id="customInput2" placeholder="Add a task...">
+
+<input type="time" id="customTime2">
+
+<select id="customPriority2">
+<option value="Low">Low</option>
+<option value="Medium" selected>Medium</option>
+<option value="High">High</option>
+</select>
+
+<button onclick="addCustomTask(2)">Add</button>
+
+</div>
+
+<div class="nav">
+<button onclick="showPage(1)">← Afternoon</button>
+<button onclick="showPage(3)">Night →</button>
+</div>
+
+</div>
+
+
+<!-- ================= PAGE 3 ================= -->
+
+<div class="page" id="page3">
+
+<h2>🌙 Night Plan</h2>
+
+<div class="date">
+<input type="date" id="dateInput4">
+</div>
+
+<div id="tasks3"></div>
+
+<div class="add">
+
+<input type="text" id="customInput3" placeholder="Add a task...">
+
+<input type="time" id="customTime3">
+
+<select id="customPriority3">
+<option value="Low">Low</option>
+<option value="Medium" selected>Medium</option>
+<option value="High">High</option>
+</select>
+
+<button onclick="addCustomTask(3)">Add</button>
+
+</div>
+
+<div class="nav">
+<button onclick="showPage(2)">← Evening</button>
+<button onclick="showPage(4)">Daily Report →</button>
+</div>
+
+</div>
+
+
+<!-- ================= PAGE 4 DAILY REPORT ================= -->
+
+<div class="page" id="page4">
+
+<h2>📊 Daily Report</h2>
+
+<div class="date">
+<input type="date" id="dateInput5">
+</div>
+
+<div class="report">
+
+<div class="item">
+<strong>Total Tasks:</strong>
+<span id="totalTasks">0</span>
+</div>
+
+<div class="item">
+<strong>Completed:</strong>
+<span id="completedTasks">0</span>
+</div>
+
+<div class="item">
+<strong>Remaining:</strong>
+<span id="remainingTasks">0</span>
+</div>
+
+<div class="progress">
+
+<strong>Daily Progress</strong>
+
+<div class="bar">
+<div class="fill" id="progressFill"></div>
+</div>
+
+<p id="progressText">0%</p>
+
+</div>
+
+<div class="streak">
+🔥 Current Streak: <span id="streakCount">0</span> day(s)
+</div>
+
+<button onclick="finishDay()">Finish Day</button>
+
+<div id="done">
+<strong>🎉 Great job! You finished your day!</strong>
+</div>
+
+</div>
+
+
+<!-- DAILY NOTES -->
+
+<div class="notes-box">
+
+<label for="dailyNotes">📝 Daily Notes</label>
+
+<textarea
+id="dailyNotes"
+placeholder="Write your thoughts, plans, reminders, or notes for today..."
+></textarea>
+
+</div>
+
+
+<!-- ACHIEVEMENTS -->
+
+<div class="achievements">
+
+<div class="achievements-title">
+🏆 Achievements
+</div>
+
+<div class="achievement-count" id="achievementCount">
+0 / 5 unlocked
+</div>
+
+<div class="achievement-grid" id="achievementGrid"></div>
+
+</div>
+
+
+<div class="nav">
+<button onclick="showPage(3)">← Night</button>
+<button onclick="showPage(5)">Focus Center →</button>
+</div>
+
+</div>
+
+
+<!-- ================= PAGE 5 FOCUS CENTER ================= -->
+
+<div class="page" id="page5">
+
+<h2>🎯 Study Focus Center</h2>
+
+<div class="focus-box">
+
+<div class="focus-title">Focus Time</div>
+
+<div class="focus-subtitle">
+Choose a subject and focus without distractions.
+</div>
+
+
+<div class="focus-controls">
+
+<select id="subjectSelect">
+
+<option>English</option>
+<option>Math</option>
+<option>Arabic</option>
+<option>Science</option>
+<option>Kurdish</option>
+<option>History</option>
+<option>Computer</option>
+<option>Religious Education</option>
+<option>Other</option>
+
+</select>
+
+
+<select id="durationSelect">
+
+<option value="5">5 minutes</option>
+<option value="10">10 minutes</option>
+<option value="15">15 minutes</option>
+<option value="20">20 minutes</option>
+<option value="25" selected>25 minutes</option>
+<option value="30">30 minutes</option>
+<option value="45">45 minutes</option>
+<option value="60">60 minutes</option>
+
+</select>
+
+</div>
+
+
+<div class="timer" id="timerDisplay">
+25:00
+</div>
+
+
+<div class="timer-buttons">
+
+<button id="startTimerBtn" onclick="startTimer()">▶ Start</button>
+
+<button id="pauseTimerBtn" onclick="pauseTimer()" disabled>
+⏸ Pause
+</button>
+
+<button onclick="resetTimer()">↻ Reset</button>
+
+</div>
+
+
+<div class="focus-message" id="focusMessage">
+🎉 Focus session completed!
+</div>
+
+
+<div class="focus-stats">
+
+<div class="focus-stat">
+
+<div class="focus-stat-number" id="sessionCount">
+0
+</div>
+
+<div class="focus-stat-label">
+Sessions Today
+</div>
+
+</div>
+
+
+<div class="focus-stat">
+
+<div class="focus-stat-number" id="studyMinutes">
+0
+</div>
+
+<div class="focus-stat-label">
+Study Minutes
+</div>
+
+</div>
+
+
+<div class="focus-stat">
+
+<div class="focus-stat-number" id="dailyGoalDisplay">
+60
+</div>
+
+<div class="focus-stat-label">
+Daily Goal
+</div>
+
+</div>
+
+</div>
+
+
+<div class="goal-box">
+
+<div class="goal-title">
+🎯 Daily Study Goal
+</div>
+
+<label>
+Goal in minutes:
+</label>
+
+<input
+type="number"
+id="dailyGoalInput"
+min="1"
+max="600"
+value="60"
+style="width:100%;margin-top:8px;padding:10px;border:2px solid #e6d6ff;border-radius:10px;font-size:16px"
+>
+
+<div class="goal-progress">
+
+<div class="goal-fill" id="goalFill"></div>
+
+</div>
+
+<p id="goalText" style="font-size:14px">
+0 / 60 minutes
+</p>
+
+</div>
+
+
+<div class="study-log">
+
+<h3>📚 Study Log</h3>
+
+<div id="studyLog"></div>
+
+</div>
+
+</div>
+
+
+<div class="nav">
+
+<button onclick="showPage(4)">← Daily Report</button>
+
+<button onclick="showPage(0)">Morning →</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DAILY PLANNER DATA
+========================================================= */
+
+const plans = [
+
+[
+"Wake up",
+"Make my bed",
+"Pray",
+"Important meeting",
+"Breakfast",
+"Skincare",
+"Review homework",
+"Wear uniform",
+"Go to school"
+],
+
+[
+"Change your clothes",
+"Wash your face",
+"Eat lunch",
+"Check your school schedule for the next day",
+"Pray",
+"Iron your uniform",
+"Study",
+"Rest"
+],
+
+[
+"Review",
+"Pray",
+"Dinner"
+],
+
+[
+"Game",
+"Review",
+"Pray",
+"Night routine",
+"Get ready for bed"
+]
+
+];
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let selectedDate = "";
+
+let customTasks = {
+0:[],
+1:[],
+2:[],
+3:[]
+};
+
+let timerInterval = null;
+let timerSeconds = 25 * 60;
+let timerRunning = false;
+let timerMode = "focus";
+
+let studySessions = [];
+
+let dailyGoal = 60;
+
+
+/* =========================================================
+   ACHIEVEMENTS
+========================================================= */
+
+let achievements = {
+
+firstStep:false,
+streak3:false,
+studyMaster:false,
+goalGetter:false,
+superProductive:false
+
+};
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+function getToday(){
+
+const date = new Date();
+
+const year = date.getFullYear();
+
+const month = String(date.getMonth()+1).padStart(2,"0");
+
+const day = String(date.getDate()).padStart(2,"0");
+
+return `${year}-${month}-${day}`;
+
+}
+
+
+/* =========================================================
+   STORAGE KEYS
+========================================================= */
+
+function storageKey(){
+
+return "dailyPlanner_" + selectedDate;
+
+}
+
+function focusStorageKey(){
+
+return "dailyPlannerFocus_" + selectedDate;
+
+}
+
+function achievementStorageKey(){
+
+return "dailyPlannerAchievements";
+
+}
+
+
+/* =========================================================
+   SAVE / LOAD ACHIEVEMENTS
+========================================================= */
+
+function saveAchievements(){
+
+localStorage.setItem(
+achievementStorageKey(),
+JSON.stringify(achievements)
+);
+
+}
+
+
+function loadAchievements(){
+
+const saved = localStorage.getItem(
+achievementStorageKey()
+);
+
+if(saved){
+
+try{
+
+achievements = {
+...achievements,
+...JSON.parse(saved)
+};
+
+}catch(error){
+
+console.error(
+"Could not load achievements:",
+error
+);
+
+}
+
+}
+
+}
+
+
+/* =========================================================
+   SAVE / LOAD FOCUS DATA
+========================================================= */
+
+function saveFocusData(){
+
+const data = {
+
+sessions:studySessions,
+
+dailyGoal:dailyGoal
+
+};
+
+localStorage.setItem(
+focusStorageKey(),
+JSON.stringify(data)
+);
+
+}
+
+
+function loadFocusData(){
+
+const saved = localStorage.getItem(
+focusStorageKey()
+);
+
+if(saved){
+
+try{
+
+const data = JSON.parse(saved);
+
+studySessions =
+Array.isArray(data.sessions)
+? data.sessions
+: [];
+
+dailyGoal =
+Number(data.dailyGoal) > 0
+? Number(data.dailyGoal)
+: 60;
+
+}catch(error){
+
+studySessions = [];
+dailyGoal = 60;
+
+}
+
+}else{
+
+studySessions = [];
+dailyGoal = 60;
+
+}
+
+}
+
+
+/* =========================================================
+   START PLANNER
+========================================================= */
+
+function startPlanner(){
+
+document.getElementById("welcome").style.display="none";
+
+document.getElementById("app").style.display="block";
+
+selectedDate =
+document.getElementById("dateInput").value ||
+getToday();
+
+setAllDates(selectedDate);
+
+loadData();
+
+loadFocusData();
+
+loadAchievements();
+
+renderAll();
+
+renderFocus();
+
+resetTimer();
+
+closeMenus();
+
+}
+
+
+/* =========================================================
+   DATE INPUTS
+========================================================= */
+
+function setAllDates(date){
+
+document.getElementById("dateInput").value = date;
+document.getElementById("dateInput2").value = date;
+document.getElementById("dateInput3").value = date;
+document.getElementById("dateInput4").value = date;
+document.getElementById("dateInput5").value = date;
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(pageNumber){
+
+document.querySelectorAll(".page").forEach(
+page => page.classList.remove("active")
+);
+
+const page =
+document.getElementById("page"+pageNumber);
+
+if(page){
+
+page.classList.add("active");
+
+}
+
+closeMenus();
+
+}
+
+
+/* =========================================================
+   MENU
+========================================================= */
+
+function toggleMenu(){
+
+const menu1 =
+document.getElementById("menu");
+
+const menu2 =
+document.getElementById("menuApp");
+
+if(document.getElementById("app").style.display==="block"){
+
+menu2.classList.toggle("show");
+
+}else{
+
+menu1.classList.toggle("show");
+
+}
+
+}
+
+
+function closeMenus(){
+
+document
+.querySelectorAll(".menu")
+.forEach(menu =>
+menu.classList.remove("show")
+);
+
+}
+
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+function toggleDarkMode(){
+
+document.body.classList.toggle("dark");
+
+localStorage.setItem(
+"dailyPlannerDark",
+document.body.classList.contains("dark")
+);
+
+closeMenus();
+
+}
+
+
+/* =========================================================
+   THEMES
+========================================================= */
+
+function setTheme(theme){
+
+document.body.classList.remove(
+"blue",
+"green",
+"peach"
+);
+
+if(theme !== "purple"){
+
+document.body.classList.add(theme);
+
+}
+
+localStorage.setItem(
+"dailyPlannerTheme",
+theme
+);
+
+closeMenus();
+
+}
+
+
+function loadTheme(){
+
+const dark =
+localStorage.getItem("dailyPlannerDark");
+
+if(dark === "true"){
+
+document.body.classList.add("dark");
+
+}
+
+const theme =
+localStorage.getItem("dailyPlannerTheme");
+
+if(theme && theme !== "purple"){
+
+document.body.classList.add(theme);
+
+}
+
+}
+
+
+/* =========================================================
+   DATA STORAGE
+========================================================= */
+
+function loadData(){
+
+const saved =
+localStorage.getItem(storageKey());
+
+if(saved){
+
+try{
+
+const data = JSON.parse(saved);
+
+customTasks = data.customTasks || {
+0:[],
+1:[],
+2:[],
+3:[]
+};
+
+if(data.notes !== undefined){
+
+document.getElementById("dailyNotes").value =
+data.notes || "";
+
+}else{
+
+document.getElementById("dailyNotes").value = "";
+
+}
+
+}catch(error){
+
+customTasks = {
+0:[],
+1:[],
+2:[],
+3:[]
+};
+
+document.getElementById("dailyNotes").value = "";
+
+}
+
+}else{
+
+customTasks = {
+0:[],
+1:[],
+2:[],
+3:[]
+};
+
+document.getElementById("dailyNotes").value = "";
+
+}
+
+}
+
+
+function saveData(){
+
+const data = {
+
+customTasks:customTasks,
+
+notes:document.getElementById("dailyNotes").value
+
+};
+
+localStorage.setItem(
+storageKey(),
+JSON.stringify(data)
+);
+
+}
+
+
+/* =========================================================
+   RENDER PLANNER
+========================================================= */
+
+function renderPlan(index){
+
+const container =
+document.getElementById("tasks"+index);
+
+container.innerHTML = "";
+
+plans[index].forEach(
+(taskName, taskIndex) => {
+
+const key =
+"plan_" + index + "_" + taskIndex;
+
+const saved =
+getTaskState(key);
+
+const row =
+document.createElement("div");
+
+row.className = "task";
+
+const checkbox =
+document.createElement("input");
+
+checkbox.type = "checkbox";
+
+checkbox.checked =
+saved.completed || false;
+
+checkbox.addEventListener(
+"change",
+function(){
+
+setTaskState(
+key,
+{
+completed:this.checked
+}
+);
+
+renderAll();
+
+}
+);
+
+const span =
+document.createElement("span");
+
+span.textContent =
+taskName;
+
+row.appendChild(checkbox);
+row.appendChild(span);
+
+container.appendChild(row);
+
+}
+);
+
+renderCustomTasks(index);
+
+}
+
+
+/* =========================================================
+   TASK STATE
+========================================================= */
+
+function getTaskState(key){
+
+const allStates =
+JSON.parse(
+localStorage.getItem(
+"dailyPlannerTaskStates_"+selectedDate
+) || "{}"
+);
+
+return allStates[key] || {};
+
+}
+
+
+function setTaskState(key,state){
+
+const storageName =
+"dailyPlannerTaskStates_"+selectedDate;
+
+const allStates =
+JSON.parse(
+localStorage.getItem(storageName) || "{}"
+);
+
+allStates[key] = state;
+
+localStorage.setItem(
+storageName,
+JSON.stringify(allStates)
+);
+
+}
+
+
+/* =========================================================
+   CUSTOM TASKS
+========================================================= */
+
+function renderCustomTasks(index){
+
+const container =
+document.getElementById("tasks"+index);
+
+customTasks[index].forEach(
+(task, taskIndex) => {
+
+const row =
+document.createElement("div");
+
+row.className="task";
+
+const checkbox =
+document.createElement("input");
+
+checkbox.type="checkbox";
+
+checkbox.checked =
+task.completed || false;
+
+checkbox.addEventListener(
+"change",
+function(){
+
+task.completed =
+this.checked;
+
+saveData();
+
+renderAll();
+
+}
+);
+
+
+const span =
+document.createElement("span");
+
+span.textContent =
+task.name;
+
+
+row.appendChild(checkbox);
+row.appendChild(span);
+
+
+if(task.time){
+
+const time =
+document.createElement("div");
+
+time.className="task-time";
+
+time.textContent =
+task.time;
+
+row.appendChild(time);
+
+}
+
+
+const priority =
+document.createElement("div");
+
+priority.className =
+"priority priority-" +
+task.priority.toLowerCase();
+
+priority.textContent =
+task.priority;
+
+row.appendChild(priority);
+
+
+const deleteButton =
+document.createElement("button");
+
+deleteButton.className="delete";
+
+deleteButton.textContent="×";
+
+deleteButton.title="Delete task";
+
+deleteButton.addEventListener(
+"click",
+function(){
+
+customTasks[index].splice(
+taskIndex,
+1
+);
+
+saveData();
+
+renderAll();
+
+}
+);
+
+row.appendChild(deleteButton);
+
+container.appendChild(row);
+
+}
+);
+
+}
+
+
+/* =========================================================
+   ADD CUSTOM TASK
+========================================================= */
+
+function addCustomTask(index){
+
+const input =
+document.getElementById(
+"customInput"+index
+);
+
+const time =
+document.getElementById(
+"customTime"+index
+);
+
+const priority =
+document.getElementById(
+"customPriority"+index
+);
+
+const name =
+input.value.trim();
+
+if(!name){
+
+input.focus();
+
+return;
+
+}
+
+customTasks[index].push({
+
+name:name,
+
+time:time.value,
+
+priority:priority.value,
+
+completed:false
+
+});
+
+saveData();
+
+input.value="";
+time.value="";
+priority.value="Medium";
+
+renderAll();
+
+input.focus();
+
+}
+
+
+/* =========================================================
+   ENTER KEY FOR ADD TASK
+========================================================= */
+
+for(let i=0;i<4;i++){
+
+document
+.getElementById("customInput"+i)
+.addEventListener(
+"keydown",
+function(event){
+
+if(event.key==="Enter"){
+
+addCustomTask(i);
+
+}
+
+}
+);
+
+}
+
+
+/* =========================================================
+   COUNTS
+========================================================= */
+
+function getCounts(){
+
+let total = 0;
+let completed = 0;
+
+
+/* preset tasks */
+
+for(let i=0;i<4;i++){
+
+plans[i].forEach(
+(_,taskIndex)=>{
+
+total++;
+
+const key =
+"plan_"+i+"_"+taskIndex;
+
+if(
+getTaskState(key).completed
+){
+
+completed++;
+
+}
+
+}
+);
+
+}
+
+
+/* custom tasks */
+
+for(let i=0;i<4;i++){
+
+customTasks[i].forEach(
+task=>{
+
+total++;
+
+if(task.completed){
+
+completed++;
+
+}
+
+}
+);
+
+}
+
+
+return {
+
+total,
+completed,
+remaining:total-completed
+
+};
+
+}
+
+
+/* =========================================================
+   DAILY REPORT
+========================================================= */
+
+function updateReport(){
+
+const counts =
+getCounts();
+
+document.getElementById(
+"totalTasks"
+).textContent =
+counts.total;
+
+document.getElementById(
+"completedTasks"
+).textContent =
+counts.completed;
+
+document.getElementById(
+"remainingTasks"
+).textContent =
+counts.remaining;
+
+
+const percentage =
+counts.total === 0
+? 0
+: Math.round(
+counts.completed /
+counts.total *
+100
+);
+
+
+document.getElementById(
+"progressFill"
+).style.width =
+percentage+"%";
+
+document.getElementById(
+"progressText"
+).textContent =
+percentage+"%";
+
+
+const streak =
+calculateStreak();
+
+document.getElementById(
+"streakCount"
+).textContent =
+streak;
+
+
+updateAchievements();
+
+}
+
+
+/* =========================================================
+   FINISH DAY
+========================================================= */
+
+function finishDay(){
+
+const counts =
+getCounts();
+
+if(
+counts.total > 0 &&
+counts.completed === counts.total
+){
+
+document.getElementById(
+"done"
+).style.display="block";
+
+document.getElementById(
+"message"
+).style.display="block";
+
+}else{
+
+document.getElementById(
+"done"
+).style.display="none";
+
+}
+
+updateAchievements();
+
+}
+
+
+/* =========================================================
+   DAY COMPLETED
+========================================================= */
+
+function isDayCompleted(date){
+
+const previousDate =
+selectedDate;
+
+selectedDate = date;
+
+loadData();
+
+const counts =
+getCounts();
+
+selectedDate =
+previousDate;
+
+loadData();
+
+return (
+counts.total > 0 &&
+counts.completed === counts.total
+);
+
+}
+
+
+/* =========================================================
+   STREAK
+========================================================= */
+
+function calculateStreak(){
+
+let streak = 0;
+
+const originalDate =
+selectedDate;
+
+let current =
+new Date(selectedDate+"T00:00:00");
+
+for(let i=0;i<365;i++){
+
+const year =
+current.getFullYear();
+
+const month =
+String(current.getMonth()+1)
+.padStart(2,"0");
+
+const day =
+String(current.getDate())
+.padStart(2,"0");
+
+const dateString =
+`${year}-${month}-${day}`;
+
+
+const saved =
+localStorage.getItem(
+"dailyPlanner_"+dateString
+);
+
+const states =
+JSON.parse(
+localStorage.getItem(
+"dailyPlannerTaskStates_"+dateString
+) || "{}"
+);
+
+
+let total = 0;
+let completed = 0;
+
+
+/* preset tasks */
+
+for(let page=0;page<4;page++){
+
+plans[page].forEach(
+(_,taskIndex)=>{
+
+total++;
+
+const key =
+"plan_"+page+"_"+taskIndex;
+
+if(
+states[key] &&
+states[key].completed
+){
+
+completed++;
+
+}
+
+}
+);
+
+}
+
+
+/* custom tasks */
+
+if(saved){
+
+try{
+
+const data =
+JSON.parse(saved);
+
+const customs =
+data.customTasks || {
+0:[],
+1:[],
+2:[],
+3:[]
+};
+
+for(let page=0;page<4;page++){
+
+customs[page].forEach(
+task=>{
+
+total++;
+
+if(task.completed){
+
+completed++;
+
+}
+
+}
+);
+
+}
+
+}catch(error){}
+
+}
+
+
+if(
+total > 0 &&
+completed === total
+){
+
+streak++;
+
+current.setDate(
+current.getDate()-1
+);
+
+}else{
+
+break;
+
+}
+
+}
+
+selectedDate =
+originalDate;
+
+return streak;
+
+}
+
+
+/* =========================================================
+   DATE CHANGE
+========================================================= */
+
+function changeDate(date){
+
+if(!date) return;
+
+selectedDate = date;
+
+setAllDates(date);
+
+loadData();
+
+loadFocusData();
+
+renderAll();
+
+renderFocus();
+
+resetTimer();
+
+}
+
+
+/* =========================================================
+   NOTES
+========================================================= */
+
+document
+.getElementById("dailyNotes")
+.addEventListener(
+"input",
+function(){
+
+saveData();
+
+}
+);
+
+
+/* =========================================================
+   ACHIEVEMENT DEFINITIONS
+========================================================= */
+
+const achievementList = [
+
+{
+id:"firstStep",
+icon:"🥇",
+name:"First Step",
+description:"Complete your first task."
+},
+
+{
+id:"streak3",
+icon:"🔥",
+name:"3-Day Streak",
+description:"Complete your planner for 3 days in a row."
+},
+
+{
+id:"studyMaster",
+icon:"📚",
+name:"Study Master",
+description:"Complete 5 Focus Center sessions."
+},
+
+{
+id:"goalGetter",
+icon:"🎯",
+name:"Goal Getter",
+description:"Reach your daily study goal."
+},
+
+{
+id:"superProductive",
+icon:"⭐",
+name:"Super Productive",
+description:"Complete 10 tasks in one day."
+}
+
+];
+
+
+/* =========================================================
+   UPDATE ACHIEVEMENTS
+========================================================= */
+
+function updateAchievements(){
+
+const counts =
+getCounts();
+
+let changed = false;
+
+
+/* First Step */
+
+if(
+!achievements.firstStep &&
+counts.completed >= 1
+){
+
+achievements.firstStep = true;
+changed = true;
+
+}
+
+
+/* 3-Day Streak */
+
+if(
+!achievements.streak3 &&
+calculateStreak() >= 3
+){
+
+achievements.streak3 = true;
+changed = true;
+
+}
+
+
+/* Study Master */
+
+if(
+!achievements.studyMaster &&
+studySessions.length >= 5
+){
+
+achievements.studyMaster = true;
+changed = true;
+
+}
+
+
+/* Goal Getter */
+
+const minutes =
+studySessions.reduce(
+(total,session)=>
+total + Number(session.minutes || 0),
+0
+);
+
+if(
+!achievements.goalGetter &&
+minutes >= dailyGoal
+){
+
+achievements.goalGetter = true;
+changed = true;
+
+}
+
+
+/* Super Productive */
+
+if(
+!achievements.superProductive &&
+counts.completed >= 10
+){
+
+achievements.superProductive = true;
+changed = true;
+
+}
+
+
+if(changed){
+
+saveAchievements();
+
+}
+
+
+renderAchievements();
+
+}
+
+
+/* =========================================================
+   RENDER ACHIEVEMENTS
+========================================================= */
+
+function renderAchievements(){
+
+const grid =
+document.getElementById(
+"achievementGrid"
+);
+
+if(!grid) return;
+
+grid.innerHTML = "";
+
+let unlocked = 0;
+
+achievementList.forEach(
+achievement => {
+
+const isUnlocked =
+achievements[achievement.id];
+
+if(isUnlocked){
+
+unlocked++;
+
+}
+
+const card =
+document.createElement("div");
+
+card.className =
+"achievement " +
+(
+isUnlocked
+? "unlocked"
+: "locked"
+);
+
+
+const icon =
+document.createElement("div");
+
+icon.className =
+"achievement-icon";
+
+icon.textContent =
+isUnlocked
+? achievement.icon
+: "🔒";
+
+
+const content =
+document.createElement("div");
+
+
+const name =
+document.createElement("div");
+
+name.className =
+"achievement-name";
+
+name.textContent =
+achievement.name;
+
+
+const description =
+document.createElement("div");
+
+description.className =
+"achievement-description";
+
+description.textContent =
+achievement.description;
+
+
+const status =
+document.createElement("div");
+
+status.className =
+"achievement-status";
+
+status.textContent =
+isUnlocked
+? "🏆 Unlocked!"
+: "🔒 Locked";
+
+
+content.appendChild(name);
+content.appendChild(description);
+content.appendChild(status);
+
+card.appendChild(icon);
+card.appendChild(content);
+
+grid.appendChild(card);
+
+}
+);
+
+
+document.getElementById(
+"achievementCount"
+).textContent =
+`${unlocked} / ${achievementList.length} unlocked`;
+
+}
+
+
+/* =========================================================
+   FOCUS TIMER
+========================================================= */
+
+function formatTime(seconds){
+
+const minutes =
+Math.floor(seconds/60);
+
+const secs =
+seconds % 60;
+
+return (
+String(minutes).padStart(2,"0")
++
+":"
++
+String(secs).padStart(2,"0")
+);
+
+}
+
+
+function updateTimerDisplay(){
+
+document.getElementById(
+"timerDisplay"
+).textContent =
+formatTime(timerSeconds);
+
+}
+
+
+function getFocusMinutes(){
+
+return Number(
+document.getElementById(
+"durationSelect"
+).value
+);
+
+}
+
+
+function resetTimer(){
+
+clearInterval(timerInterval);
+
+timerInterval = null;
+
+timerRunning = false;
+
+timerSeconds =
+getFocusMinutes() * 60;
+
+updateTimerDisplay();
+
+document.getElementById(
+"startTimerBtn"
+).disabled=false;
+
+document.getElementById(
+"pauseTimerBtn"
+).disabled=true;
+
+document.getElementById(
+"focusMessage"
+).style.display="none";
+
+}
+
+
+function startTimer(){
+
+if(timerRunning) return;
+
+timerRunning = true;
+
+document.getElementById(
+"startTimerBtn"
+).disabled=true;
+
+document.getElementById(
+"pauseTimerBtn"
+).disabled=false;
+
+
+timerInterval =
+setInterval(
+function(){
+
+timerSeconds--;
+
+updateTimerDisplay();
+
+if(timerSeconds <= 0){
+
+timerFinished();
+
+}
+
+},
+1000
+);
+
+}
+
+
+function pauseTimer(){
+
+if(!timerRunning) return;
+
+clearInterval(timerInterval);
+
+timerInterval = null;
+
+timerRunning = false;
+
+document.getElementById(
+"startTimerBtn"
+).disabled=false;
+
+document.getElementById(
+"pauseTimerBtn"
+).disabled=true;
+
+}
+
+
+function timerFinished(){
+
+clearInterval(timerInterval);
+
+timerInterval = null;
+
+timerRunning = false;
+
+const minutes =
+getFocusMinutes();
+
+const subject =
+document.getElementById(
+"subjectSelect"
+).value;
+
+
+studySessions.push({
+
+subject:subject,
+
+minutes:minutes,
+
+date:selectedDate,
+
+time:new Date().toLocaleTimeString(
+[],
+{
+hour:"2-digit",
+minute:"2-digit"
+}
+)
+
+});
+
+
+saveFocusData();
+
+document.getElementById(
+"focusMessage"
+).style.display="block";
+
+document.getElementById(
+"startTimerBtn"
+).disabled=false;
+
+document.getElementById(
+"pauseTimerBtn"
+).disabled=true;
+
+timerSeconds = 0;
+
+updateTimerDisplay();
+
+renderFocus();
+
+updateAchievements();
+
+}
+
+
+/* =========================================================
+   RENDER FOCUS
+========================================================= */
+
+function renderFocus(){
+
+const sessionCount =
+studySessions.length;
+
+const totalMinutes =
+studySessions.reduce(
+(total,session)=>
+total + Number(session.minutes || 0),
+0
+);
+
+
+document.getElementById(
+"sessionCount"
+).textContent =
+sessionCount;
+
+
+document.getElementById(
+"studyMinutes"
+).textContent =
+totalMinutes;
+
+
+document.getElementById(
+"dailyGoalDisplay"
+).textContent =
+dailyGoal;
+
+
+document.getElementById(
+"dailyGoalInput"
+).value =
+dailyGoal;
+
+
+const percentage =
+dailyGoal > 0
+? Math.min(
+100,
+Math.round(
+totalMinutes / dailyGoal * 100
+)
+)
+: 0;
+
+
+document.getElementById(
+"goalFill"
+).style.width =
+percentage+"%";
+
+
+document.getElementById(
+"goalText"
+).textContent =
+`${totalMinutes} / ${dailyGoal} minutes (${percentage}%)`;
+
+
+const log =
+document.getElementById("studyLog");
+
+log.innerHTML = "";
+
+
+if(studySessions.length === 0){
+
+const empty =
+document.createElement("div");
+
+empty.className="empty-log";
+
+empty.textContent =
+"No study sessions yet. Start your first focus session!";
+
+log.appendChild(empty);
+
+return;
+
+}
+
+
+[...studySessions]
+.reverse()
+.forEach(
+session => {
+
+const item =
+document.createElement("div");
+
+item.className="log-item";
+
+item.textContent =
+`📚 ${session.subject} — ${session.minutes} minutes — ${session.time}`;
+
+log.appendChild(item);
+
+}
+);
+
+}
+
+
+/* =========================================================
+   SUBJECT / DURATION EVENTS
+========================================================= */
+
+document
+.getElementById("durationSelect")
+.addEventListener(
+"change",
+function(){
+
+if(!timerRunning){
+
+resetTimer();
+
+}
+
+}
+);
+
+
+document
+.getElementById("dailyGoalInput")
+.addEventListener(
+"change",
+function(){
+
+let value =
+Number(this.value);
+
+if(!value || value < 1){
+
+value = 60;
+
+}
+
+if(value > 600){
+
+value = 600;
+
+}
+
+dailyGoal = value;
+
+this.value = value;
+
+saveFocusData();
+
+renderFocus();
+
+updateAchievements();
+
+}
+);
+
+
+/* =========================================================
+   DATE INPUT EVENTS
+========================================================= */
+
+document
+.getElementById("dateInput")
+.addEventListener(
+"change",
+function(){
+
+changeDate(this.value);
+
+}
+);
+
+document
+.getElementById("dateInput2")
+.addEventListener(
+"change",
+function(){
+
+changeDate(this.value);
+
+}
+);
+
+document
+.getElementById("dateInput3")
+.addEventListener(
+"change",
+function(){
+
+changeDate(this.value);
+
+}
+);
+
+document
+.getElementById("dateInput4")
+.addEventListener(
+"change",
+function(){
+
+changeDate(this.value);
+
+}
+);
+
+document
+.getElementById("dateInput5")
+.addEventListener(
+"change",
+function(){
+
+changeDate(this.value);
+
+}
+);
+
+
+/* =========================================================
+   RENDER EVERYTHING
+========================================================= */
+
+function renderAll(){
+
+for(let i=0;i<4;i++){
+
+renderPlan(i);
+
+}
+
+updateReport();
+
+}
+
+
+/* =========================================================
+   CLOSE MENU WHEN CLICKING OUTSIDE
+========================================================= */
+
+document.addEventListener(
+"click",
+function(event){
+
+if(
+!event.target.closest(".top")
+){
+
+closeMenus();
+
+}
+
+}
+);
+
+
+/* =========================================================
+   INITIAL LOAD
+========================================================= */
+
+loadTheme();
+
+selectedDate = getToday();
+
+setAllDates(selectedDate);
+
+loadData();
+
+loadFocusData();
+
+loadAchievements();
+
+renderAll();
+
+renderFocus();
+
+resetTimer();
+
+</script>
+
+</body>
+</html>
