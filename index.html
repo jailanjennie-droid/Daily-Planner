@@ -1,1 +1,4226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Planner</title>
 
+<style>
+*{box-sizing:border-box}
+
+body{
+font-family:Arial,sans-serif;
+text-align:center;
+margin:0;
+padding:30px;
+min-height:100vh;
+color:#333;
+transition:.3s;
+background:linear-gradient(135deg,#ffd6e7,#e6d6ff)
+}
+
+body.blue{
+background:linear-gradient(135deg,#cfe9ff,#dcd6ff)
+}
+
+body.green{
+background:linear-gradient(135deg,#d5f5dc,#c8f1ef)
+}
+
+body.peach{
+background:linear-gradient(135deg,#ffd9c2,#ffe9d6)
+}
+
+body.dark{
+background:linear-gradient(135deg,#181827,#27213a);
+color:#eee
+}
+
+button{
+border:0;
+border-radius:12px;
+padding:12px 20px;
+cursor:pointer;
+font-size:15px;
+background:#8b5cf6;
+color:white;
+transition:.2s
+}
+
+button:hover{
+transform:translateY(-2px);
+opacity:.9
+}
+
+#welcome{
+max-width:700px;
+margin:80px auto;
+padding:45px;
+border-radius:25px;
+background:rgba(255,255,255,.8);
+box-shadow:0 10px 35px #0002
+}
+
+#welcome h1{
+font-size:42px;
+margin:0 0 15px
+}
+
+#welcome p{
+font-size:18px;
+line-height:1.6
+}
+
+#app{
+display:none;
+max-width:1000px;
+margin:auto
+}
+
+.page{
+display:none
+}
+
+.page.active{
+display:block
+}
+
+.planner,
+.report,
+.focus-box,
+.weekly-box,
+.homework-box,
+.subject-box{
+background:#fffffff2;
+border-radius:22px;
+padding:30px;
+box-shadow:0 8px 30px #0002
+}
+
+body.dark .planner,
+body.dark .report,
+body.dark .focus-box,
+body.dark .weekly-box,
+body.dark .homework-box,
+body.dark .subject-box,
+body.dark .achievement,
+body.dark .notes-box,
+body.dark .week-day,
+body.dark .homework-item,
+body.dark .subject-item,
+body.dark .homework-stat,
+body.dark .subject-stat{
+background:#252538;
+color:#eee
+}
+
+body.dark .task{
+background:#33334b
+}
+
+body.dark input,
+body.dark select,
+body.dark textarea{
+background:#33334b;
+color:white;
+border-color:#666
+}
+
+.dots{
+position:absolute;
+top:20px;
+right:25px;
+font-size:28px;
+cursor:pointer
+}
+
+.menu{
+display:none;
+position:absolute;
+top:60px;
+right:20px;
+background:white;
+padding:15px;
+border-radius:15px;
+box-shadow:0 8px 25px #0003;
+z-index:100
+}
+
+body.dark .menu{
+background:#252538
+}
+
+.menu button{
+display:block;
+width:100%;
+margin:5px 0
+}
+
+h1,h2{
+margin-top:0
+}
+
+.date-box{
+margin:15px 0 25px
+}
+
+.date-box input,
+.week-controls input{
+padding:10px;
+border-radius:10px;
+border:1px solid #ccc;
+font-size:15px
+}
+
+.task,
+.homework-item,
+.subject-item{
+display:flex;
+align-items:center;
+gap:10px;
+text-align:left;
+margin:10px 0;
+padding:14px;
+border-radius:14px;
+background:white;
+box-shadow:0 3px 10px #00000012
+}
+
+.task.completed,
+.homework-item.completed,
+.subject-item.completed{
+opacity:.6
+}
+
+.task.completed .task-name,
+.homework-item.completed .homework-name,
+.subject-item.completed .subject-name{
+text-decoration:line-through
+}
+
+.task-name,
+.homework-name,
+.subject-name{
+flex:1;
+font-weight:bold
+}
+
+.task-time{
+color:#777;
+font-size:13px
+}
+
+.priority,
+.repeat-badge,
+.homework-due,
+.subject-date,
+.subject-overdue{
+font-size:12px;
+padding:5px 8px;
+border-radius:8px;
+font-weight:bold;
+white-space:nowrap
+}
+
+.priority.low{
+background:#d9f7df;
+color:#23843b
+}
+
+.priority.medium{
+background:#fff1bd;
+color:#9b7400
+}
+
+.priority.high{
+background:#ffd4d4;
+color:#b83232
+}
+
+.repeat-badge{
+background:#e7ddff;
+color:#6d42c4
+}
+
+.subject-date{
+background:#e7ddff;
+color:#6d42c4
+}
+
+.subject-overdue{
+background:#ffd4d4;
+color:#b83232
+}
+
+body.dark .repeat-badge,
+body.dark .subject-date{
+background:#463b63;
+color:#e0d3ff
+}
+
+.add-task,
+.homework-form,
+.subject-form{
+display:grid;
+gap:8px;
+margin-top:20px
+}
+
+.add-task{
+grid-template-columns:2fr 1fr 1fr 1fr
+}
+
+.homework-form,
+.subject-form{
+grid-template-columns:2fr 1fr 1fr 1fr
+}
+
+.add-task input,
+.add-task select,
+.homework-form input,
+.homework-form select,
+.subject-form input,
+.subject-form select{
+padding:11px;
+border-radius:10px;
+border:1px solid #ccc;
+min-width:0
+}
+
+.add-task button,
+.homework-form button,
+.subject-form button{
+grid-column:1/-1
+}
+
+.delete-btn{
+background:#ef4444;
+padding:7px 10px;
+font-size:12px
+}
+
+.edit-btn{
+background:#f59e0b;
+padding:7px 10px;
+font-size:12px
+}
+
+.nav{
+display:flex;
+gap:10px;
+margin-top:25px
+}
+
+.nav button{
+flex:1
+}
+
+.notes-box{
+background:white;
+padding:20px;
+border-radius:18px;
+margin-top:25px
+}
+
+.notes-box textarea{
+width:100%;
+min-height:130px;
+resize:vertical;
+padding:12px;
+border:1px solid #ccc;
+border-radius:12px;
+font:14px Arial
+}
+
+.stats,
+.focus-stats,
+.week-summary,
+.homework-stats,
+.subject-stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+margin:20px 0
+}
+
+.stat,
+.focus-stat,
+.week-summary-box,
+.homework-stat,
+.subject-stat{
+background:#f4efff;
+padding:20px;
+border-radius:16px
+}
+
+.stat strong,
+.week-summary-box strong,
+.homework-stat strong,
+.subject-stat strong,
+.focus-stat strong{
+display:block;
+font-size:28px;
+margin-bottom:5px
+}
+
+.progress-container,
+.goal-progress,
+.week-progress{
+background:#ddd;
+border-radius:20px;
+overflow:hidden
+}
+
+.progress-container{
+height:20px;
+margin:15px 0
+}
+
+.progress-bar{
+height:100%;
+width:0;
+background:#8b5cf6;
+transition:.4s
+}
+
+.goal-progress{
+height:16px;
+margin-top:12px
+}
+
+.goal-progress div,
+.week-progress div{
+height:100%;
+width:0;
+background:#10b981
+}
+
+.streak{
+font-size:20px;
+margin:15px
+}
+
+.finish-btn{
+background:#10b981
+}
+
+.message{
+min-height:25px;
+margin:15px;
+font-weight:bold
+}
+
+.achievements{
+margin-top:30px
+}
+
+.achievement-count{
+margin-bottom:15px
+}
+
+.achievement-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+gap:15px
+}
+
+.achievement{
+background:white;
+border-radius:18px;
+padding:20px;
+box-shadow:0 4px 15px #00000014;
+border:2px solid transparent
+}
+
+.achievement.unlocked{
+border-color:#f5c542
+}
+
+.achievement.locked{
+opacity:.55;
+filter:grayscale(.5)
+}
+
+.achievement-icon{
+font-size:40px
+}
+
+.achievement-name{
+font-weight:bold;
+font-size:17px;
+margin:7px
+}
+
+.achievement-description{
+font-size:13px;
+line-height:1.4
+}
+
+.achievement-status{
+margin-top:10px;
+font-size:12px;
+font-weight:bold
+}
+
+.focus-box,
+.weekly-box,
+.homework-box,
+.subject-box{
+max-width:950px;
+margin:auto
+}
+
+.focus-title,
+.weekly-title,
+.homework-title,
+.subject-title{
+font-size:32px;
+margin-bottom:8px
+}
+
+.focus-subtitle,
+.weekly-subtitle,
+.homework-subtitle,
+.subject-subtitle{
+color:#777;
+margin-bottom:25px
+}
+
+.focus-controls,
+.week-controls{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
+flex-wrap:wrap
+}
+
+.focus-controls select{
+padding:12px;
+border-radius:10px;
+border:1px solid #ccc
+}
+
+.timer{
+font-size:70px;
+font-weight:bold;
+margin:25px 0
+}
+
+.timer-buttons{
+display:flex;
+justify-content:center;
+gap:10px;
+flex-wrap:wrap
+}
+
+.timer-buttons button{
+min-width:110px
+}
+
+.goal-box{
+margin-top:25px;
+background:#f4efff;
+padding:20px;
+border-radius:16px
+}
+
+.goal-box input{
+padding:10px;
+border-radius:10px;
+border:1px solid #ccc;
+width:100px
+}
+
+.study-log{
+text-align:left;
+margin-top:25px
+}
+
+.log-item{
+padding:12px;
+margin:8px 0;
+background:#f7f7f7;
+border-radius:10px
+}
+
+body.dark .goal-box,
+body.dark .focus-stat,
+body.dark .log-item,
+body.dark .stat,
+body.dark .week-summary-box{
+background:#33334b
+}
+
+.week-controls{
+margin-bottom:25px
+}
+
+.week-controls button{
+padding:10px 15px
+}
+
+.week-range{
+font-weight:bold;
+font-size:18px;
+margin-bottom:20px
+}
+
+.week-days{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:10px
+}
+
+.week-day{
+background:white;
+border-radius:16px;
+padding:15px 10px;
+box-shadow:0 3px 12px #00000012
+}
+
+.week-day.today{
+border:2px solid #8b5cf6
+}
+
+.week-day-name{
+font-weight:bold
+}
+
+.week-day-date{
+font-size:13px;
+color:#777;
+margin:5px 0 12px
+}
+
+.week-day-number{
+font-size:25px;
+font-weight:bold;
+margin:8px 0
+}
+
+.week-day-info{
+font-size:12px;
+line-height:1.7
+}
+
+.week-progress{
+height:10px;
+margin-top:10px
+}
+
+.homework-list,
+.subject-list{
+text-align:left
+}
+
+.homework-details,
+.subject-details{
+font-size:12px;
+color:#777
+}
+
+.homework-empty,
+.subject-empty{
+text-align:center;
+padding:30px;
+color:#777
+}
+
+body.dark .homework-details,
+body.dark .subject-details,
+body.dark .homework-empty,
+body.dark .subject-empty{
+color:#bbb
+}
+
+@media(max-width:800px){
+
+.week-days{
+grid-template-columns:repeat(2,1fr)
+}
+
+.add-task,
+.homework-form,
+.subject-form{
+grid-template-columns:1fr 1fr
+}
+
+}
+
+@media(max-width:600px){
+
+body{
+padding:15px
+}
+
+#welcome{
+margin:40px auto;
+padding:30px 20px
+}
+
+#welcome h1{
+font-size:32px
+}
+
+.stats,
+.focus-stats,
+.week-summary,
+.homework-stats,
+.subject-stats{
+grid-template-columns:1fr
+}
+
+.task,
+.homework-item,
+.subject-item{
+flex-wrap:wrap
+}
+
+.nav{
+flex-direction:column
+}
+
+.add-task,
+.homework-form,
+.subject-form{
+grid-template-columns:1fr
+}
+
+.timer{
+font-size:55px
+}
+
+.week-days{
+grid-template-columns:1fr
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div id="welcome">
+
+<div class="dots" onclick="toggleMenu()">⋮</div>
+
+<div class="menu" id="menu">
+
+<button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+<button onclick="setTheme('purple')">💜 Purple</button>
+<button onclick="setTheme('blue')">💙 Blue</button>
+<button onclick="setTheme('green')">💚 Green</button>
+<button onclick="setTheme('peach')">🍑 Peach</button>
+
+</div>
+
+<h1>📚 My Daily Planner</h1>
+
+<p>
+Organize your day, complete your tasks, track your progress,
+and build better study habits.
+</p>
+
+<button onclick="startPlanner()">Let's Start</button>
+
+</div>
+
+
+<div id="app">
+
+<div class="dots" onclick="toggleMenu()">⋮</div>
+
+<div class="menu" id="menuApp">
+
+<button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+<button onclick="setTheme('purple')">💜 Purple</button>
+<button onclick="setTheme('blue')">💙 Blue</button>
+<button onclick="setTheme('green')">💚 Green</button>
+<button onclick="setTheme('peach')">🍑 Peach</button>
+
+</div>
+
+
+<script>
+
+const pageInfo=[
+
+["🌅 Morning Plan",[
+
+"Wake up|06:00|High",
+"Make my bed|06:05|Low",
+"Pray|06:15|High",
+"Important meeting|06:30|High",
+"Breakfast|07:00|Medium",
+"Skincare|07:20|Low",
+"Review homework|07:30|High",
+"Wear uniform|07:45|Medium",
+"Go to school|08:00|High"
+
+]],
+
+["☀️ Afternoon Plan",[
+
+"Change your clothes|12:10|Low",
+"Wash your face|12:20|Low",
+"Eat lunch|12:30|High",
+"Check your school schedule for the next day|13:00|Medium",
+"Pray|13:30|High",
+"Iron your uniform|14:00|Medium",
+"Study|15:00|High",
+"Rest|16:30|Low"
+
+]],
+
+["🌆 Evening Plan",[
+
+"Review|17:00|High",
+"Pray|18:00|High",
+"Dinner|19:00|Medium"
+
+]],
+
+["🌙 Night Plan",[
+
+"Game|20:00|Low",
+"Review|20:30|High",
+"Pray|21:00|High",
+"Night routine|21:30|Medium",
+"Get ready for bed|22:00|High"
+
+]]
+
+];
+
+
+const subjects=[
+
+"English",
+"Math",
+"Arabic",
+"Science",
+"Kurdish",
+"History",
+"Computer",
+"Religious Education",
+"Other"
+
+];
+
+
+pageInfo.forEach((p,i)=>{
+
+document.write(`
+
+<section class="page" id="page${i}">
+
+<div class="planner">
+
+<h1>${p[0]}</h1>
+
+<div class="date-box">
+<input type="date" id="dateInput${i||""}">
+</div>
+
+<div id="tasks${i}"></div>
+
+<div class="add-task">
+
+<input
+id="customTask${i}"
+placeholder="Add a task..."
+>
+
+<input
+type="time"
+id="customTime${i}"
+>
+
+<select id="customPriority${i}">
+
+<option>Low</option>
+<option selected>Medium</option>
+<option>High</option>
+
+</select>
+
+
+<select id="customRepeat${i}">
+
+<option value="none">
+Does not repeat
+</option>
+
+<option value="daily">
+Every day
+</option>
+
+<option value="weekly">
+Every week
+</option>
+
+<option value="weekday">
+Every weekday
+</option>
+
+</select>
+
+
+<button onclick="addCustomTask(${i})">
+Add Task
+</button>
+
+</div>
+
+
+<div class="nav">
+
+${i>0
+?`<button onclick="showPage(${i-1})">
+← ${pageInfo[i-1][0].replace(/^[^ ]+ /,"")}
+</button>`
+:""}
+
+
+${i<3
+?`<button onclick="showPage(${i+1})">
+${pageInfo[i+1][0].replace(/^[^ ]+ /,"")} →
+</button>`
+:`<button onclick="showPage(4)">
+Daily Report →
+</button>`}
+
+</div>
+
+</div>
+
+</section>
+
+`);
+
+});
+
+</script>
+
+
+<!-- DAILY REPORT -->
+
+<section class="page" id="page4">
+
+<div class="report">
+
+<h1>📊 Daily Report</h1>
+
+<div class="date-box">
+<input type="date" id="dateInput5">
+</div>
+
+
+<div class="stats">
+
+<div class="stat">
+<strong id="totalTasks">0</strong>
+Total Tasks
+</div>
+
+<div class="stat">
+<strong id="completedTasks">0</strong>
+Completed
+</div>
+
+<div class="stat">
+<strong id="remainingTasks">0</strong>
+Remaining
+</div>
+
+</div>
+
+
+<h3>Daily Progress</h3>
+
+<div class="progress-container">
+
+<div
+class="progress-bar"
+id="progressBar">
+</div>
+
+</div>
+
+<p id="progressText">
+0%
+</p>
+
+
+<div class="streak">
+
+🔥 Streak:
+<strong id="streakCount">0</strong>
+days
+
+</div>
+
+
+<div
+class="message"
+id="reportMessage">
+</div>
+
+
+<button
+class="finish-btn"
+onclick="finishDay()">
+Finish Day
+</button>
+
+
+<div class="notes-box">
+
+<h2>📝 Daily Notes</h2>
+
+<textarea
+id="dailyNotes"
+placeholder="Write your notes for today..."
+></textarea>
+
+</div>
+
+
+<div class="achievements">
+
+<h2>🏆 Achievements</h2>
+
+<div
+class="achievement-count"
+id="achievementCount">
+0 / 5 Unlocked
+</div>
+
+<div
+class="achievement-grid"
+id="achievementGrid">
+</div>
+
+</div>
+
+
+<div class="nav">
+
+<button onclick="showPage(3)">
+← Night
+</button>
+
+<button onclick="showPage(5)">
+🎯 Focus Center →
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- FOCUS CENTER -->
+
+<section class="page" id="page5">
+
+<div class="focus-box">
+
+<div class="focus-title">
+🎯 Study Focus Center
+</div>
+
+<div class="focus-subtitle">
+Focus on one subject and make your study time count.
+</div>
+
+
+<div class="date-box">
+
+<input
+type="date"
+id="focusDateInput">
+
+</div>
+
+
+<div class="focus-controls">
+
+<select id="subjectSelect">
+
+<option>English</option>
+<option>Math</option>
+<option>Arabic</option>
+<option>Science</option>
+<option>Kurdish</option>
+<option>History</option>
+<option>Computer</option>
+<option>Religious Education</option>
+<option>Other</option>
+
+</select>
+
+
+<select id="durationSelect">
+
+<option value="5">
+5 minutes
+</option>
+
+<option value="10">
+10 minutes
+</option>
+
+<option value="15">
+15 minutes
+</option>
+
+<option value="20">
+20 minutes
+</option>
+
+<option value="25" selected>
+25 minutes
+</option>
+
+<option value="30">
+30 minutes
+</option>
+
+<option value="45">
+45 minutes
+</option>
+
+<option value="60">
+60 minutes
+</option>
+
+</select>
+
+</div>
+
+
+<div
+class="timer"
+id="timer">
+25:00
+</div>
+
+
+<div class="timer-buttons">
+
+<button onclick="startTimer()">
+▶ Start
+</button>
+
+<button onclick="pauseTimer()">
+⏸ Pause
+</button>
+
+<button onclick="resetTimer()">
+🔄 Reset
+</button>
+
+</div>
+
+
+<div class="focus-stats">
+
+<div class="focus-stat">
+<strong id="sessionCount">0</strong>
+Sessions
+</div>
+
+<div class="focus-stat">
+<strong id="studyMinutes">0</strong>
+Study Minutes
+</div>
+
+<div class="focus-stat">
+<strong id="goalDisplay">60</strong>
+Daily Goal
+</div>
+
+</div>
+
+
+<div class="goal-box">
+
+<h3>🎯 Daily Study Goal</h3>
+
+<p>
+Set how many minutes you want to study today.
+</p>
+
+<input
+type="number"
+id="dailyGoalInput"
+min="1"
+value="60">
+
+<button onclick="saveDailyGoal()">
+Save Goal
+</button>
+
+
+<div class="goal-progress">
+
+<div id="goalProgressBar"></div>
+
+</div>
+
+
+<p id="goalProgressText">
+0 / 60 minutes
+</p>
+
+</div>
+
+
+<div class="study-log">
+
+<h3>📚 Study Log</h3>
+
+<div id="studyLog"></div>
+
+</div>
+
+
+<div class="nav">
+
+<button onclick="showPage(4)">
+← Daily Report
+</button>
+
+<button onclick="showPage(6)">
+📅 Weekly Overview →
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- WEEKLY OVERVIEW -->
+
+<section class="page" id="page6">
+
+<div class="weekly-box">
+
+<div class="weekly-title">
+📅 Weekly Overview
+</div>
+
+<div class="weekly-subtitle">
+See your tasks and study progress for the whole week.
+</div>
+
+
+<div class="week-controls">
+
+<button onclick="changeWeek(-7)">
+← Previous Week
+</button>
+
+<input
+type="date"
+id="weekDateInput">
+
+<button onclick="changeWeek(7)">
+Next Week →
+</button>
+
+</div>
+
+
+<div
+class="week-range"
+id="weekRange">
+This Week
+</div>
+
+
+<div class="week-summary">
+
+<div class="week-summary-box">
+
+<strong id="weeklyTotalTasks">
+0
+</strong>
+
+Total Tasks
+
+</div>
+
+
+<div class="week-summary-box">
+
+<strong id="weeklyCompletedTasks">
+0
+</strong>
+
+Completed
+
+</div>
+
+
+<div class="week-summary-box">
+
+<strong id="weeklyStudyMinutes">
+0
+</strong>
+
+Study Minutes
+
+</div>
+
+</div>
+
+
+<h3>
+Weekly Task Progress
+</h3>
+
+
+<div class="progress-container">
+
+<div
+class="progress-bar"
+id="weeklyProgressBar">
+</div>
+
+</div>
+
+
+<p id="weeklyProgressText">
+0% completed
+</p>
+
+
+<div
+class="week-days"
+id="weekDays">
+</div>
+
+
+<div class="nav">
+
+<button onclick="showPage(5)">
+← Focus Center
+</button>
+
+<button onclick="showPage(7)">
+📚 Homework Tracker →
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- HOMEWORK -->
+
+<section class="page" id="page7">
+
+<div class="homework-box">
+
+<div class="homework-title">
+📚 Homework Tracker
+</div>
+
+<div class="homework-subtitle">
+Organize your homework, deadlines, subjects, and priorities.
+</div>
+
+
+<div class="homework-form">
+
+<input
+id="homeworkName"
+placeholder="Homework name...">
+
+
+<select id="homeworkSubject">
+
+<option>English</option>
+<option>Math</option>
+<option>Arabic</option>
+<option>Science</option>
+<option>Kurdish</option>
+<option>History</option>
+<option>Computer</option>
+<option>Religious Education</option>
+<option>Other</option>
+
+</select>
+
+
+<input
+type="date"
+id="homeworkDueDate">
+
+
+<select id="homeworkPriority">
+
+<option>Low</option>
+<option selected>Medium</option>
+<option>High</option>
+
+</select>
+
+
+<button onclick="addHomework()">
+➕ Add Homework
+</button>
+
+</div>
+
+
+<div class="homework-stats">
+
+<div class="homework-stat">
+
+<strong id="homeworkTotal">
+0
+</strong>
+
+Total Homework
+
+</div>
+
+
+<div class="homework-stat">
+
+<strong id="homeworkCompleted">
+0
+</strong>
+
+Completed
+
+</div>
+
+
+<div class="homework-stat">
+
+<strong id="homeworkRemaining">
+0
+</strong>
+
+Remaining
+
+</div>
+
+</div>
+
+
+<div
+class="homework-list"
+id="homeworkList">
+</div>
+
+
+<div class="nav">
+
+<button onclick="showPage(6)">
+← Weekly Overview
+</button>
+
+<button onclick="showPage(8)">
+📚 Subject Study Planner →
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- SUBJECT STUDY PLANNER -->
+
+<section class="page" id="page8">
+
+<div class="subject-box">
+
+<div class="subject-title">
+📚 Subject Study Planner
+</div>
+
+<div class="subject-subtitle">
+Plan what you want to study and organize your study time by subject.
+</div>
+
+
+<div class="subject-form">
+
+<select id="studyPlanSubject">
+
+<option>English</option>
+<option>Math</option>
+<option>Arabic</option>
+<option>Science</option>
+<option>Kurdish</option>
+<option>History</option>
+<option>Computer</option>
+<option>Religious Education</option>
+<option>Other</option>
+
+</select>
+
+
+<input
+id="studyPlanTopic"
+placeholder="What do you want to study?">
+
+
+<input
+type="date"
+id="studyPlanDate">
+
+
+<select id="studyPlanDuration">
+
+<option value="15">
+15 minutes
+</option>
+
+<option value="20">
+20 minutes
+</option>
+
+<option value="25">
+25 minutes
+</option>
+
+<option value="30" selected>
+30 minutes
+</option>
+
+<option value="45">
+45 minutes
+</option>
+
+<option value="60">
+60 minutes
+</option>
+
+<option value="90">
+90 minutes
+</option>
+
+<option value="120">
+120 minutes
+</option>
+
+</select>
+
+
+<select id="studyPlanPriority">
+
+<option>Low</option>
+<option selected>Medium</option>
+<option>High</option>
+
+</select>
+
+
+<button onclick="addStudyPlan()">
+➕ Add Study Plan
+</button>
+
+</div>
+
+
+<div class="subject-stats">
+
+<div class="subject-stat">
+
+<strong id="studyPlanTotal">
+0
+</strong>
+
+Total Plans
+
+</div>
+
+
+<div class="subject-stat">
+
+<strong id="studyPlanCompleted">
+0
+</strong>
+
+Completed
+
+</div>
+
+
+<div class="subject-stat">
+
+<strong id="studyPlanRemaining">
+0
+</strong>
+
+Remaining
+
+</div>
+
+</div>
+
+
+<div
+class="subject-list"
+id="studyPlanList">
+</div>
+
+
+<div class="nav">
+
+<button onclick="showPage(7)">
+← Homework Tracker
+</button>
+
+<button onclick="showPage(0)">
+🏠 Morning Plan
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+
+<script>
+
+const plans=pageInfo.map(p=>
+p[1].map(x=>{
+
+const [name,time,priority]=x.split("|");
+
+return{
+name,
+time,
+priority
+};
+
+})
+);
+
+
+let selectedDate=getToday();
+
+let weekDate=getToday();
+
+
+let customTasks=JSON.parse(
+localStorage.getItem("dailyPlannerCustomTasks")||"{}"
+);
+
+
+let repeatTasks=JSON.parse(
+localStorage.getItem("dailyPlannerRepeatTasks")||"[]"
+);
+
+
+let homeworkTasks=JSON.parse(
+localStorage.getItem("dailyPlannerHomework")||"[]"
+);
+
+
+let subjectStudyPlans=JSON.parse(
+localStorage.getItem("dailyPlannerSubjectPlans")||"[]"
+);
+
+
+let studySessions=JSON.parse(
+localStorage.getItem("dailyPlannerStudySessions")||"{}"
+);
+
+
+let dailyGoal=JSON.parse(
+localStorage.getItem("dailyPlannerGoals")||"{}"
+);
+
+
+let achievements=JSON.parse(
+localStorage.getItem("dailyPlannerAchievements")||"{}"
+);
+
+
+let timerInterval=null;
+
+let timerSeconds=1500;
+
+let timerRunning=false;
+
+
+/* DATE */
+
+function getToday(){
+
+const d=new Date();
+
+return `${d.getFullYear()}-${String(
+d.getMonth()+1
+).padStart(2,"0")}-${String(
+d.getDate()
+).padStart(2,"0")}`;
+
+}
+
+
+function getDateKey(d){
+
+return `${d.getFullYear()}-${String(
+d.getMonth()+1
+).padStart(2,"0")}-${String(
+d.getDate()
+).padStart(2,"0")}`;
+
+}
+
+
+/* STORAGE */
+
+function key(page,date=selectedDate){
+
+return `dailyPlanner_${date}_${page}`;
+
+}
+
+
+function state(page,date=selectedDate){
+
+return JSON.parse(
+localStorage.getItem(key(page,date))||"{}"
+);
+
+}
+
+
+function saveState(page,s){
+
+localStorage.setItem(
+key(page),
+JSON.stringify(s)
+);
+
+}
+
+
+function save(name,data){
+
+localStorage.setItem(
+name,
+JSON.stringify(data)
+);
+
+}
+
+
+function id(prefix){
+
+return prefix+"_"+Date.now()+"_"+Math.random()
+.toString(36)
+.slice(2,8);
+
+}
+
+
+/* START */
+
+function startPlanner(){
+
+document.getElementById("welcome")
+.style.display="none";
+
+document.getElementById("app")
+.style.display="block";
+
+showPage(0);
+
+loadAll();
+
+}
+
+
+/* NAVIGATION */
+
+function showPage(n){
+
+document.querySelectorAll(".page")
+.forEach(p=>
+p.classList.remove("active")
+);
+
+const p=document.getElementById(
+"page"+n
+);
+
+if(p)
+p.classList.add("active");
+
+
+if(n<4)
+renderPlan(n);
+
+if(n===4)
+updateReport();
+
+if(n===5)
+loadFocusData();
+
+if(n===6)
+loadWeeklyOverview();
+
+if(n===7)
+renderHomework();
+
+if(n===8)
+renderSubjectStudyPlanner();
+
+
+scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+
+/* MENU */
+
+function toggleMenu(){
+
+const m=document.getElementById(
+
+document.getElementById("app")
+.style.display==="block"
+?"menuApp"
+:"menu"
+
+);
+
+m.style.display=
+m.style.display==="block"
+?"none"
+:"block";
+
+}
+
+
+/* THEME */
+
+function toggleDarkMode(){
+
+document.body.classList.toggle("dark");
+
+save(
+"dailyPlannerDark",
+document.body.classList.contains("dark")
+);
+
+}
+
+
+function setTheme(t){
+
+document.body.classList.remove(
+"blue",
+"green",
+"peach"
+);
+
+if(t!=="purple")
+document.body.classList.add(t);
+
+localStorage.setItem(
+"dailyPlannerTheme",
+t
+);
+
+}
+
+
+/* REPEATING TASKS */
+
+function repeatLabel(r){
+
+return r==="daily"
+?"🔄 Daily"
+:r==="weekly"
+?"🔄 Weekly"
+:r==="weekday"
+?"🔄 Weekdays"
+:"";
+
+}
+
+
+function repeatActive(t,date){
+
+if(t.repeat==="none")
+return false;
+
+
+const d=new Date(
+date+"T00:00:00"
+);
+
+const s=new Date(
+t.startDate+"T00:00:00"
+);
+
+
+if(d<s)
+return false;
+
+
+if(t.repeat==="daily")
+return true;
+
+
+if(t.repeat==="weekday")
+return d.getDay()>=1 &&
+d.getDay()<=5;
+
+
+return t.repeat==="weekly" &&
+d.getDay()===s.getDay();
+
+}
+
+
+function repeats(page,date){
+
+return repeatTasks.filter(
+t=>
+Number(t.page)===page &&
+repeatActive(t,date)
+);
+
+}
+
+
+/* PLANNER */
+
+function renderPlan(page){
+
+const c=document.getElementById(
+"tasks"+page
+);
+
+if(!c)
+return;
+
+c.innerHTML="";
+
+
+const s=state(page);
+
+
+plans[page].forEach((t,i)=>{
+
+taskHTML(
+c,
+t,
+s["preset_"+i],
+()=>togglePreset(page,i)
+);
+
+});
+
+
+(
+customTasks[selectedDate]?.[page]||[]
+)
+.forEach((t,i)=>{
+
+taskHTML(
+c,
+t,
+s["custom_"+i],
+()=>toggleCustom(page,i),
+()=>deleteCustom(page,i),
+"",
+()=>editCustom(page,i)
+);
+
+});
+
+
+repeats(page,selectedDate)
+.forEach(t=>{
+
+taskHTML(
+c,
+t,
+s["repeat_"+t.id],
+()=>toggleRepeat(page,t.id),
+()=>deleteRepeat(t.id),
+repeatLabel(t.repeat),
+()=>editRepeat(t.id)
+);
+
+});
+
+}
+
+
+function taskHTML(
+c,
+t,
+done,
+toggle,
+del,
+badge="",
+edit
+){
+
+const d=document.createElement("div");
+
+d.className=
+"task "+(done?"completed":"");
+
+
+d.innerHTML=`
+
+<input
+type="checkbox"
+${done?"checked":""}
+>
+
+<span class="task-name">
+${t.name}
+</span>
+
+<span class="task-time">
+${t.time||""}
+</span>
+
+<span class="priority ${t.priority.toLowerCase()}">
+${t.priority}
+</span>
+
+${badge
+?`<span class="repeat-badge">${badge}</span>`
+:""
+}
+
+${edit
+?`<button class="edit-btn">Edit</button>`
+:""
+}
+
+${del
+?`<button class="delete-btn">Delete</button>`
+:""
+}
+
+`;
+
+
+d.querySelector("input")
+.onchange=toggle;
+
+
+if(edit){
+
+d.querySelector(".edit-btn")
+.onclick=edit;
+
+}
+
+
+if(del){
+
+d.querySelector(".delete-btn")
+.onclick=del;
+
+}
+
+
+c.appendChild(d);
+
+}
+
+
+/* TASK CHECKING */
+
+function togglePreset(p,i){
+
+const s=state(p);
+
+s["preset_"+i]=
+!s["preset_"+i];
+
+saveState(p,s);
+
+renderPlan(p);
+
+updateReport();
+
+}
+
+
+function toggleCustom(p,i){
+
+const s=state(p);
+
+s["custom_"+i]=
+!s["custom_"+i];
+
+saveState(p,s);
+
+renderPlan(p);
+
+updateReport();
+
+}
+
+
+function toggleRepeat(p,i){
+
+const s=state(p);
+
+s["repeat_"+i]=
+!s["repeat_"+i];
+
+saveState(p,s);
+
+renderPlan(p);
+
+updateReport();
+
+}
+
+
+/* ADD CUSTOM TASK */
+
+function addCustomTask(p){
+
+const name=
+document.getElementById(
+"customTask"+p
+).value.trim();
+
+
+const time=
+document.getElementById(
+"customTime"+p
+).value;
+
+
+const priority=
+document.getElementById(
+"customPriority"+p
+).value;
+
+
+const repeat=
+document.getElementById(
+"customRepeat"+p
+).value;
+
+
+if(!name){
+
+alert("Please enter a task.");
+
+return;
+
+}
+
+
+if(repeat==="none"){
+
+customTasks[selectedDate]??={};
+
+customTasks[selectedDate][p]??=[];
+
+
+customTasks[selectedDate][p].push({
+
+name,
+time,
+priority
+
+});
+
+
+save(
+"dailyPlannerCustomTasks",
+customTasks
+);
+
+}else{
+
+repeatTasks.push({
+
+id:id("repeat"),
+
+name,
+time,
+priority,
+
+page:p,
+
+repeat,
+
+startDate:selectedDate
+
+});
+
+
+save(
+"dailyPlannerRepeatTasks",
+repeatTasks
+);
+
+}
+
+
+document.getElementById(
+"customTask"+p
+).value="";
+
+
+document.getElementById(
+"customTime"+p
+).value="";
+
+
+document.getElementById(
+"customRepeat"+p
+).value="none";
+
+
+renderPlan(p);
+
+updateReport();
+
+renderWeeklyOverview();
+
+}
+
+
+/* EDIT CUSTOM */
+
+function editCustom(p,i){
+
+const task=
+customTasks[selectedDate]
+?.[p]?.[i];
+
+
+if(!task)
+return;
+
+
+const name=prompt(
+"Edit task name:",
+task.name
+);
+
+
+if(name===null)
+return;
+
+
+const cleanName=
+name.trim();
+
+
+if(!cleanName){
+
+alert(
+"Task name cannot be empty."
+);
+
+return;
+
+}
+
+
+const time=prompt(
+"Edit task time (HH:MM):",
+task.time||""
+);
+
+
+if(time===null)
+return;
+
+
+const priority=prompt(
+"Edit priority: Low, Medium, or High:",
+task.priority
+);
+
+
+if(priority===null)
+return;
+
+
+const cleanPriority=
+["Low","Medium","High"]
+.includes(priority)
+?priority
+:task.priority;
+
+
+task.name=cleanName;
+
+task.time=time;
+
+task.priority=cleanPriority;
+
+
+save(
+"dailyPlannerCustomTasks",
+customTasks
+);
+
+
+renderPlan(p);
+
+updateReport();
+
+renderWeeklyOverview();
+
+}
+
+
+/* DELETE CUSTOM */
+
+function deleteCustom(p,i){
+
+if(!customTasks[selectedDate]?.[p])
+return;
+
+
+if(!confirm("Delete this task?"))
+return;
+
+
+customTasks[selectedDate][p]
+.splice(i,1);
+
+
+save(
+"dailyPlannerCustomTasks",
+customTasks
+);
+
+
+renderPlan(p);
+
+updateReport();
+
+renderWeeklyOverview();
+
+}
+
+
+/* EDIT REPEATING */
+
+function editRepeat(i){
+
+const task=
+repeatTasks.find(
+t=>t.id===i
+);
+
+
+if(!task)
+return;
+
+
+const name=prompt(
+"Edit repeating task name:",
+task.name
+);
+
+
+if(name===null)
+return;
+
+
+const cleanName=
+name.trim();
+
+
+if(!cleanName){
+
+alert(
+"Task name cannot be empty."
+);
+
+return;
+
+}
+
+
+const time=prompt(
+"Edit task time (HH:MM):",
+task.time||""
+);
+
+
+if(time===null)
+return;
+
+
+const priority=prompt(
+"Edit priority: Low, Medium, or High:",
+task.priority
+);
+
+
+if(priority===null)
+return;
+
+
+if(
+["Low","Medium","High"]
+.includes(priority)
+){
+
+task.priority=priority;
+
+}
+
+
+task.name=cleanName;
+
+task.time=time;
+
+
+save(
+"dailyPlannerRepeatTasks",
+repeatTasks
+);
+
+
+loadAll();
+
+}
+
+
+/* DELETE REPEATING */
+
+function deleteRepeat(i){
+
+if(!confirm(
+"Delete this repeating task?"
+))
+return;
+
+
+repeatTasks=
+repeatTasks.filter(
+t=>t.id!==i
+);
+
+
+save(
+"dailyPlannerRepeatTasks",
+repeatTasks
+);
+
+
+loadAll();
+
+}
+
+
+/* COUNTS */
+
+function getCounts(date=selectedDate){
+
+let total=0;
+
+let completed=0;
+
+
+for(let p=0;p<4;p++){
+
+const s=state(p,date);
+
+const c=
+customTasks[date]?.[p]||[];
+
+const r=
+repeats(p,date);
+
+
+total+=
+plans[p].length+
+c.length+
+r.length;
+
+
+plans[p].forEach((_,i)=>{
+
+completed+=
+!!s["preset_"+i];
+
+});
+
+
+c.forEach((_,i)=>{
+
+completed+=
+!!s["custom_"+i];
+
+});
+
+
+r.forEach(t=>{
+
+completed+=
+!!s["repeat_"+t.id];
+
+});
+
+}
+
+
+return{
+
+total,
+
+completed,
+
+remaining:
+total-completed
+
+};
+
+}
+
+
+/* ACHIEVEMENTS */
+
+const achievementList=[
+
+{
+
+id:"firstStep",
+
+icon:"🌱",
+
+name:"First Step",
+
+description:
+"Complete your first task.",
+
+check:()=>
+getCounts().completed>0
+
+},
+
+{
+
+id:"threeDayStreak",
+
+icon:"🔥",
+
+name:"3-Day Streak",
+
+description:
+"Use your planner for 3 days in a row.",
+
+check:()=>
+calculateStreak()>=3
+
+},
+
+{
+
+id:"studyMaster",
+
+icon:"📚",
+
+name:"Study Master",
+
+description:
+"Complete 5 focus sessions in one day.",
+
+check:()=>
+(studySessions[selectedDate]||[])
+.length>=5
+
+},
+
+{
+
+id:"goalGetter",
+
+icon:"🎯",
+
+name:"Goal Getter",
+
+description:
+"Complete your daily study goal.",
+
+check:()=>
+getStudyMinutes()>=getGoal()
+
+},
+
+{
+
+id:"superProductive",
+
+icon:"⭐",
+
+name:"Super Productive",
+
+description:
+"Complete 10 tasks in one day.",
+
+check:()=>
+getCounts().completed>=10
+
+}
+
+];
+
+
+function updateAchievements(){
+
+achievementList.forEach(a=>{
+
+if(
+!achievements[a.id] &&
+a.check()
+){
+
+achievements[a.id]=true;
+
+}
+
+});
+
+
+save(
+"dailyPlannerAchievements",
+achievements
+);
+
+
+renderAchievements();
+
+}
+
+
+function renderAchievements(){
+
+const g=
+document.getElementById(
+"achievementGrid"
+);
+
+
+if(!g)
+return;
+
+
+g.innerHTML="";
+
+let n=0;
+
+
+achievementList.forEach(a=>{
+
+const u=
+!!achievements[a.id];
+
+
+if(u)
+n++;
+
+
+g.innerHTML+=`
+
+<div class="achievement ${u?"unlocked":"locked"}">
+
+<div class="achievement-icon">
+${a.icon}
+</div>
+
+<div class="achievement-name">
+${a.name}
+</div>
+
+<div class="achievement-description">
+${a.description}
+</div>
+
+<div class="achievement-status">
+${u?"🏆 Unlocked":"🔒 Locked"}
+</div>
+
+</div>
+
+`;
+
+});
+
+
+document.getElementById(
+"achievementCount"
+).textContent=
+`${n} / ${achievementList.length} Unlocked`;
+
+}
+
+
+/* DAILY REPORT */
+
+function updateReport(){
+
+const c=getCounts();
+
+
+const pct=c.total
+?Math.round(
+c.completed/c.total*100
+)
+:0;
+
+
+document.getElementById(
+"totalTasks"
+).textContent=c.total;
+
+
+document.getElementById(
+"completedTasks"
+).textContent=c.completed;
+
+
+document.getElementById(
+"remainingTasks"
+).textContent=c.remaining;
+
+
+document.getElementById(
+"progressBar"
+).style.width=
+pct+"%";
+
+
+document.getElementById(
+"progressText"
+).textContent=
+pct+"% completed";
+
+
+document.getElementById(
+"streakCount"
+).textContent=
+calculateStreak();
+
+
+document.getElementById(
+"dailyNotes"
+).value=
+localStorage.getItem(
+"dailyNotes_"+selectedDate
+)||"";
+
+
+updateAchievements();
+
+}
+
+
+function finishDay(){
+
+const c=getCounts();
+
+
+document.getElementById(
+"reportMessage"
+).textContent=
+
+c.total &&
+c.total===c.completed
+
+?"🎉 Amazing! You completed everything today!"
+
+:`You completed ${c.completed} of ${c.total} tasks. Keep going!`;
+
+}
+
+
+function isDayCompleted(d){
+
+const c=getCounts(d);
+
+return c.total>0 &&
+c.total===c.completed;
+
+}
+
+
+function calculateStreak(){
+
+let n=0;
+
+let d=new Date(
+selectedDate+"T00:00:00"
+);
+
+
+while(
+isDayCompleted(
+getDateKey(d)
+)
+){
+
+n++;
+
+d.setDate(
+d.getDate()-1
+);
+
+}
+
+
+return n;
+
+}
+
+
+/* NOTES */
+
+document.getElementById(
+"dailyNotes"
+).oninput=()=>{
+
+localStorage.setItem(
+"dailyNotes_"+selectedDate,
+document.getElementById(
+"dailyNotes"
+).value
+);
+
+};
+
+
+/* DATES */
+
+const dateInputs=[
+
+"dateInput",
+"dateInput2",
+"dateInput3",
+"dateInput4",
+"dateInput5",
+"focusDateInput"
+
+];
+
+
+dateInputs.forEach(inputId=>{
+
+const e=
+document.getElementById(inputId);
+
+
+if(e){
+
+e.onchange=()=>{
+
+if(!e.value)
+return;
+
+
+selectedDate=e.value;
+
+syncDates();
+
+loadAll();
+
+};
+
+}
+
+});
+
+
+function syncDates(){
+
+dateInputs.forEach(inputId=>{
+
+const e=
+document.getElementById(inputId);
+
+
+if(e)
+e.value=selectedDate;
+
+});
+
+}
+
+
+/* FOCUS CENTER */
+
+function getFocusData(){
+
+return studySessions[selectedDate]||[];
+
+}
+
+
+function saveFocus(){
+
+save(
+"dailyPlannerStudySessions",
+studySessions
+);
+
+}
+
+
+function getStudyMinutes(){
+
+return getFocusData()
+.reduce(
+(s,x)=>
+s+Number(x.minutes||0),
+0
+);
+
+}
+
+
+function getStudyMinutesForDate(d){
+
+return (studySessions[d]||[])
+.reduce(
+(s,x)=>
+s+Number(x.minutes||0),
+0
+);
+
+}
+
+
+function getGoal(){
+
+return Number(
+dailyGoal[selectedDate]||60
+);
+
+}
+
+
+function loadFocusData(){
+
+const s=getFocusData();
+
+const m=getStudyMinutes();
+
+const g=getGoal();
+
+
+document.getElementById(
+"sessionCount"
+).textContent=s.length;
+
+
+document.getElementById(
+"studyMinutes"
+).textContent=m;
+
+
+document.getElementById(
+"goalDisplay"
+).textContent=g;
+
+
+document.getElementById(
+"dailyGoalInput"
+).value=g;
+
+
+const p=Math.min(
+100,
+Math.round(m/g*100)
+);
+
+
+document.getElementById(
+"goalProgressBar"
+).style.width=
+p+"%";
+
+
+document.getElementById(
+"goalProgressText"
+).textContent=
+`${m} / ${g} minutes`;
+
+
+renderStudyLog();
+
+updateAchievements();
+
+}
+
+
+function renderStudyLog(){
+
+const log=
+document.getElementById(
+"studyLog"
+);
+
+
+log.innerHTML="";
+
+
+const s=getFocusData();
+
+
+if(!s.length){
+
+log.innerHTML=
+'<div class="log-item">No study sessions yet.</div>';
+
+return;
+
+}
+
+
+s.slice()
+.reverse()
+.forEach(x=>{
+
+log.innerHTML+=`
+
+<div class="log-item">
+
+📚 <strong>
+${x.subject}
+</strong>
+
+— ${x.minutes} minutes
+
+<small>
+(${x.time})
+</small>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+/* TIMER */
+
+function updateTimerDisplay(){
+
+document.getElementById(
+"timer"
+).textContent=
+
+`${String(
+Math.floor(timerSeconds/60)
+).padStart(2,"0")}:${String(
+timerSeconds%60
+).padStart(2,"0")}`;
+
+}
+
+
+function startTimer(){
+
+if(timerRunning)
+return;
+
+
+timerRunning=true;
+
+
+timerInterval=setInterval(()=>{
+
+if(timerSeconds>0){
+
+timerSeconds--;
+
+updateTimerDisplay();
+
+}else{
+
+completeFocusSession();
+
+pauseTimer();
+
+alert(
+"🎉 Focus session complete!"
+);
+
+resetTimer();
+
+}
+
+},1000);
+
+}
+
+
+function pauseTimer(){
+
+clearInterval(
+timerInterval
+);
+
+timerInterval=null;
+
+timerRunning=false;
+
+}
+
+
+function resetTimer(){
+
+pauseTimer();
+
+
+timerSeconds=
+Number(
+document.getElementById(
+"durationSelect"
+).value
+)*60;
+
+
+updateTimerDisplay();
+
+}
+
+
+function completeFocusSession(){
+
+studySessions[selectedDate]??=[];
+
+
+studySessions[selectedDate].push({
+
+subject:
+document.getElementById(
+"subjectSelect"
+).value,
+
+minutes:
+Number(
+document.getElementById(
+"durationSelect"
+).value
+),
+
+time:
+new Date().toLocaleTimeString(
+[],
+{
+hour:"2-digit",
+minute:"2-digit"
+}
+)
+
+});
+
+
+saveFocus();
+
+loadFocusData();
+
+}
+
+
+document.getElementById(
+"durationSelect"
+).onchange=resetTimer;
+
+
+function saveDailyGoal(){
+
+dailyGoal[selectedDate]=
+Math.max(
+1,
+Number(
+document.getElementById(
+"dailyGoalInput"
+).value
+)||1
+);
+
+
+save(
+"dailyPlannerGoals",
+dailyGoal
+);
+
+
+loadFocusData();
+
+}
+
+
+/* WEEKLY OVERVIEW */
+
+function getWeekDates(s){
+
+const d=new Date(
+s+"T00:00:00"
+);
+
+
+const day=d.getDay();
+
+
+d.setDate(
+d.getDate()+
+(day===0?-6:1-day)
+);
+
+
+return Array.from(
+{length:7},
+(_,i)=>{
+
+const x=new Date(d);
+
+x.setDate(
+d.getDate()+i
+);
+
+return x;
+
+});
+
+}
+
+
+function shortDate(d){
+
+return d.toLocaleDateString(
+[],
+{
+month:"short",
+day:"numeric"
+}
+);
+
+}
+
+
+function loadWeeklyOverview(){
+
+document.getElementById(
+"weekDateInput"
+).value=weekDate;
+
+
+renderWeeklyOverview();
+
+}
+
+
+function renderWeeklyOverview(){
+
+const days=
+getWeekDates(weekDate);
+
+
+const container=
+document.getElementById(
+"weekDays"
+);
+
+
+container.innerHTML="";
+
+
+let total=0;
+
+let done=0;
+
+let study=0;
+
+
+days.forEach(d=>{
+
+const k=getDateKey(d);
+
+const c=getCounts(k);
+
+const m=
+getStudyMinutesForDate(k);
+
+
+total+=c.total;
+
+done+=c.completed;
+
+study+=m;
+
+
+const p=c.total
+?Math.round(
+c.completed/c.total*100
+)
+:0;
+
+
+container.innerHTML+=`
+
+<div class="week-day ${k===getToday()?"today":""}">
+
+<div class="week-day-name">
+
+${d.toLocaleDateString(
+[],
+{weekday:"short"}
+)}
+
+</div>
+
+
+<div class="week-day-date">
+
+${shortDate(d)}
+
+</div>
+
+
+<div class="week-day-number">
+
+${p}%
+
+</div>
+
+
+<div class="week-day-info">
+
+${c.completed} / ${c.total} tasks
+<br>
+
+${c.remaining} remaining
+<br>
+
+📚 ${m} study min
+
+</div>
+
+
+<div class="week-progress">
+
+<div style="width:${p}%"></div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+
+const p=total
+?Math.round(done/total*100)
+:0;
+
+
+document.getElementById(
+"weeklyTotalTasks"
+).textContent=total;
+
+
+document.getElementById(
+"weeklyCompletedTasks"
+).textContent=done;
+
+
+document.getElementById(
+"weeklyStudyMinutes"
+).textContent=study;
+
+
+document.getElementById(
+"weeklyProgressBar"
+).style.width=
+p+"%";
+
+
+document.getElementById(
+"weeklyProgressText"
+).textContent=
+p+"% completed";
+
+
+document.getElementById(
+"weekRange"
+).textContent=
+`${shortDate(days[0])} – ${shortDate(days[6])}`;
+
+}
+
+
+function changeWeek(n){
+
+const d=new Date(
+weekDate+"T00:00:00"
+);
+
+
+d.setDate(
+d.getDate()+n
+);
+
+
+weekDate=getDateKey(d);
+
+
+renderWeeklyOverview();
+
+}
+
+
+document.getElementById(
+"weekDateInput"
+).onchange=()=>{
+
+weekDate=
+document.getElementById(
+"weekDateInput"
+).value;
+
+
+if(!weekDate)
+weekDate=getToday();
+
+
+renderWeeklyOverview();
+
+};
+
+
+/* HOMEWORK */
+
+function addHomework(){
+
+const name=
+document.getElementById(
+"homeworkName"
+).value.trim();
+
+
+const date=
+document.getElementById(
+"homeworkDueDate"
+).value;
+
+
+if(!name){
+
+alert(
+"Please enter the homework name."
+);
+
+return;
+
+}
+
+
+if(!date){
+
+alert(
+"Please choose a due date."
+);
+
+return;
+
+}
+
+
+homeworkTasks.push({
+
+id:id("homework"),
+
+name,
+
+subject:
+document.getElementById(
+"homeworkSubject"
+).value,
+
+dueDate:date,
+
+priority:
+document.getElementById(
+"homeworkPriority"
+).value,
+
+completed:false
+
+});
+
+
+save(
+"dailyPlannerHomework",
+homeworkTasks
+);
+
+
+document.getElementById(
+"homeworkName"
+).value="";
+
+
+document.getElementById(
+"homeworkDueDate"
+).value="";
+
+
+renderHomework();
+
+}
+
+
+function toggleHomework(i){
+
+const x=
+homeworkTasks.find(
+t=>t.id===i
+);
+
+
+if(x)
+x.completed=!x.completed;
+
+
+save(
+"dailyPlannerHomework",
+homeworkTasks
+);
+
+
+renderHomework();
+
+}
+
+
+function deleteHomework(i){
+
+if(
+confirm("Delete this homework?")
+){
+
+homeworkTasks=
+homeworkTasks.filter(
+t=>t.id!==i
+);
+
+
+save(
+"dailyPlannerHomework",
+homeworkTasks
+);
+
+
+renderHomework();
+
+}
+
+}
+
+
+/* EDIT HOMEWORK */
+
+function editHomework(i){
+
+const x=
+homeworkTasks.find(
+t=>t.id===i
+);
+
+
+if(!x)
+return;
+
+
+const name=prompt(
+"Edit homework name:",
+x.name
+);
+
+
+if(name===null)
+return;
+
+
+if(!name.trim()){
+
+alert(
+"Homework name cannot be empty."
+);
+
+return;
+
+}
+
+
+const due=prompt(
+"Edit due date (YYYY-MM-DD):",
+x.dueDate
+);
+
+
+if(due===null)
+return;
+
+
+const priority=prompt(
+"Edit priority: Low, Medium, or High:",
+x.priority
+);
+
+
+if(priority===null)
+return;
+
+
+x.name=name.trim();
+
+x.dueDate=due;
+
+
+if(
+["Low","Medium","High"]
+.includes(priority)
+){
+
+x.priority=priority;
+
+}
+
+
+save(
+"dailyPlannerHomework",
+homeworkTasks
+);
+
+
+renderHomework();
+
+}
+
+
+/* FORMAT DATE */
+
+function formatDate(s){
+
+return new Date(
+s+"T00:00:00"
+).toLocaleDateString(
+[],
+{
+month:"short",
+day:"numeric",
+year:"numeric"
+}
+);
+
+}
+
+
+/* RENDER HOMEWORK */
+
+function renderHomework(){
+
+const list=
+document.getElementById(
+"homeworkList"
+);
+
+
+list.innerHTML="";
+
+
+const done=
+homeworkTasks.filter(
+x=>x.completed
+).length;
+
+
+document.getElementById(
+"homeworkTotal"
+).textContent=
+homeworkTasks.length;
+
+
+document.getElementById(
+"homeworkCompleted"
+).textContent=
+done;
+
+
+document.getElementById(
+"homeworkRemaining"
+).textContent=
+homeworkTasks.length-done;
+
+
+if(!homeworkTasks.length){
+
+list.innerHTML=
+'<div class="homework-empty">📚 No homework added yet.</div>';
+
+return;
+
+}
+
+
+homeworkTasks
+.slice()
+.sort(
+(a,b)=>
+a.completed-b.completed||
+a.dueDate.localeCompare(
+b.dueDate
+)
+)
+.forEach(x=>{
+
+list.innerHTML+=`
+
+<div class="homework-item ${x.completed?"completed":""}">
+
+<input
+type="checkbox"
+${x.completed?"checked":""}
+onchange="toggleHomework('${x.id}')">
+
+
+<div class="homework-name">
+
+${x.name}
+
+<div class="homework-details">
+
+📖 ${x.subject}
+
+</div>
+
+</div>
+
+
+<span class="homework-due">
+
+📅 ${formatDate(x.dueDate)}
+
+</span>
+
+
+<span class="priority ${x.priority.toLowerCase()}">
+
+${x.priority}
+
+</span>
+
+
+<button
+class="edit-btn"
+onclick="editHomework('${x.id}')">
+
+Edit
+
+</button>
+
+
+<button
+class="delete-btn"
+onclick="deleteHomework('${x.id}')">
+
+Delete
+
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+/* SUBJECT STUDY PLANNER */
+
+function addStudyPlan(){
+
+const topic=
+document.getElementById(
+"studyPlanTopic"
+).value.trim();
+
+
+const date=
+document.getElementById(
+"studyPlanDate"
+).value;
+
+
+if(!topic){
+
+alert(
+"Please enter what you want to study."
+);
+
+return;
+
+}
+
+
+if(!date){
+
+alert(
+"Please choose a study date."
+);
+
+return;
+
+}
+
+
+subjectStudyPlans.push({
+
+id:id("studyplan"),
+
+subject:
+document.getElementById(
+"studyPlanSubject"
+).value,
+
+topic,
+
+date,
+
+duration:
+Number(
+document.getElementById(
+"studyPlanDuration"
+).value
+),
+
+priority:
+document.getElementById(
+"studyPlanPriority"
+).value,
+
+completed:false
+
+});
+
+
+save(
+"dailyPlannerSubjectPlans",
+subjectStudyPlans
+);
+
+
+document.getElementById(
+"studyPlanTopic"
+).value="";
+
+
+document.getElementById(
+"studyPlanDate"
+).value="";
+
+
+renderSubjectStudyPlanner();
+
+}
+
+
+/* TOGGLE STUDY PLAN */
+
+function toggleStudyPlan(i){
+
+const x=
+subjectStudyPlans.find(
+t=>t.id===i
+);
+
+
+if(x)
+x.completed=!x.completed;
+
+
+save(
+"dailyPlannerSubjectPlans",
+subjectStudyPlans
+);
+
+
+renderSubjectStudyPlanner();
+
+}
+
+
+/* DELETE STUDY PLAN */
+
+function deleteStudyPlan(i){
+
+if(
+confirm("Delete this study plan?")
+){
+
+subjectStudyPlans=
+subjectStudyPlans.filter(
+t=>t.id!==i
+);
+
+
+save(
+"dailyPlannerSubjectPlans",
+subjectStudyPlans
+);
+
+
+renderSubjectStudyPlanner();
+
+}
+
+}
+
+
+/* EDIT STUDY PLAN */
+
+function editStudyPlan(i){
+
+const x=
+subjectStudyPlans.find(
+t=>t.id===i
+);
+
+
+if(!x)
+return;
+
+
+const topic=prompt(
+"Edit study topic:",
+x.topic
+);
+
+
+if(topic===null)
+return;
+
+
+if(!topic.trim()){
+
+alert(
+"Study topic cannot be empty."
+);
+
+return;
+
+}
+
+
+const date=prompt(
+"Edit study date (YYYY-MM-DD):",
+x.date
+);
+
+
+if(date===null)
+return;
+
+
+const duration=prompt(
+"Edit duration in minutes:",
+x.duration
+);
+
+
+if(duration===null)
+return;
+
+
+const priority=prompt(
+"Edit priority: Low, Medium, or High:",
+x.priority
+);
+
+
+if(priority===null)
+return;
+
+
+x.topic=topic.trim();
+
+x.date=date;
+
+x.duration=
+Math.max(
+1,
+Number(duration)||x.duration
+);
+
+
+if(
+["Low","Medium","High"]
+.includes(priority)
+){
+
+x.priority=priority;
+
+}
+
+
+save(
+"dailyPlannerSubjectPlans",
+subjectStudyPlans
+);
+
+
+renderSubjectStudyPlanner();
+
+}
+
+
+/* RENDER STUDY PLANNER */
+
+function renderSubjectStudyPlanner(){
+
+const list=
+document.getElementById(
+"studyPlanList"
+);
+
+
+list.innerHTML="";
+
+
+const done=
+subjectStudyPlans.filter(
+x=>x.completed
+).length;
+
+
+document.getElementById(
+"studyPlanTotal"
+).textContent=
+subjectStudyPlans.length;
+
+
+document.getElementById(
+"studyPlanCompleted"
+).textContent=
+done;
+
+
+document.getElementById(
+"studyPlanRemaining"
+).textContent=
+subjectStudyPlans.length-done;
+
+
+if(!subjectStudyPlans.length){
+
+list.innerHTML=
+'<div class="subject-empty">📚 No study plans added yet.</div>';
+
+return;
+
+}
+
+
+subjectStudyPlans
+.slice()
+.sort(
+(a,b)=>
+a.completed-b.completed||
+a.date.localeCompare(b.date)
+)
+.forEach(x=>{
+
+const overdue=
+!x.completed &&
+x.date<getToday();
+
+
+list.innerHTML+=`
+
+<div class="subject-item ${x.completed?"completed":""}">
+
+<input
+type="checkbox"
+${x.completed?"checked":""}
+onchange="toggleStudyPlan('${x.id}')">
+
+
+<div class="subject-name">
+
+${x.topic}
+
+<div class="subject-details">
+
+📖 ${x.subject}
+•
+⏱ ${x.duration} minutes
+
+</div>
+
+</div>
+
+
+<span
+class="${overdue
+?"subject-overdue"
+:"subject-date"}">
+
+📅 ${formatDate(x.date)}
+
+${overdue
+?" • Overdue"
+:""}
+
+</span>
+
+
+<span
+class="priority ${x.priority.toLowerCase()}">
+
+${x.priority}
+
+</span>
+
+
+<button
+class="edit-btn"
+onclick="editStudyPlan('${x.id}')">
+
+Edit
+
+</button>
+
+
+<button
+class="delete-btn"
+onclick="deleteStudyPlan('${x.id}')">
+
+Delete
+
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+/* LOAD EVERYTHING */
+
+function loadAll(){
+
+syncDates();
+
+
+for(let i=0;i<4;i++)
+renderPlan(i);
+
+
+updateReport();
+
+loadFocusData();
+
+renderHomework();
+
+renderSubjectStudyPlanner();
+
+
+if(
+document.getElementById(
+"page6"
+).classList.contains("active")
+){
+
+renderWeeklyOverview();
+
+}
+
+}
+
+
+/* SETTINGS */
+
+const savedTheme=
+localStorage.getItem(
+"dailyPlannerTheme"
+);
+
+
+if(savedTheme)
+setTheme(savedTheme);
+
+
+if(
+localStorage.getItem(
+"dailyPlannerDark"
+)==="true"
+){
+
+document.body.classList.add("dark");
+
+}
+
+
+syncDates();
+
+
+document.getElementById(
+"weekDateInput"
+).value=weekDate;
+
+
+updateTimerDisplay();
+
+loadAll();
+
+renderWeeklyOverview();
+
+renderHomework();
+
+renderSubjectStudyPlanner();
+
+</script>
+
+</body>
+</html>
