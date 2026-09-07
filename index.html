@@ -1,1 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Planner</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;text-align:center;margin:0;padding:30px;min-height:100vh;color:#333;transition:.3s;background:linear-gradient(135deg,#ffd6e7,#e6d6ff)}
+body.blue{background:linear-gradient(135deg,#cfe9ff,#dcd6ff)}
+body.green{background:linear-gradient(135deg,#d5f5dc,#c8f1ef)}
+body.peach{background:linear-gradient(135deg,#ffd9c2,#ffe9d6)}
+body.dark{background:linear-gradient(135deg,#181827,#27213a);color:#eee}
+button{border:0;border-radius:12px;padding:12px 20px;cursor:pointer;font-size:15px;background:#8b5cf6;color:#fff;transition:.2s}
+button:hover{transform:translateY(-2px);opacity:.9}
+#welcome{max-width:700px;margin:80px auto;padding:45px;border-radius:25px;background:#fffc;box-shadow:0 10px 35px #0002}
+#welcome h1{font-size:42px;margin:0 0 15px}
+#welcome p{font-size:18px;line-height:1.6}
+#app{display:none;max-width:1000px;margin:auto}
+.page{display:none}.page.active{display:block}
+.planner,.report,.focus-box,.weekly-box,.homework-box,.subject-box{background:#fffffff2;border-radius:22px;padding:30px;box-shadow:0 8px 30px #0002}
+body.dark .planner,body.dark .report,body.dark .focus-box,body.dark .weekly-box,body.dark .homework-box,body.dark .subject-box,body.dark .achievement,body.dark .notes-box,body.dark .week-day,body.dark .homework-item,body.dark .subject-item,body.dark .homework-stat,body.dark .subject-stat,body.dark .habit-box,body.dark .habit-item,body.dark .goal-item{background:#252538;color:#eee}
+body.dark .task,body.dark input,body.dark select,body.dark textarea{background:#33334b;color:#fff;border-color:#666}
+.dots{position:absolute;top:20px;right:25px;font-size:28px;cursor:pointer}
+.menu{display:none;position:absolute;top:60px;right:20px;background:#fff;padding:15px;border-radius:15px;box-shadow:0 8px 25px #0003;z-index:100}
+.menu button{display:block;width:100%;margin:5px 0}
+body.dark .menu{background:#252538}
+h1,h2{margin-top:0}
+.date-box{margin:15px 0 25px}
+.date-box input,.week-controls input{padding:10px;border-radius:10px;border:1px solid #ccc;font-size:15px}
+.task,.homework-item,.subject-item{display:flex;align-items:center;gap:10px;text-align:left;margin:10px 0;padding:14px;border-radius:14px;background:#fff;box-shadow:0 3px 10px #00000012}
+.task.completed,.homework-item.completed,.subject-item.completed{opacity:.6}
+.task.completed .task-name,.homework-item.completed .homework-name,.subject-item.completed .subject-name{text-decoration:line-through}
+.task-name,.homework-name,.subject-name{flex:1;font-weight:bold}
+.task-time{color:#777;font-size:13px}
+.priority,.repeat-badge,.homework-due,.subject-date,.subject-overdue{font-size:12px;padding:5px 8px;border-radius:8px;font-weight:bold;white-space:nowrap}
+.priority.low{background:#d9f7df;color:#23843b}
+.priority.medium{background:#fff1bd;color:#9b7400}
+.priority.high{background:#ffd4d4;color:#b83232}
+.repeat-badge,.subject-date{background:#e7ddff;color:#6d42c4}
+.subject-overdue{background:#ffd4d4;color:#b83232}
+.add-task,.homework-form,.subject-form{display:grid;gap:8px;margin-top:20px;grid-template-columns:2fr 1fr 1fr 1fr}
+.add-task input,.add-task select,.homework-form input,.homework-form select,.subject-form input,.subject-form select{padding:11px;border-radius:10px;border:1px solid #ccc;min-width:0}
+.add-task button,.homework-form button,.subject-form button{grid-column:1/-1}
+.delete-btn{background:#ef4444;padding:7px 10px;font-size:12px}
+.edit-btn{background:#f59e0b;padding:7px 10px;font-size:12px}
+.reminder-btn{background:#3b82f6;padding:7px 10px;font-size:12px}
+.reminder-btn.active{background:#10b981}
+.nav{display:flex;gap:10px;margin-top:25px}
+.nav button{flex:1}
+.notes-box{background:#fff;padding:20px;border-radius:18px;margin-top:25px}
+.notes-box textarea{width:100%;min-height:130px;resize:vertical;padding:12px;border:1px solid #ccc;border-radius:12px;font:14px Arial}
+.stats,.focus-stats,.week-summary,.homework-stats,.subject-stats,.progress-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 0}
+.stat,.focus-stat,.week-summary-box,.homework-stat,.subject-stat,.progress-stat{background:#f4efff;padding:20px;border-radius:16px}
+.stat strong,.week-summary-box strong,.homework-stat strong,.subject-stat strong,.focus-stat strong,.progress-stat strong{display:block;font-size:28px;margin-bottom:5px}
+.progress-container,.goal-progress,.week-progress{background:#ddd;border-radius:20px;overflow:hidden}
+.progress-container{height:20px;margin:15px 0}
+.progress-bar{height:100%;width:0;background:#8b5cf6;transition:.4s}
+.goal-progress{height:16px;margin-top:12px}
+.goal-progress div,.week-progress div{height:100%;width:0;background:#10b981}
+.streak{font-size:20px;margin:15px}
+.finish-btn{background:#10b981}
+.message{min-height:25px;margin:15px;font-weight:bold}
+.achievements{margin-top:30px}
+.achievement-count{margin-bottom:15px}
+.achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px}
+.achievement{background:#fff;border-radius:18px;padding:20px;box-shadow:0 4px 15px #00000014;border:2px solid transparent}
+.achievement.unlocked{border-color:#f5c542}
+.achievement.locked{opacity:.55;filter:grayscale(.5)}
+.achievement-icon{font-size:40px}
+.achievement-name{font-weight:bold;font-size:17px;margin:7px}
+.achievement-description{font-size:13px;line-height:1.4}
+.achievement-status{margin-top:10px;font-size:12px;font-weight:bold}
+.focus-box,.weekly-box,.homework-box,.subject-box{max-width:950px;margin:auto}
+.focus-title,.weekly-title,.homework-title,.subject-title{font-size:32px;margin-bottom:8px}
+.focus-subtitle,.weekly-subtitle,.homework-subtitle,.subject-subtitle{color:#777;margin-bottom:25px}
+.focus-controls,.week-controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
+.focus-controls select{padding:12px;border-radius:10px;border:1px solid #ccc}
+.timer{font-size:70px;font-weight:bold;margin:25px 0}
+.timer-buttons{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.timer-buttons button{min-width:110px}
+.goal-box{margin-top:25px;background:#f4efff;padding:20px;border-radius:16px}
+.goal-box input{padding:10px;border-radius:10px;border:1px solid #ccc;width:100px}
+.study-log,.homework-list,.subject-list{margin-top:25px;text-align:left}
+.log-item{padding:12px;margin:8px 0;background:#f7f7f7;border-radius:10px}
+body.dark .goal-box,body.dark .focus-stat,body.dark .log-item,body.dark .stat,body.dark .week-summary-box,body.dark .progress-stat{background:#33334b}
+.week-controls{margin-bottom:25px}
+.week-controls button{padding:10px 15px}
+.week-range{font-weight:bold;font-size:18px;margin-bottom:20px}
+.week-days{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.week-day{background:#fff;border-radius:16px;padding:15px 10px;box-shadow:0 3px 12px #00000012}
+.week-day.today{border:2px solid #8b5cf6}
+.week-day-name{font-weight:bold}
+.week-day-date{font-size:13px;color:#777;margin:5px 0 12px}
+.week-day-number{font-size:25px;font-weight:bold;margin:8px 0}
+.week-day-info{font-size:12px;line-height:1.7}
+.week-progress{height:10px;margin-top:10px}
+.homework-details,.subject-details{font-size:12px;color:#777}
+.homework-empty,.subject-empty{text-align:center;padding:30px;color:#777}
+body.dark .homework-details,body.dark .subject-details,body.dark .homework-empty,body.dark .subject-empty{color:#bbb}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:20px}
+.cal-head{font-weight:bold;padding:10px}
+.cal-day{background:#fff;border-radius:12px;min-height:90px;padding:8px;text-align:left;cursor:pointer}
+.cal-day:hover{transform:scale(1.02)}
+.cal-day.today{border:2px solid #8b5cf6}
+.cal-day.selected{box-shadow:0 0 0 3px #10b981}
+.cal-num{font-weight:bold}
+.cal-info{font-size:11px;margin-top:7px;line-height:1.5}
+.cal-done{color:#10b981}
+body.dark .cal-day{background:#252538;color:#eee}
+.calendar-title{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.calendar-title button{padding:8px 12px}
+.search-box{width:100%;padding:12px;border-radius:10px;border:1px solid #ccc}
+.quick-box{margin-top:25px;padding:20px;background:#f4efff;border-radius:16px}
+.quick-box input,.quick-box select{width:100%;padding:12px;border-radius:10px;border:1px solid #ccc;margin-top:10px}
+.quick-box button{margin-top:12px;width:100%}
+body.dark .quick-box{background:#33334b}
+.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{min-width:240px;max-width:360px;padding:13px 17px;border-radius:14px;background:#8b5cf6;color:#fff;box-shadow:0 8px 25px #0003;font-weight:bold;text-align:left;animation:in .25s ease,out .25s ease 2.5s forwards}
+.toast.info{background:#3b82f6}
+.toast.warning{background:#f59e0b}
+.toast.achievement{background:#eab308;color:#332600}
+@keyframes in{from{opacity:0;transform:translateX(30px)}}
+@keyframes out{to{opacity:0;transform:translateX(30px)}}
+.habit-box{background:#fffffff2;border-radius:22px;padding:30px;box-shadow:0 8px 30px #0002;max-width:950px;margin:auto}
+.habit-title{font-size:32px;margin-bottom:8px}
+.habit-subtitle{color:#777;margin-bottom:25px}
+.habit-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 0}
+.habit-stat{background:#f4efff;padding:20px;border-radius:16px}
+.habit-stat strong{display:block;font-size:28px;margin-bottom:5px}
+.habit-form{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-top:20px}
+.habit-form input,.habit-form select{padding:11px;border-radius:10px;border:1px solid #ccc;min-width:0}
+.habit-form button{grid-column:1/-1}
+.habit-list{margin-top:25px;text-align:left}
+.habit-item{display:flex;align-items:center;gap:10px;margin:10px 0;padding:14px;border-radius:14px;background:#fff;box-shadow:0 3px 10px #00000012}
+.habit-item.completed{opacity:.6}
+.habit-item.completed .habit-name{text-decoration:line-through}
+.habit-name{flex:1;font-weight:bold}
+.habit-frequency{font-size:12px;padding:5px 8px;border-radius:8px;background:#e7ddff;color:#6d42c4;font-weight:bold}
+.habit-progress{background:#ddd;height:9px;border-radius:20px;overflow:hidden;min-width:80px}
+.habit-progress div{height:100%;background:#10b981}
+.habit-empty{text-align:center;padding:30px;color:#777}
+body.dark .habit-stat{background:#33334b}
+@media(max-width:800px){
+.week-days,.calendar{grid-template-columns:repeat(2,1fr)}
+.add-task,.homework-form,.subject-form{grid-template-columns:1fr 1fr}
+.habit-form{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+body{padding:15px}
+#welcome{margin:40px auto;padding:30px 20px}
+#welcome h1{font-size:32px}
+.stats,.focus-stats,.week-summary,.homework-stats,.subject-stats,.progress-stats,.habit-stats{grid-template-columns:1fr}
+.task,.homework-item,.subject-item,.habit-item{flex-wrap:wrap}
+.nav{flex-direction:column}
+.add-task,.homework-form,.subject-form,.habit-form{grid-template-columns:1fr}
+.timer{font-size:55px}
+.week-days,.calendar{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
 
+<div id="toastContainer" class="toast-container"></div>
+
+<div id="welcome">
+<div class="dots" onclick="toggleMenu()">⋮</div>
+<div class="menu" id="menu">
+<button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+<button onclick="setTheme('purple')">💜 Purple</button>
+<button onclick="setTheme('blue')">💙 Blue</button>
+<button onclick="setTheme('green')">💚 Green</button>
+<button onclick="setTheme('peach')">🍑 Peach</button>
+</div>
+<h1>📚 My Daily Planner</h1>
+<p>Organize your day, complete your tasks, track your progress, and build better study habits.</p>
+<button onclick="startPlanner()">Let's Start</button>
+</div>
+
+<div id="app">
+<div class="dots" onclick="toggleMenu()">⋮</div>
+<div class="menu" id="menuApp">
+<button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+<button onclick="setTheme('purple')">💜 Purple</button>
+<button onclick="setTheme('blue')">💙 Blue</button>
+<button onclick="setTheme('green')">💚 Green</button>
+<button onclick="setTheme('peach')">🍑 Peach</button>
+</div>
+
+<script>
+const pageInfo=[
+["🌅 Morning Plan",[["Wake up","06:00","High"],["Make my bed","06:05","Low"],["Pray","06:15","High"],["Important meeting","06:30","High"],["Breakfast","07:00","Medium"],["Skincare","07:20","Low"],["Review homework","07:30","High"],["Wear uniform","07:45","Medium"],["Go to school","08:00","High"]]],
+["☀️ Afternoon Plan",[["Change your clothes","12:10","Low"],["Wash your face","12:20","Low"],["Eat lunch","12:30","High"],["Check your school schedule for the next day","13:00","Medium"],["Pray","13:30","High"],["Iron your uniform","14:00","Medium"],["Study","15:00","High"],["Rest","16:30","Low"]]],
+["🌆 Evening Plan",[["Review","17:00","High"],["Pray","18:00","High"],["Dinner","19:00","Medium"]]],
+["🌙 Night Plan",[["Game","20:00","Low"],["Review","20:30","High"],["Pray","21:00","High"],["Night routine","21:30","Medium"],["Get ready for bed","22:00","High"]]]
+];
+
+const subjects=["English","Math","Arabic","Science","Kurdish","History","Computer","Religious Education","Other"];
+const get=(k,d)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d));
+const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+
+let selectedDate=new Date().toISOString().slice(0,10),
+customTasks=get("dailyPlannerCustomTasks",{}),
+repeatTasks=get("dailyPlannerRepeatTasks",[]),
+homeworkTasks=get("dailyPlannerHomework",[]),
+subjectStudyPlans=get("dailyPlannerSubjectPlans",[]),
+studySessions=get("dailyPlannerStudySessions",{}),
+dailyGoal=get("dailyPlannerGoals",{}),
+achievements=get("dailyPlannerAchievements",{}),
+taskReminders=get("dailyPlannerReminders",{}),
+reminderLastFired=get("dailyPlannerReminderLastFired",{}),
+habits=get("dailyPlannerHabits",{}),
+weekDate=selectedDate,
+calDate=selectedDate;
+
+function today(){return new Date().toISOString().slice(0,10)}
+function uid(x){return x+"_"+Date.now()+"_"+Math.random().toString(36).slice(2,7)}
+function toast(m,t="info",i="💜"){
+let x=document.createElement("div");
+x.className="toast "+t;
+x.textContent=i+" "+m;
+toastContainer.appendChild(x);
+setTimeout(()=>x.remove(),2800)
+}
+function toggleMenu(){
+["menu","menuApp"].forEach(id=>{
+let x=document.getElementById(id);
+if(x)x.style.display=x.style.display=="block"?"none":"block"
+})
+}
+function setTheme(t){
+document.body.classList.remove("blue","green","peach");
+if(t!="purple")document.body.classList.add(t);
+save("dailyPlannerTheme",t)
+}
+function toggleDarkMode(){
+document.body.classList.toggle("dark");
+save("dailyPlannerDark",document.body.classList.contains("dark"))
+}
+function startPlanner(){
+welcome.style.display="none";
+app.style.display="block";
+showPage(0);
+loadAll();
+startReminderChecker()
+}
+function state(p,d=selectedDate){return get(`dailyPlanner_${d}_${p}`,{})}
+function saveState(p,s){save(`dailyPlanner_${selectedDate}_${p}`,s)}
+
+for(let i=0;i<4;i++)
+document.write(`
+<section class="page" id="page${i}">
+<div class="planner">
+<h1>${pageInfo[i][0]}</h1>
+<div class="date-box"><input type="date" id="dateInput${i||""}"></div>
+<div id="tasks${i}"></div>
+<div class="add-task">
+<input id="customTask${i}" placeholder="Add a task...">
+<input type="time" id="customTime${i}">
+<select id="customPriority${i}">
+<option>Low</option><option selected>Medium</option><option>High</option>
+</select>
+<select id="customRepeat${i}">
+<option value="none">Does not repeat</option>
+<option value="daily">Every day</option>
+<option value="weekly">Every week</option>
+<option value="weekday">Every weekday</option>
+</select>
+<button onclick="addCustomTask(${i})">Add Task</button>
+</div>
+<div class="nav">
+${i?`<button onclick="showPage(${i-1})">← ${pageInfo[i-1][0].slice(2)}</button>`:""}
+<button onclick="showPage(${i<3?i+1:4})">${i<3?pageInfo[i+1][0].slice(2):"Focus Center →"}</button>
+</div>
+</div>
+</section>
+`);
+</script>
+
+<section class="page" id="page4">
+<div class="focus-box">
+<div class="focus-title">🎯 Focus Center</div>
+<div class="focus-subtitle">Use the timer to study with focus.</div>
+<div class="focus-controls">
+<select id="focusSubject"></select>
+<select id="durationSelect">
+<option value="5">5 Minutes</option>
+<option value="15">15 Minutes</option>
+<option value="25" selected>25 Minutes</option>
+<option value="45">45 Minutes</option>
+<option value="60">60 Minutes</option>
+</select>
+</div>
+<div class="timer" id="timer">25:00</div>
+<div class="timer-buttons">
+<button onclick="startTimer()">▶ Start</button>
+<button onclick="pauseTimer()">⏸ Pause</button>
+<button onclick="resetTimer()">↺ Reset</button>
+</div>
+<div class="focus-stats">
+<div class="focus-stat"><strong id="todayStudyMinutes">0</strong>Study Minutes</div>
+<div class="focus-stat"><strong id="todaySessions">0</strong>Sessions</div>
+<div class="focus-stat"><strong id="dailyGoalDisplay">60</strong>Goal Minutes</div>
+</div>
+<div class="goal-box">
+<h3>🎯 Daily Study Goal</h3>
+<input type="number" id="dailyGoalInput" min="1" value="60">
+<button onclick="saveDailyGoal()">Save Goal</button>
+<div class="goal-progress"><div id="goalProgressBar"></div></div>
+<p id="goalProgressText">0 / 60 minutes</p>
+</div>
+<div class="study-log">
+<h3>📚 Study Log</h3>
+<div id="studyLog"></div>
+</div>
+<div class="nav">
+<button onclick="showPage(3)">← Night Plan</button>
+<button onclick="showPage(5)">Homework Tracker →</button>
+</div>
+</div>
+</section>
+
+<section class="page" id="page5">
+<div class="homework-box">
+<div class="homework-title">📚 Homework Tracker</div>
+<div class="homework-subtitle">Keep all your homework organized in one place.</div>
+<div class="homework-stats">
+<div class="homework-stat"><strong id="homeworkTotal">0</strong>Total</div>
+<div class="homework-stat"><strong id="homeworkCompleted">0</strong>Completed</div>
+<div class="homework-stat"><strong id="homeworkRemaining">0</strong>Remaining</div>
+</div>
+<div class="homework-form">
+<input id="homeworkName" placeholder="Homework name...">
+<select id="homeworkSubject"></select>
+<input type="date" id="homeworkDueDate">
+<select id="homeworkPriority">
+<option>Low</option><option selected>Medium</option><option>High</option>
+</select>
+<button onclick="addHomework()">Add Homework</button>
+</div>
+<div class="homework-list" id="homeworkList"></div>
+<div class="nav">
+<button onclick="showPage(4)">← Focus Center</button>
+<button onclick="showPage(6)">Subject Study Planner →</button>
+</div>
+</div>
+</section>
+
+<section class="page" id="page6">
+<div class="subject-box">
+<div class="subject-title">📖 Subject Study Planner</div>
+<div class="subject-subtitle">Plan exactly what you want to study for each subject.</div>
+<div class="subject-stats">
+<div class="subject-stat"><strong id="studyPlanTotal">0</strong>Total Plans</div>
+<div class="subject-stat"><strong id="studyPlanCompleted">0</strong>Completed</div>
+<div class="subject-stat"><strong id="studyPlanRemaining">0</strong>Remaining</div>
+</div>
+<div class="subject-form">
+<input id="studyPlanTopic" placeholder="What do you want to study?">
+<select id="studyPlanSubject"></select>
+<input type="date" id="studyPlanDate">
+<input type="number" id="studyPlanDuration" placeholder="Minutes" min="1" value="30">
+<select id="studyPlanPriority">
+<option>Low</option><option selected>Medium</option><option>High</option>
+</select>
+<button onclick="addStudyPlan()">Add Study Plan</button>
+</div>
+<div class="subject-list" id="studyPlanList"></div>
+<div class="nav">
+<button onclick="showPage(5)">← Homework Tracker</button>
+<button onclick="showPage(7)">Search & Quick Add →</button>
+</div>
+</div>
+</section>
+
+<section class="page" id="page7">
+<div class="planner">
+<h1>🔎 Search & ⚡ Quick Add</h1>
+<input id="searchInput" class="search-box" placeholder="Search tasks, homework, study plans...">
+<div id="searchResults" style="margin-top:20px;text-align:left"></div>
+<div class="quick-box">
+<h2>⚡ Quick Add</h2>
+<p>Add a task quickly to any planner section.</p>
+<input id="quickTask" placeholder="Task name...">
+<input type="time" id="quickTime">
+<select id="quickPriority">
+<option>Low</option><option selected>Medium</option><option>High</option>
+</select>
+<select id="quickPage">
+<option value="0">🌅 Morning</option>
+<option value="1">☀️ Afternoon</option>
+<option value="2">🌆 Evening</option>
+<option value="3">🌙 Night</option>
+</select>
+<button onclick="quickAddTask()">Add Task</button>
+</div>
+<div class="nav">
+<button onclick="showPage(6)">← Subject Study Planner</button>
+<button onclick="showPage(8)">Daily Report & Dashboard →</button>
+</div>
+</div>
+</section>
+
+<!-- DAILY REPORT + DASHBOARD -->
+<section class="page" id="page8">
+<div class="report">
+<h1>📊 Daily Report & Dashboard</h1>
+
+<div class="date-box">
+<input type="date" id="dateInput5">
+</div>
+
+<div class="stats">
+<div class="stat"><strong id="totalTasks">0</strong>Total Tasks</div>
+<div class="stat"><strong id="completedTasks">0</strong>Completed</div>
+<div class="stat"><strong id="remainingTasks">0</strong>Remaining</div>
+</div>
+
+<h3>Daily Progress</h3>
+
+<div class="progress-container">
+<div class="progress-bar" id="progressBar"></div>
+</div>
+
+<p id="progressText">0%</p>
+
+<div class="progress-stats">
+<div class="progress-stat"><strong id="productivityScore">0%</strong>Productivity Score</div>
+<div class="progress-stat"><strong id="bestDay">0%</strong>Best Day</div>
+<div class="progress-stat"><strong id="completedWeek">0</strong>Week Tasks</div>
+</div>
+
+<div class="streak">🔥 Streak: <strong id="streakCount">0</strong> days</div>
+
+<div class="message" id="reportMessage"></div>
+
+<button class="finish-btn" onclick="finishDay()">Finish Day</button>
+
+<div class="notes-box">
+<h2>📝 Daily Notes</h2>
+<textarea id="dailyNotes" placeholder="Write your notes for today..."></textarea>
+</div>
+
+<!-- DASHBOARD SUMMARY -->
+<div style="margin-top:35px">
+<h2>📈 Dashboard Summary</h2>
+
+<div class="stats">
+<div class="stat"><strong id="dashboardToday">0%</strong>Today</div>
+<div class="stat"><strong id="dashboardWeek">0%</strong>This Week</div>
+<div class="stat"><strong id="dashboardStudy">0</strong>Study Minutes</div>
+</div>
+</div>
+
+<div class="achievements">
+<h2>🏆 Achievements</h2>
+<div class="achievement-count" id="achievementCount">0 / 9 Unlocked</div>
+<div class="achievement-grid" id="achievementGrid"></div>
+</div>
+
+<div class="nav">
+<button onclick="showPage(7)">← Search & Quick Add</button>
+<button onclick="showPage(9)">Weekly Overview →</button>
+</div>
+
+<div class="nav">
+<button onclick="showPage(10)">📅 Calendar View →</button>
+<button onclick="showPage(11)">🎯 Goals & Habits →</button>
+</div>
+
+</div>
+</section>
+
+<section class="page" id="page9">
+<div class="weekly-box">
+<div class="weekly-title">📅 Weekly Overview</div>
+<div class="weekly-subtitle">See your tasks and study progress for the week.</div>
+<div class="week-controls">
+<button onclick="changeWeek(-7)">← Previous Week</button>
+<input type="date" id="weekDateInput">
+<button onclick="changeWeek(7)">Next Week →</button>
+</div>
+<div class="week-range" id="weekRange"></div>
+<div class="week-summary">
+<div class="week-summary-box"><strong id="weeklyTotalTasks">0</strong>Total Tasks</div>
+<div class="week-summary-box"><strong id="weeklyCompletedTasks">0</strong>Completed</div>
+<div class="week-summary-box"><strong id="weeklyStudyMinutes">0</strong>Study Minutes</div>
+</div>
+<div class="progress-container">
+<div class="progress-bar" id="weeklyProgressBar"></div>
+</div>
+<p id="weeklyProgressText">0% completed</p>
+<div class="week-days" id="weekDays"></div>
+<div class="nav">
+<button onclick="showPage(8)">← Daily Report & Dashboard</button>
+<button onclick="showPage(10)">Calendar View →</button>
+</div>
+</div>
+</section>
+
+<section class="page" id="page10">
+<div class="planner">
+<div class="calendar-title">
+<button onclick="changeMonth(-1)">←</button>
+<h1 id="calendarTitle">📅 Calendar</h1>
+<button onclick="changeMonth(1)">→</button>
+</div>
+<p>Click a day to view and plan your progress.</p>
+<div class="calendar" id="calendar"></div>
+<div class="nav">
+<button onclick="showPage(9)">← Weekly Overview</button>
+<button onclick="showPage(8)">📊 Daily Report & Dashboard →</button>
+</div>
+</div>
+</section>
+
+<!-- DAILY GOALS & HABITS -->
+<section class="page" id="page11">
+<div class="habit-box">
+<div class="habit-title">🎯 Daily Goals & Habits</div>
+<div class="habit-subtitle">Build good habits and complete your daily goals.</div>
+
+<div class="habit-stats">
+<div class="habit-stat"><strong id="habitTotal">0</strong>Total Habits</div>
+<div class="habit-stat"><strong id="habitCompleted">0</strong>Completed Today</div>
+<div class="habit-stat"><strong id="habitProgress">0%</strong>Today's Progress</div>
+</div>
+
+<div class="habit-form">
+<input id="habitName" placeholder="Add a habit or daily goal...">
+
+<select id="habitFrequency">
+<option value="daily">Every Day</option>
+<option value="weekday">Weekdays</option>
+</select>
+
+<select id="habitTarget">
+<option value="1">1 time</option>
+<option value="2">2 times</option>
+<option value="3">3 times</option>
+</select>
+
+<button onclick="addHabit()">Add Goal / Habit</button>
+</div>
+
+<div class="habit-list" id="habitList"></div>
+
+<div class="nav">
+<button onclick="showPage(8)">← Daily Report & Dashboard</button>
+<button onclick="showPage(0)">Back to Planner →</button>
+</div>
+</div>
+</section>
+
+<script>
+subjects.forEach(s=>
+document.querySelectorAll("#focusSubject,#homeworkSubject,#studyPlanSubject")
+.forEach(x=>x.innerHTML+=`<option>${s}</option>`)
+);
+
+function repeatActive(t,d){
+let a=new Date(d+"T00:00:00"),s=new Date(t.startDate+"T00:00:00");
+if(a<s)return false;
+if(t.repeat=="daily")return true;
+if(t.repeat=="weekday")return a.getDay()>0&&a.getDay()<6;
+return t.repeat=="weekly"&&a.getDay()==s.getDay()
+}
+
+function repeats(p,d){
+return repeatTasks.filter(t=>+t.page==p&&repeatActive(t,d))
+}
+
+function repeatLabel(x){
+return x=="daily"?"🔄 Daily":x=="weekly"?"🔄 Weekly":x=="weekday"?"🔄 Weekdays":""
+}
+
+function taskKey(p,t,i,type){
+return type+"_"+p+"_"+(t.id||i)
+}
+
+function reminderOn(k,d=selectedDate){
+return !!taskReminders[d]?.[k]
+}
+
+function toggleReminder(k,n,t){
+if(!t)return toast("Please add a time to this task first.","warning","⚠️");
+taskReminders[selectedDate]??={};
+taskReminders[selectedDate][k]=!taskReminders[selectedDate][k];
+save("dailyPlannerReminders",taskReminders);
+toast(`${taskReminders[selectedDate][k]?"Reminder enabled":"Reminder disabled"} for "${n}".`,"info",taskReminders[selectedDate][k]?"🔔":"🔕");
+renderPlan(+k.split("_")[1]||0)
+}
+
+function taskHTML(c,t,done,toggle,del,repeat="",edit,k){
+let d=document.createElement("div");
+d.className="task "+(done?"completed":"");
+let on=reminderOn(k);
+
+d.innerHTML=`
+<input type="checkbox" ${done?"checked":""}>
+<span class="task-name"></span>
+<span class="task-time">${t.time||""}</span>
+<span class="priority ${t.priority.toLowerCase()}">${t.priority}</span>
+${repeat?`<span class="repeat-badge">${repeat}</span>`:""}
+<button class="reminder-btn ${on?"active":""}">${on?"🔕":"🔔"}</button>
+${edit?'<button class="edit-btn">Edit</button>':""}
+${del?'<button class="delete-btn">Delete</button>':""}`;
+
+d.querySelector(".task-name").textContent=t.name;
+d.querySelector("input").onchange=toggle;
+d.querySelector(".reminder-btn").onclick=()=>toggleReminder(k,t.name,t.time);
+if(edit)d.querySelector(".edit-btn").onclick=edit;
+if(del)d.querySelector(".delete-btn").onclick=del;
+c.appendChild(d)
+}
+
+function renderPlan(p){
+let c=document.getElementById("tasks"+p);
+if(!c)return;
+c.innerHTML="";
+let s=state(p);
+
+pageInfo[p][1].forEach((x,i)=>{
+let t={name:x[0],time:x[1],priority:x[2]};
+taskHTML(c,t,s["preset_"+i],()=>togglePreset(p,i),null,"",null,`preset_${p}_${i}`)
+});
+
+(customTasks[selectedDate]?.[p]||[]).forEach((t,i)=>
+taskHTML(c,t,s["custom_"+i],()=>toggleCustom(p,i),()=>deleteCustom(p,i),"",()=>editCustom(p,i),`custom_${p}_${i}`)
+);
+
+repeats(p,selectedDate).forEach(t=>
+taskHTML(c,t,s["repeat_"+t.id],()=>toggleRepeat(p,t.id),()=>deleteRepeat(t.id),repeatLabel(t.repeat),()=>editRepeat(t.id),`repeat_${p}_${t.id}`)
+)
+}
+
+function togglePreset(p,i){
+let s=state(p);
+s["preset_"+i]=!s["preset_"+i];
+saveState(p,s);
+renderPlan(p);
+updateReport()
+}
+
+function toggleCustom(p,i){
+let s=state(p);
+s["custom_"+i]=!s["custom_"+i];
+saveState(p,s);
+renderPlan(p);
+updateReport()
+}
+
+function toggleRepeat(p,i){
+let s=state(p);
+s["repeat_"+i]=!s["repeat_"+i];
+saveState(p,s);
+renderPlan(p);
+updateReport()
+}
+
+function addCustomTask(p){
+let n=document.getElementById("customTask"+p).value.trim(),
+time=document.getElementById("customTime"+p).value,
+pr=document.getElementById("customPriority"+p).value,
+r=document.getElementById("customRepeat"+p).value;
+
+if(!n)return alert("Please enter a task name.");
+
+customTasks[selectedDate]??=[[],[],[],[]];
+customTasks[selectedDate][p].push({name:n,time,priority:pr});
+
+if(r!="none")
+repeatTasks.push({id:uid("repeat"),name:n,time,priority:pr,page:p,repeat:r,startDate:selectedDate});
+
+save("dailyPlannerCustomTasks",customTasks);
+save("dailyPlannerRepeatTasks",repeatTasks);
+
+document.getElementById("customTask"+p).value="";
+document.getElementById("customTime"+p).value="";
+document.getElementById("customRepeat"+p).value="none";
+
+renderPlan(p);
+updateReport();
+toast("Task added!","info","✅")
+}
+
+function editCustom(p,i){
+let t=customTasks[selectedDate]?.[p]?.[i];
+if(!t)return;
+
+let n=prompt("Edit task name:",t.name),
+tm=prompt("Edit task time:",t.time||""),
+pr=prompt("Edit priority: Low, Medium, or High:",t.priority);
+
+if(n===null||tm===null||pr===null)return;
+if(!n.trim())return alert("Task name cannot be empty.");
+
+t.name=n.trim();
+t.time=tm;
+if(["Low","Medium","High"].includes(pr))t.priority=pr;
+
+save("dailyPlannerCustomTasks",customTasks);
+renderPlan(p);
+updateReport()
+}
+
+function deleteCustom(p,i){
+if(confirm("Delete this task?")){
+customTasks[selectedDate][p].splice(i,1);
+save("dailyPlannerCustomTasks",customTasks);
+renderPlan(p);
+updateReport()
+}
+}
+
+function editRepeat(i){
+let t=repeatTasks.find(x=>x.id==i);
+if(!t)return;
+
+let n=prompt("Edit repeating task name:",t.name),
+tm=prompt("Edit task time:",t.time||""),
+pr=prompt("Edit priority:",t.priority);
+
+if(n===null||tm===null||pr===null)return;
+
+t.name=n.trim()||t.name;
+t.time=tm;
+if(["Low","Medium","High"].includes(pr))t.priority=pr;
+
+save("dailyPlannerRepeatTasks",repeatTasks);
+loadAll()
+}
+
+function deleteRepeat(i){
+if(confirm("Delete this repeating task?")){
+repeatTasks=repeatTasks.filter(x=>x.id!=i);
+save("dailyPlannerRepeatTasks",repeatTasks);
+loadAll()
+}
+}
+
+function getCounts(d=selectedDate){
+let total=0,completed=0;
+
+for(let p=0;p<4;p++){
+let s=state(p,d),
+c=customTasks[d]?.[p]||[],
+r=repeats(p,d);
+
+total+=pageInfo[p][1].length+c.length+r.length;
+
+pageInfo[p][1].forEach((_,i)=>completed+=!!s["preset_"+i]);
+c.forEach((_,i)=>completed+=!!s["custom_"+i]);
+r.forEach(x=>completed+=!!s["repeat_"+x.id])
+}
+
+return{total,completed,remaining:total-completed}
+}
+
+function dayDone(d){
+let c=getCounts(d);
+return c.total>0&&c.total==c.completed
+}
+
+function streak(){
+let n=0,d=new Date();
+
+while(dayDone(d.toISOString().slice(0,10))){
+n++;
+d.setDate(d.getDate()-1)
+}
+
+return n
+}
+
+function weekDates(s){
+let d=new Date(s+"T00:00:00"),
+x=d.getDay();
+
+d.setDate(d.getDate()+(x==0?-6:1-x));
+
+return Array.from({length:7},(_,i)=>{
+let a=new Date(d);
+a.setDate(d.getDate()+i);
+return a
+})
+}
+
+const achievementList=[
+["firstStep","🌱","First Step","Complete your first task.",()=>getCounts().completed>0],
+["threeDay","🔥","3-Day Streak","Reach a 3-day streak.",()=>streak()>=3],
+["studyMaster","📚","Study Master","Complete 5 focus sessions.",()=>getSessions().length>=5],
+["goalGetter","🎯","Goal Getter","Complete your study goal.",()=>studyMinutes()>=goal()],
+["superProductive","⭐","Super Productive","Complete 10 tasks in one day.",()=>getCounts().completed>=10],
+["earlyBird","🌅","Early Bird","Complete 5 morning tasks.",()=>{
+let s=state(0);
+return pageInfo[0][1].filter((_,i)=>s["preset_"+i]).length>=5
+}],
+["homeworkHero","📖","Homework Hero","Complete 5 homework tasks.",()=>homeworkTasks.filter(x=>x.completed).length>=5],
+["focusLegend","⏱️","Focus Legend","Study for 120 minutes in one day.",()=>studyMinutes()>=120],
+["perfectDay","💎","Perfect Day","Complete every task today.",()=>getCounts().total>0&&getCounts().total==getCounts().completed]
+];
+
+function updateAchievements(){
+let fresh=[];
+
+achievementList.forEach(a=>{
+if(!achievements[a[0]]&&a[4]()){
+achievements[a[0]]=1;
+fresh.push(a[2])
+}
+});
+
+save("dailyPlannerAchievements",achievements);
+renderAchievements();
+
+fresh.forEach(x=>toast("Achievement unlocked: "+x,"achievement","🏆"))
+}
+
+function renderAchievements(){
+let g=document.getElementById("achievementGrid");
+if(!g)return;
+
+g.innerHTML="";
+let n=0;
+
+achievementList.forEach(a=>{
+let u=!!achievements[a[0]];
+n+=u;
+
+g.innerHTML+=`
+<div class="achievement ${u?"unlocked":"locked"}">
+<div class="achievement-icon">${a[1]}</div>
+<div class="achievement-name">${a[2]}</div>
+<div class="achievement-description">${a[3]}</div>
+<div class="achievement-status">${u?"🏆 Unlocked":"🔒 Locked"}</div>
+</div>`
+});
+
+document.getElementById("achievementCount").textContent=
+`${n} / ${achievementList.length} Unlocked`
+}
+
+function studyMinutes(d=selectedDate){
+return(studySessions[d]||[]).reduce((s,x)=>s+Number(x.minutes||0),0)
+}
+
+function getSessions(){
+return studySessions[selectedDate]||[]
+}
+
+function goal(){
+return dailyGoal[selectedDate]||60
+}
+
+function updateReport(){
+let c=getCounts(),
+p=c.total?Math.round(c.completed/c.total*100):0;
+
+let days=weekDates(selectedDate),
+best=0;
+
+days.forEach(d=>{
+let x=getCounts(d.toISOString().slice(0,10));
+if(x.total)best=Math.max(best,Math.round(x.completed/x.total*100))
+});
+
+totalTasks.textContent=c.total;
+completedTasks.textContent=c.completed;
+remainingTasks.textContent=c.remaining;
+
+progressBar.style.width=p+"%";
+progressText.textContent=p+"% completed";
+
+streakCount.textContent=streak();
+
+productivityScore.textContent=
+Math.round((p+Math.min(100,studyMinutes()/goal()*100))/2)+"%";
+
+bestDay.textContent=best+"%";
+
+completedWeek.textContent=
+days.reduce((n,d)=>n+getCounts(d.toISOString().slice(0,10)).completed,0);
+
+dailyNotes.value=
+localStorage.getItem("dailyNotes_"+selectedDate)||"";
+
+updateAchievements();
+renderDashboard()
+}
+
+function finishDay(){
+let c=getCounts();
+
+reportMessage.textContent=
+c.total&&c.total==c.completed
+?"🎉 Amazing! You completed everything today!"
+:`You completed ${c.completed} of ${c.total} tasks. Keep going!`
+}
+
+dailyNotes.oninput=()=>
+localStorage.setItem("dailyNotes_"+selectedDate,dailyNotes.value);
+
+let timerSeconds=1500,timerInterval;
+
+function updateTimer(){
+timer.textContent=
+`${String(Math.floor(timerSeconds/60)).padStart(2,"0")}:${String(timerSeconds%60).padStart(2,"0")}`
+}
+
+function startTimer(){
+if(timerInterval)return;
+
+timerInterval=setInterval(()=>{
+if(timerSeconds<=0){
+clearInterval(timerInterval);
+timerInterval=null;
+logStudySession();
+toast("Focus session completed!","achievement","🎉");
+resetTimer();
+return
+}
+
+timerSeconds--;
+updateTimer()
+},1000)
+}
+
+function pauseTimer(){
+clearInterval(timerInterval);
+timerInterval=null
+}
+
+function resetTimer(){
+pauseTimer();
+timerSeconds=+durationSelect.value*60;
+updateTimer()
+}
+
+durationSelect.onchange=resetTimer;
+
+function logStudySession(){
+let s=studySessions[selectedDate]??=[];
+s.push({
+subject:focusSubject.value,
+minutes:+durationSelect.value,
+time:new Date().toLocaleTimeString()
+});
+
+studySessions[selectedDate]=s;
+save("dailyPlannerStudySessions",studySessions);
+loadFocusData();
+updateReport()
+}
+
+function loadFocusData(){
+let s=getSessions(),
+m=studyMinutes(),
+g=goal();
+
+todayStudyMinutes.textContent=m;
+todaySessions.textContent=s.length;
+dailyGoalDisplay.textContent=g;
+dailyGoalInput.value=g;
+
+goalProgressBar.style.width=
+Math.min(100,m/g*100)+"%";
+
+goalProgressText.textContent=
+`${m} / ${g} minutes`;
+
+studyLog.innerHTML=
+s.slice().reverse().map(x=>
+`<div class="log-item">📚 <strong>${x.subject}</strong> — ${x.minutes} minutes<br>🕒 ${x.time}</div>`
+).join("")
+}
+
+function saveDailyGoal(){
+dailyGoal[selectedDate]=Math.max(1,+dailyGoalInput.value||1);
+save("dailyPlannerGoals",dailyGoal);
+loadFocusData();
+updateAchievements()
+}
+
+function renderWeeklyOverview(){
+let days=weekDates(weekDate),
+total=0,
+done=0,
+study=0;
+
+weekDays.innerHTML="";
+
+days.forEach(d=>{
+let k=d.toISOString().slice(0,10),
+c=getCounts(k),
+m=studyMinutes(k),
+p=c.total?Math.round(c.completed/c.total*100):0;
+
+total+=c.total;
+done+=c.completed;
+study+=m;
+
+weekDays.innerHTML+=`
+<div class="week-day ${k==today()?"today":""}">
+<div class="week-day-name">${d.toLocaleDateString([],{weekday:"short"})}</div>
+<div class="week-day-date">${d.toLocaleDateString([],{month:"short",day:"numeric"})}</div>
+<div class="week-day-number">${p}%</div>
+<div class="week-day-info">
+${c.completed}/${c.total} tasks<br>
+${c.remaining} remaining<br>
+📚 ${m} min
+</div>
+<div class="week-progress"><div style="width:${p}%"></div></div>
+</div>`
+});
+
+let p=total?Math.round(done/total*100):0;
+
+weeklyTotalTasks.textContent=total;
+weeklyCompletedTasks.textContent=done;
+weeklyStudyMinutes.textContent=study;
+
+weeklyProgressBar.style.width=p+"%";
+weeklyProgressText.textContent=p+"% completed";
+
+weekRange.textContent=
+`${days[0].toLocaleDateString([],{month:"short",day:"numeric"})} – ${days[6].toLocaleDateString([],{month:"short",day:"numeric"})}`
+}
+
+function changeWeek(n){
+let d=new Date(weekDate+"T00:00:00");
+d.setDate(d.getDate()+n);
+weekDate=d.toISOString().slice(0,10);
+weekDateInput.value=weekDate;
+renderWeeklyOverview()
+}
+
+function addHomework(){
+let n=homeworkName.value.trim(),
+d=homeworkDueDate.value;
+
+if(!n)return alert("Please enter the homework name.");
+if(!d)return alert("Please choose a due date.");
+
+homeworkTasks.push({
+id:uid("homework"),
+name:n,
+subject:homeworkSubject.value,
+dueDate:d,
+priority:homeworkPriority.value,
+completed:false
+});
+
+save("dailyPlannerHomework",homeworkTasks);
+
+homeworkName.value="";
+homeworkDueDate.value="";
+
+renderHomework()
+}
+
+function toggleHomework(i){
+let x=homeworkTasks.find(x=>x.id==i);
+
+if(x)x.completed=!x.completed;
+
+save("dailyPlannerHomework",homeworkTasks);
+renderHomework();
+updateAchievements()
+}
+
+function deleteHomework(i){
+if(confirm("Delete this homework?")){
+homeworkTasks=homeworkTasks.filter(x=>x.id!=i);
+save("dailyPlannerHomework",homeworkTasks);
+renderHomework()
+}
+}
+
+function editHomework(i){
+let x=homeworkTasks.find(x=>x.id==i);
+if(!x)return;
+
+let n=prompt("Edit homework name:",x.name),
+d=prompt("Edit due date:",x.dueDate),
+p=prompt("Edit priority:",x.priority);
+
+if(n)x.name=n.trim();
+if(d)x.dueDate=d;
+if(["Low","Medium","High"].includes(p))x.priority=p;
+
+save("dailyPlannerHomework",homeworkTasks);
+renderHomework()
+}
+
+function fmt(d){
+return new Date(d+"T00:00:00").toLocaleDateString([],{month:"short",day:"numeric",year:"numeric"})
+}
+
+function renderHomework(){
+let done=homeworkTasks.filter(x=>x.completed).length;
+
+homeworkTotal.textContent=homeworkTasks.length;
+homeworkCompleted.textContent=done;
+homeworkRemaining.textContent=homeworkTasks.length-done;
+
+homeworkList.innerHTML=
+homeworkTasks.length
+?homeworkTasks.slice()
+.sort((a,b)=>a.completed-b.completed||a.dueDate.localeCompare(b.dueDate))
+.map(x=>`
+<div class="homework-item ${x.completed?"completed":""}">
+<input type="checkbox" ${x.completed?"checked":""} onchange="toggleHomework('${x.id}')">
+<div class="homework-name">
+${x.name}
+<div class="homework-details">📖 ${x.subject}</div>
+</div>
+<span class="homework-due">📅 ${fmt(x.dueDate)}</span>
+<span class="priority ${x.priority.toLowerCase()}">${x.priority}</span>
+<button class="edit-btn" onclick="editHomework('${x.id}')">Edit</button>
+<button class="delete-btn" onclick="deleteHomework('${x.id}')">Delete</button>
+</div>
+`).join("")
+:'<div class="homework-empty">📚 No homework added yet.</div>'
+}
+
+function addStudyPlan(){
+let t=studyPlanTopic.value.trim(),
+d=studyPlanDate.value;
+
+if(!t)return alert("Please enter what you want to study.");
+if(!d)return alert("Please choose a study date.");
+
+subjectStudyPlans.push({
+id:uid("studyplan"),
+subject:studyPlanSubject.value,
+topic:t,
+date:d,
+duration:+studyPlanDuration.value||30,
+priority:studyPlanPriority.value,
+completed:false
+});
+
+save("dailyPlannerSubjectPlans",subjectStudyPlans);
+
+studyPlanTopic.value="";
+studyPlanDate.value="";
+
+renderSubjectStudyPlanner()
+}
+
+function toggleStudyPlan(i){
+let x=subjectStudyPlans.find(x=>x.id==i);
+if(x)x.completed=!x.completed;
+
+save("dailyPlannerSubjectPlans",subjectStudyPlans);
+renderSubjectStudyPlanner()
+}
+
+function deleteStudyPlan(i){
+if(confirm("Delete this study plan?")){
+subjectStudyPlans=subjectStudyPlans.filter(x=>x.id!=i);
+save("dailyPlannerSubjectPlans",subjectStudyPlans);
+renderSubjectStudyPlanner()
+}
+}
+
+function editStudyPlan(i){
+let x=subjectStudyPlans.find(x=>x.id==i);
+if(!x)return;
+
+let t=prompt("Edit study topic:",x.topic),
+d=prompt("Edit study date:",x.date),
+m=prompt("Edit duration:",x.duration),
+p=prompt("Edit priority:",x.priority);
+
+if(t)x.topic=t.trim();
+if(d)x.date=d;
+if(m)x.duration=Math.max(1,+m||x.duration);
+if(["Low","Medium","High"].includes(p))x.priority=p;
+
+save("dailyPlannerSubjectPlans",subjectStudyPlans);
+renderSubjectStudyPlanner()
+}
+
+function renderSubjectStudyPlanner(){
+let done=subjectStudyPlans.filter(x=>x.completed).length;
+
+studyPlanTotal.textContent=subjectStudyPlans.length;
+studyPlanCompleted.textContent=done;
+studyPlanRemaining.textContent=subjectStudyPlans.length-done;
+
+studyPlanList.innerHTML=
+subjectStudyPlans.length
+?subjectStudyPlans.slice()
+.sort((a,b)=>a.completed-b.completed||a.date.localeCompare(b.date))
+.map(x=>`
+<div class="subject-item ${x.completed?"completed":""}">
+<input type="checkbox" ${x.completed?"checked":""} onchange="toggleStudyPlan('${x.id}')">
+<div class="subject-name">
+${x.topic}
+<div class="subject-details">📖 ${x.subject} • ⏱ ${x.duration} minutes</div>
+</div>
+<span class="${!x.completed&&x.date<today()?"subject-overdue":"subject-date"}">
+📅 ${fmt(x.date)}${!x.completed&&x.date<today()?" • Overdue":""}
+</span>
+<span class="priority ${x.priority.toLowerCase()}">${x.priority}</span>
+<button class="edit-btn" onclick="editStudyPlan('${x.id}')">Edit</button>
+<button class="delete-btn" onclick="deleteStudyPlan('${x.id}')">Delete</button>
+</div>
+`).join("")
+:'<div class="subject-empty">📚 No study plans added yet.</div>'
+}
+
+function changeMonth(n){
+let d=new Date(calDate+"T00:00:00");
+d.setDate(1);
+d.setMonth(d.getMonth()+n);
+calDate=d.toISOString().slice(0,10);
+renderCalendar()
+}
+
+function renderCalendar(){
+let d=new Date(calDate+"T00:00:00"),
+y=d.getFullYear(),
+m=d.getMonth(),
+first=new Date(y,m,1).getDay();
+
+first=first==0?6:first-1;
+
+let last=new Date(y,m+1,0).getDate();
+
+calendarTitle.textContent=
+`📅 ${d.toLocaleDateString([],{month:"long",year:"numeric"})}`;
+
+calendar.innerHTML=
+["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
+.map(x=>`<div class="cal-head">${x}</div>`).join("");
+
+for(let i=0;i<first;i++)
+calendar.innerHTML+="<div></div>";
+
+for(let day=1;day<=last;day++){
+let k=
+`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`,
+c=getCounts(k),
+sm=studyMinutes(k);
+
+calendar.innerHTML+=`
+<div class="cal-day ${k==today()?"today":""} ${k==selectedDate?"selected":""}" onclick="selectCalendarDate('${k}')">
+<div class="cal-num">${day}</div>
+<div class="cal-info">
+${c.total?`✅ ${c.completed}/${c.total}`:"No tasks"}<br>
+📚 ${sm} min
+</div>
+</div>`
+}
+}
+
+function selectCalendarDate(k){
+selectedDate=k;
+syncDates();
+loadAll();
+toast("Selected "+fmt(k),"info","📅")
+}
+
+function renderSearch(){
+searchInput.oninput=()=>{
+let q=searchInput.value.toLowerCase().trim();
+
+if(!q){
+searchResults.innerHTML="<p>Type something to search.</p>";
+return
+}
+
+let a=[];
+
+for(let p=0;p<4;p++){
+pageInfo[p][1].forEach(x=>{
+if(x[0].toLowerCase().includes(q))
+a.push(`
+<div class="task">
+<span class="task-name">${x[0]}</span>
+<span class="task-time">${x[1]}</span>
+</div>`)
+});
+
+(customTasks[selectedDate]?.[p]||[]).forEach(x=>{
+if(x.name.toLowerCase().includes(q))
+a.push(`
+<div class="task">
+<span class="task-name">${x.name}</span>
+</div>`)
+})
+}
+
+homeworkTasks.forEach(x=>{
+if((x.name+x.subject).toLowerCase().includes(q))
+a.push(`
+<div class="homework-item">
+<span class="homework-name">
+${x.name}<br>
+<small>📖 ${x.subject}</small>
+</span>
+</div>`)
+});
+
+subjectStudyPlans.forEach(x=>{
+if((x.topic+x.subject).toLowerCase().includes(q))
+a.push(`
+<div class="subject-item">
+<span class="subject-name">
+${x.topic}<br>
+<small>📖 ${x.subject}</small>
+</span>
+</div>`)
+});
+
+searchResults.innerHTML=
+a.length?a.join(""):"<p>No results found.</p>"
+};
+
+searchInput.value="";
+searchResults.innerHTML="<p>Type something to search.</p>"
+}
+
+function quickAddTask(){
+let n=quickTask.value.trim(),
+p=+quickPage.value;
+
+if(!n)return alert("Please enter a task name.");
+
+customTasks[selectedDate]??=[[],[],[],[]];
+
+customTasks[selectedDate][p].push({
+name:n,
+time:quickTime.value,
+priority:quickPriority.value
+});
+
+save("dailyPlannerCustomTasks",customTasks);
+
+quickTask.value="";
+quickTime.value="";
+
+renderPlan(p);
+updateReport();
+
+toast("Task added!","info","⚡")
+}
+
+/* DASHBOARD NOW LIVES INSIDE DAILY REPORT */
+function renderDashboard(){
+let t=getCounts(today()),
+tp=t.total?Math.round(t.completed/t.total*100):0,
+d=weekDates(today()),
+wt=0,
+wd=0;
+
+d.forEach(x=>{
+let c=getCounts(x.toISOString().slice(0,10));
+wt+=c.total;
+wd+=c.completed
+});
+
+dashboardToday.textContent=tp+"%";
+dashboardWeek.textContent=(wt?Math.round(wd/wt*100):0)+"%";
+dashboardStudy.textContent=studyMinutes(today());
+}
+
+function habitData(d=selectedDate){
+habits[d]??={};
+return habits[d]
+}
+
+function addHabit(){
+let n=habitName.value.trim(),
+f=habitFrequency.value,
+target=+habitTarget.value;
+
+if(!n)return alert("Please enter a goal or habit.");
+
+let id=uid("habit"),
+d=habitData();
+
+d[id]={
+id,
+name:n,
+frequency:f,
+target,
+completed:0
+};
+
+habits[selectedDate]=d;
+save("dailyPlannerHabits",habits);
+
+habitName.value="";
+renderHabits();
+
+toast("Goal / habit added!","info","🎯")
+}
+
+function toggleHabit(id){
+let d=habitData(),
+x=d[id];
+
+if(!x)return;
+
+x.completed=x.completed>=x.target?0:x.completed+1;
+
+save("dailyPlannerHabits",habits);
+renderHabits();
+
+if(x.completed>=x.target)
+toast("Habit completed! Great job!","achievement","🏆")
+}
+
+function deleteHabit(id){
+if(confirm("Delete this goal / habit?")){
+let d=habitData();
+delete d[id];
+save("dailyPlannerHabits",habits);
+renderHabits()
+}
+}
+
+function editHabit(id){
+let d=habitData(),
+x=d[id];
+
+if(!x)return;
+
+let n=prompt("Edit goal / habit name:",x.name),
+target=prompt("How many times per day?",x.target);
+
+if(n===null||target===null)return;
+
+if(n.trim())x.name=n.trim();
+x.target=Math.max(1,+target||x.target);
+x.completed=Math.min(x.completed,x.target);
+
+save("dailyPlannerHabits",habits);
+renderHabits()
+}
+
+function renderHabits(){
+let d=habitData(),
+a=Object.values(d),
+done=a.filter(x=>x.completed>=x.target).length,
+percent=a.length?Math.round(done/a.length*100):0;
+
+habitTotal.textContent=a.length;
+habitCompleted.textContent=done;
+habitProgress.textContent=percent+"%";
+
+habitList.innerHTML=a.length
+?a.map(x=>{
+let p=Math.min(100,Math.round(x.completed/x.target*100));
+return`
+<div class="habit-item ${x.completed>=x.target?"completed":""}">
+<input type="checkbox"
+${x.completed>=x.target?"checked":""}
+onclick="toggleHabit('${x.id}')">
+
+<span class="habit-name">${x.name}</span>
+
+<span class="habit-frequency">
+${x.frequency=="daily"?"🔄 Daily":"📚 Weekdays"}
+</span>
+
+<span>${x.completed}/${x.target}</span>
+
+<div class="habit-progress">
+<div style="width:${p}%"></div>
+</div>
+
+<button class="edit-btn" onclick="editHabit('${x.id}')">Edit</button>
+<button class="delete-btn" onclick="deleteHabit('${x.id}')">Delete</button>
+</div>`
+}).join("")
+:'<div class="habit-empty">🎯 No goals or habits added yet.</div>'
+}
+
+function syncDates(){
+for(let i=0;i<4;i++){
+let x=document.getElementById("dateInput"+(i||""));
+
+if(x){
+x.value=selectedDate;
+x.onchange=()=>{
+selectedDate=x.value||today();
+syncDates();
+loadAll()
+}
+}
+}
+
+let r=document.getElementById("dateInput5");
+
+if(r){
+r.value=selectedDate;
+r.onchange=()=>{
+selectedDate=r.value||today();
+syncDates();
+loadAll()
+}
+}
+
+weekDateInput.value=weekDate
+}
+
+function loadAll(){
+syncDates();
+
+for(let i=0;i<4;i++)
+renderPlan(i);
+
+updateReport();
+loadFocusData();
+renderHomework();
+renderSubjectStudyPlanner();
+renderWeeklyOverview();
+renderCalendar();
+renderDashboard();
+renderHabits()
+}
+
+let reminderInterval;
+
+function startReminderChecker(){
+if(reminderInterval)return;
+checkReminders();
+reminderInterval=setInterval(checkReminders,1000)
+}
+
+function checkReminders(){
+if(!app||app.style.display!="block")return;
+
+let d=today(),
+tm=new Date().toTimeString().slice(0,5);
+
+for(let p=0;p<4;p++){
+let s=state(p,d);
+
+pageInfo[p][1].forEach((x,i)=>{
+let k=`preset_${p}_${i}`;
+
+if(x[1]==tm&&reminderOn(k,d)&&!s["preset_"+i])
+fireReminder(d,k,x[0],x[1])
+});
+
+(customTasks[d]?.[p]||[]).forEach((x,i)=>{
+let k=`custom_${p}_${i}`;
+
+if(x.time==tm&&reminderOn(k,d)&&!s["custom_"+i])
+fireReminder(d,k,x.name,x.time)
+});
+
+repeats(p,d).forEach(x=>{
+let k=`repeat_${p}_${x.id}`;
+
+if(x.time==tm&&reminderOn(k,d)&&!s["repeat_"+x.id])
+fireReminder(d,k,x.name,x.time)
+})
+}
+}
+
+function fireReminder(d,k,n,t){
+let x=d+"_"+k;
+
+if(reminderLastFired[x]==t)return;
+
+reminderLastFired[x]=t;
+save("dailyPlannerReminderLastFired",reminderLastFired);
+
+toast(`Reminder: ${n} — ${t}`,"info","🔔")
+}
+
+/* UPDATED PAGE NAVIGATION */
+function showPage(p){
+document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+
+document.getElementById("page"+p)?.classList.add("active");
+
+if(p<=3)renderPlan(p);
+if(p==4)loadFocusData();
+if(p==5)renderHomework();
+if(p==6)renderSubjectStudyPlanner();
+if(p==7)renderSearch();
+
+if(p==8){
+updateReport();
+renderDashboard()
+}
+
+if(p==9)renderWeeklyOverview();
+if(p==10)renderCalendar();
+if(p==11)renderHabits()
+}
+
+if(
+save("dailyPlannerTheme",localStorage.getItem("dailyPlannerTheme")||"purple"),
+localStorage.getItem("dailyPlannerDark")=="true"
+)
+document.body.classList.add("dark");
+
+setTheme(localStorage.getItem("dailyPlannerTheme")||"purple");
+syncDates();
+updateTimer();
+loadAll();
+</script>
+
+</body>
+</html>
