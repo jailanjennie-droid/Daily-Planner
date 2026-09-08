@@ -1,4 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Daily Planner</title><style>*{box-sizing:border-box}body{--accent:#8b5cf6;font-family:Arial,sans-serif;text-align:center;margin:0;padding:30px;min-height:100vh;color:#333;transition:.3s;background:linear-gradient(135deg,#ffd6e7,#e6d6ff)}body.blue{background:linear-gradient(135deg,#cfe9ff,#dcd6ff)}body.green{background:linear-gradient(135deg,#d5f5dc,#c8f1ef)}body.peach{background:linear-gradient(135deg,#ffd9c2,#ffe9d6)}body.strawberry{background:linear-gradient(135deg,#ffd1dc,#ff9fba)}body.rose{background:linear-gradient(135deg,#ffe0ec,#f8b6d2)}body.mint{background:linear-gradient(135deg,#d8f8e8,#aee8d0)}body.ocean{background:linear-gradient(135deg,#d5f3ff,#9edcf5)}body.lavender{background:linear-gradient(135deg,#eee1ff,#cdb8ff)}body.dark{background:linear-gradient(135deg,#181827,#27213a);color:#eee}button{border:0;border-radius:12px;padding:12px 20px;cursor:pointer;font-size:15px;background:var(--accent);color:white;transition:.2s}button:hover{transform:translateY(-2px);opacity:.9}#welcome{max-width:700px;margin:80px auto;padding:45px;border-radius:25px;background:rgba(255,255,255,.8);box-shadow:0 10px 35px #0002}#welcome h1{font-size:42px;margin:0 0 15px}#welcome p{font-size:18px;line-height:1.6}#app{display:none;max-width:1000px;margin:auto}.page{display:none}.page.active{display:block}.planner,.report,.focus-box,.weekly-box,.homework-box,.subject-box{background:#fffffff2;border-radius:22px;padding:30px;box-shadow:0 8px 30px #0002}body.dark .planner,body.dark .report,body.dark .focus-box,body.dark .weekly-box,body.dark .homework-box,body.dark .subject-box,body.dark .achievement,body.dark .notes-box,body.dark .week-day,body.dark .homework-item,body.dark .subject-item,body.dark .homework-stat,body.dark .subject-stat{background:#252538;color:#eee}body.dark .task{background:#33334b}body.dark input,body.dark select,body.dark textarea{background:#33334b;color:white;border-color:#666}.dots{position:absolute;top:20px;right:25px;font-size:28px;cursor:pointer}.menu{display:none;position:absolute;top:60px;right:20px;background:white;padding:15px;border-radius:15px;box-shadow:0 8px 25px #0003;z-index:100}body.dark .menu{background:#252538}.menu button{display:block;width:100%;margin:5px 0}h1,h2{margin-top:0}.date-box{margin:15px 0 25px}.date-box input,.week-controls input{padding:10px;border-radius:10px;border:1px solid #ccc;font-size:15px}.task,.homework-item,.subject-item{display:flex;align-items:center;gap:10px;text-align:left;margin:10px 0;padding:14px;border-radius:14px;background:white;box-shadow:0 3px 10px #00000012}.task.completed,.homework-item.completed,.subject-item.completed{opacity:.6}.task.completed .task-name,.homework-item.completed .homework-name,.subject-item.completed .subject-name{text-decoration:line-through}.task-name,.homework-name,.subject-name{flex:1;font-weight:bold}.task-time{color:#777;font-size:13px}.priority,.repeat-badge,.homework-due,.subject-date,.subject-overdue{font-size:12px;padding:5px 8px;border-radius:8px;font-weight:bold;white-space:nowrap}.priority.low{background:#d9f7df;color:#23843b}.priority.medium{background:#fff1bd;color:#9b7400}.priority.high{background:#ffd4d4;color:#b83232}.repeat-badge{background:#e7ddff;color:#6d42c4}.subject-date{background:#e7ddff;color:#6d42c4}.subject-overdue{background:#ffd4d4;color:#b83232}body.dark .repeat-badge,body.dark .subject-date{background:#463b63;color:#e0d3ff}.add-task,.homework-form,.subject-form{display:grid;gap:8px;margin-top:20px}.add-task{grid-template-columns:2fr 1fr 1fr 1fr}.homework-form,.subject-form{grid-template-columns:2fr 1fr 1fr 1fr}.add-task input,.add-task select,.homework-form input,.homework-form select,.subject-form input,.subject-form select{padding:11px;border-radius:10px;border:1px solid #ccc;min-width:0}.add-task button,.homework-form button,.subject-form button{grid-column:1/-1}.delete-btn{background:#ef4444;padding:7px 10px;font-size:12px}.edit-btn{background:#f59e0b;padding:7px 10px;font-size:12px}.nav{display:flex;gap:10px;margin-top:25px}.nav button{flex:1}.notes-box{background:white;padding:20px;border-radius:18px;margin-top:25px}.notes-box textarea{width:100%;min-height:130px;resize:vertical;padding:12px;border:1px solid #ccc;border-radius:12px;font:14px Arial}.stats,.focus-stats,.week-summary,.homework-stats,.subject-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 0}.stat,.focus-stat,.week-summary-box,.homework-stat,.subject-stat{background:#f4efff;padding:20px;border-radius:16px}.stat strong,.week-summary-box strong,.homework-stat strong,.subject-stat strong,.focus-stat strong{display:block;font-size:28px;margin-bottom:5px}.progress-container,.goal-progress,.week-progress{background:#ddd;border-radius:20px;overflow:hidden}.progress-container{height:20px;margin:15px 0}.progress-bar{height:100%;width:0;background:var(--accent);transition:.4s}.goal-progress{height:16px;margin-top:12px}.goal-progress div,.week-progress div{height:100%;width:0;background:#10b981}.streak{font-size:20px;margin:15px}.finish-btn{background:#10b981}.message{min-height:25px;margin:15px;font-weight:bold}.achievements{margin-top:30px}.achievement-count{margin-bottom:15px}.achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px}.achievement{background:white;border-radius:18px;padding:20px;box-shadow:0 4px 15px #00000014;border:2px solid transparent}.achievement.unlocked{border-color:#f5c542}.achievement.locked{opacity:.55;filter:grayscale(.5)}.achievement-icon{font-size:40px}.achievement-name{font-weight:bold;font-size:17px;margin:7px}.achievement-description{font-size:13px;line-height:1.4}.achievement-status{margin-top:10px;font-size:12px;font-weight:bold}.focus-box,.weekly-box,.homework-box,.subject-box{max-width:950px;margin:auto}.focus-title,.weekly-title,.homework-title,.subject-title{font-size:32px;margin-bottom:8px}.focus-subtitle,.weekly-subtitle,.homework-subtitle,.subject-subtitle{color:#777;margin-bottom:25px}.focus-controls,.week-controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}.focus-controls select{padding:12px;border-radius:10px;border:1px solid #ccc}.timer{font-size:70px;font-weight:bold;margin:25px 0}.timer-buttons{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.timer-buttons button{min-width:110px}.goal-box{margin-top:25px;background:#f4efff;padding:20px;border-radius:16px}.goal-box input{padding:10px;border-radius:10px;border:1px solid #ccc;width:100px}.study-log{text-align:left;margin-top:25px}.log-item{padding:12px;margin:8px 0;background:#f7f7f7;border-radius:10px}body.dark .goal-box,body.dark .focus-stat,body.dark .log-item,body.dark .stat,body.dark .week-summary-box{background:#33334b}.week-controls{margin-bottom:25px}.week-controls button{padding:10px 15px}.week-range{font-weight:bold;font-size:18px;margin-bottom:20px}.week-days{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}.week-day{background:white;border-radius:16px;padding:15px 10px;box-shadow:0 3px 12px #00000012}.week-day.today{border:2px solid #8b5cf6}.week-day-name{font-weight:bold}.week-day-date{font-size:13px;color:#777;margin:5px 0 12px}.week-day-number{font-size:25px;font-weight:bold;margin:8px 0}.week-day-info{font-size:12px;line-height:1.7}.week-progress{height:10px;margin-top:10px}.homework-list,.subject-list{text-align:left}.homework-details,.subject-details{font-size:12px;color:#777}.homework-empty,.subject-empty{text-align:center;padding:30px;color:#777}body.dark .homework-details,body.dark .subject-details,body.dark .homework-empty,body.dark .subject-empty{color:#bbb}.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}.toast{min-width:240px;max-width:360px;padding:13px 17px;border-radius:14px;background:#8b5cf6;color:white;box-shadow:0 8px 25px #0003;font-weight:bold;text-align:left;animation:toastIn .25s ease,toastOut .25s ease 2.5s forwards}.toast.info{background:#3b82f6}.toast.warning{background:#f59e0b}.toast.achievement{background:#eab308;color:#332600}@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}@keyframes toastOut{to{opacity:0;transform:translateX(30px)}}body.dark .toast{box-shadow:0 8px 25px #0006}@media(max-width:600px){.toast-container{top:12px;left:12px;right:12px}.toast{min-width:0;max-width:none;width:100%}}@media(max-width:800px){.week-days{grid-template-columns:repeat(2,1fr)}.add-task,.homework-form,.subject-form{grid-template-columns:1fr 1fr}}@media(max-width:600px){body{padding:15px}#welcome{margin:40px auto;padding:30px 20px}#welcome h1{font-size:32px}.stats,.focus-stats,.week-summary,.homework-stats,.subject-stats{grid-template-columns:1fr}.task,.homework-item,.subject-item{flex-wrap:wrap}.nav{flex-direction:column}.add-task,.homework-form,.subject-form{grid-template-columns:1fr}.timer{font-size:55px}.week-days{grid-template-columns:1fr}}.reminder-btn{background:#3b82f6;padding:7px 10px;font-size:12px}.reminder-btn.active{background:#10b981}.settings-box{max-width:950px;margin:auto;background:#fffffff2;border-radius:22px;padding:30px;box-shadow:0 8px 30px #0002}.settings-section{background:#f4efff;padding:20px;border-radius:16px;margin:15px 0;text-align:left}.settings-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:10px 0;border-bottom:1px solid #ddd}.settings-row:last-child{border-bottom:0}.settings-row select,.settings-row input{padding:9px;border-radius:9px;border:1px solid #ccc}.settings-help{font-size:13px;color:#777;margin-top:5px}.danger-btn{background:#ef4444}.backup-btn{background:#10b981}.small-text{font-size:14px}.large-text{font-size:18px}.compact .planner,.compact .report,.compact .focus-box,.compact .weekly-box,.compact .homework-box,.compact .subject-box,.compact .settings-box{padding:20px}.compact .task,.compact .homework-item,.compact .subject-item{padding:9px;margin:6px 0}.accent-blue{--accent:#3b82f6}.accent-pink{--accent:#ec4899}.accent-green{--accent:#10b981}.accent-orange{--accent:#f97316}body.dark .settings-box{background:#252538;color:#eee}body.dark .settings-section{background:#33334b}body.dark .settings-row{border-color:#555}body.dark .settings-help{color:#bbb}.daily-goals-box{max-width:950px;margin:auto;background:#fffffff2;border-radius:22px;padding:30px;box-shadow:0 8px 30px #0002}.goals-habits-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}.goal-section,.habit-section{background:#f4efff;padding:20px;border-radius:16px;text-align:left}.goal-form,.habit-form{display:grid;grid-template-columns:1fr auto;gap:8px;margin:15px 0}.goal-form input,.habit-form input{padding:11px;border-radius:10px;border:1px solid #ccc;min-width:0}.goal-item,.habit-item{display:flex;align-items:center;gap:10px;background:white;padding:12px;border-radius:12px;margin:8px 0}.goal-item.done,.habit-item.done{opacity:.6}.goal-item.done span,.habit-item.done span{text-decoration:line-through}.goal-item span,.habit-item span{flex:1;font-weight:bold}.goal-progress-text{font-size:13px;color:#777;margin:8px 0}.empty-goal-habit{text-align:center;color:#777;padding:15px}.habit-streak{font-size:12px;color:#6d42c4}.daily-gh-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin:20px 0}.daily-gh-stat{background:#f4efff;padding:18px;border-radius:16px}.daily-gh-stat strong{display:block;font-size:28px;margin-bottom:5px}body.dark .daily-goals-box{background:#252538;color:#eee}body.dark .goal-section,body.dark .habit-section,body.dark .daily-gh-stat{background:#33334b}body.dark .goal-item,body.dark .habit-item{background:#252538}body.dark .goal-progress-text,.daily-gh-stat{color:inherit}@media(max-width:700px){.goals-habits-grid{grid-template-columns:1fr}.daily-gh-summary{grid-template-columns:1fr}}.calendar-box{max-width:1000px;margin:auto;background:#fffffff2;border-radius:22px;padding:30px;box-shadow:0 8px 30px #0002}.calendar-controls{display:flex;justify-content:center;align-items:center;gap:12px;margin:20px 0}.calendar-title{font-size:28px;font-weight:bold}.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.calendar-head{font-weight:bold;padding:10px}.calendar-day{min-height:100px;background:#f4efff;border-radius:12px;padding:8px;text-align:left;cursor:pointer}.calendar-day:hover{transform:translateY(-2px)}.calendar-day.today{outline:3px solid var(--accent)}.calendar-day.empty{background:transparent;cursor:default}.calendar-number{font-weight:bold}.calendar-task{font-size:11px;margin-top:5px;padding:4px 6px;border-radius:7px;background:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.category-badge{font-size:11px;padding:3px 7px;border-radius:8px;background:#e9ddff;color:#5b21b6;display:inline-block;margin-left:4px}.category-select{min-width:120px}.category-filters{margin:15px 0}.category-filters select{padding:9px;border-radius:9px;border:1px solid #ccc}.notes-box textarea{min-height:130px}body.dark .calendar-box{background:#252538;color:#eee}body.dark .calendar-day{background:#33334b}body.dark .calendar-task{background:#252538}body.dark .category-badge{background:#4b3a68;color:#eee}@media(max-width:700px){.calendar-box{padding:18px}.calendar-day{min-height:75px;padding:5px}.calendar-task{font-size:9px}.calendar-controls{flex-wrap:wrap}.calendar-grid{gap:4px}}</style></head><body><div id="toastContainer" class="toast-container"></div><div id="welcome"><div class="dots" onclick="toggleMenu()">⋮</div><div class="menu" id="menu"><button onclick="toggleDarkMode()">🌙 Dark Mode</button><button onclick="setTheme('purple')">💜 Purple</button><button onclick="setTheme('strawberry')">🍓 Strawberry</button><button onclick="setTheme('rose')">🌹 Rose</button><button onclick="setTheme('blue')">💙 Blue</button><button onclick="setTheme('green')">💚 Green</button><button onclick="setTheme('mint')">🌿 Mint</button><button onclick="setTheme('ocean')">🌊 Ocean</button><button onclick="setTheme('lavender')">💜 Lavender</button><button onclick="setTheme('peach')">🍑 Peach</button><button onclick="showPage(11);toggleMenu()">📅 Calendar View</button><button onclick="showPage(9);toggleMenu()">⚙️ Settings</button><button onclick="showPage(10);toggleMenu()">🎯 Goals & Habits</button></div><h1>📚 My Daily Planner</h1><p> Organize your day, complete your tasks, track your progress, and build better study habits. </p><button onclick="startPlanner()">Let's Start</button></div><div id="app"><div class="dots" onclick="toggleMenu()">⋮</div><div class="menu" id="menuApp"><button onclick="toggleDarkMode()">🌙 Dark Mode</button><button onclick="setTheme('purple')">💜 Purple</button><button onclick="setTheme('strawberry')">🍓 Strawberry</button><button onclick="setTheme('rose')">🌹 Rose</button><button onclick="setTheme('blue')">💙 Blue</button><button onclick="setTheme('green')">💚 Green</button><button onclick="setTheme('mint')">🌿 Mint</button><button onclick="setTheme('ocean')">🌊 Ocean</button><button onclick="setTheme('lavender')">💜 Lavender</button><button onclick="setTheme('peach')">🍑 Peach</button><button onclick="showPage(11);toggleMenu()">📅 Calendar View</button><button onclick="showPage(9);toggleMenu()">⚙️ Settings</button><button onclick="showPage(10);toggleMenu()">🎯 Goals & Habits</button></div><script>const pageInfo=[
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Daily Planner</title><style>*{box-sizing:border-box}body{--accent:#8b5cf6;font-family:Arial,sans-serif;text-align:center;margin:0;padding:30px;min-height:100vh;color:#333;transition:.3s;background:linear-gradient(135deg,#ffd6e7,#e6d6ff)}body.blue{background:linear-gradient(135deg,#cfe9ff,#dcd6ff)}body.green{background:linear-gradient(135deg,#d5f5dc,#c8f1ef)}body.peach{background:linear-gradient(135deg,#ffd9c2,#ffe9d6)}body.dark{background:linear-gradient(135deg,#181827,#27213a);color:#eee}button{border:0;border-radius:12px;padding:12px 20px;cursor:pointer;font-size:15px;background:var(--accent);color:white;transition:.2s}button:hover{transform:translateY(-2px);opacity:.9}#welcome{max-width:700px;margin:80px auto;padding:45px;border-radius:25px;background:rgba(255,255,255,.8);box-shadow:0 10px 35px #0002}#welcome h1{font-size:42px;margin:0 0 15px}#welcome p{font-size:18px;line-height:1.6}#app{display:none;max-width:1000px;margin:auto}.page{display:none}.page.active{display:block}.planner,.report,.focus-box,.weekly-box,.homework-box,.subject-box{background:#fffffff2;border-radius:22px;padding:30px;box-shadow:0 8px 30px #0002}body.dark .planner,body.dark .report,body.dark .focus-box,body.dark .weekly-box,body.dark .homework-box,body.dark .subject-box,body.dark .achievement,body.dark .notes-box,body.dark .week-day,body.dark .homework-item,body.dark .subject-item,body.dark .homework-stat,body.dark .subject-stat{background:#252538;color:#eee}body.dark .task{background:#33334b}body.dark input,body.dark select,body.dark textarea{background:#33334b;color:white;border-color:#666}.dots{position:absolute;top:20px;right:25px;font-size:28px;cursor:pointer}.menu{display:none;position:absolute;top:60px;right:20px;background:white;padding:15px;border-radius:15px;box-shadow:0 8px 25px #0003;z-index:100}body.dark .menu{background:#252538}.menu button{display:block;width:100%;margin:5px 0}h1,h2{margin-top:0}.date-box{margin:15px 0 25px}.date-box input,.week-controls input{padding:10px;border-radius:10px;border:1px solid #ccc;font-size:15px}.task,.homework-item,.subject-item{display:flex;align-items:center;gap:10px;text-align:left;margin:10px 0;padding:14px;border-radius:14px;background:white;box-shadow:0 3px 10px #00000012}.task.completed,.homework-item.completed,.subject-item.completed{opacity:.6}.task.completed .task-name,.homework-item.completed .homework-name,.subject-item.completed .subject-name{text-decoration:line-through}.task-name,.homework-name,.subject-name{flex:1;font-weight:bold}.task-time{color:#777;font-size:13px}.priority,.repeat-badge,.homework-due,.subject-date,.subject-overdue{font-size:12px;padding:5px 8px;border-radius:8px;font-weight:bold;white-space:nowrap}.priority.low{background:#d9f7df;color:#23843b}.priority.medium{background:#fff1bd;color:#9b7400}.priority.high{background:#ffd4d4;color:#b83232}.repeat-badge{background:#e7ddff;color:#6d42c4}.subject-date{background:#e7ddff;color:#6d42c4}.subject-overdue{background:#ffd4d4;color:#b83232}body.dark .repeat-badge,body.dark .subject-date{background:#463b63;color:#e0d3ff}.add-task,.homework-form,.subject-form{display:grid;gap:8px;margin-top:20px}.add-task{grid-template-columns:2fr 1fr 1fr 1fr}.homework-form,.subject-form{grid-template-columns:2fr 1fr 1fr 1fr}.add-task input,.add-task select,.homework-form input,.homework-form select,.subject-form input,.subject-form select{padding:11px;border-radius:10px;border:1px solid #ccc;min-width:0}.add-task button,.homework-form button,.subject-form button{grid-column:1/-1}.delete-btn{background:#ef4444;padding:7px 10px;font-size:12px}.edit-btn{background:#f59e0b;padding:7px 10px;font-size:12px}.nav{display:flex;gap:10px;margin-top:25px}.nav button{flex:1}.notes-box{background:white;padding:20px;border-radius:18px;margin-top:25px}.notes-box textarea{width:100%;min-height:130px;resize:vertical;padding:12px;border:1px solid #ccc;border-radius:12px;font:14px Arial}.stats,.focus-stats,.week-summary,.homework-stats,.subject-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 0}.stat,.focus-stat,.week-summary-box,.homework-stat,.subject-stat{background:#f4efff;padding:20px;border-radius:16px}.stat strong,.week-summary-box strong,.homework-stat strong,.subject-stat strong,.focus-stat strong{display:block;font-size:28px;margin-bottom:5px}.progress-container,.goal-progress,.week-progress{background:#ddd;border-radius:20px;overflow:hidden}.progress-container{height:20px;margin:15px 0}.progress-bar{height:100%;width:0;background:var(--accent);transition:.4s}.goal-progress{height:16px;margin-top:12px}.goal-progress div,.week-progress div{height:100%;width:0;background:#10b981}.streak{font-size:20px;margin:15px}.finish-btn{background:#10b981}.message{min-height:25px;margin:15px;font-weight:bold}.achievements{margin-top:30px}.achievement-count{margin-bottom:15px}.achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px}.achievement{background:white;border-radius:18px;padding:20px;box-shadow:0 4px 15px #00000014;border:2px solid transparent}.achievement.unlocked{border-color:#f5c542}.achievement.locked{opacity:.55;filter:grayscale(.5)}.achievement-icon{font-size:40px}.achievement-name{font-weight:bold;font-size:17px;margin:7px}.achievement-description{font-size:13px;line-height:1.4}.achievement-status{margin-top:10px;font-size:12px;font-weight:bold}.focus-box,.weekly-box,.homework-box,.subject-box{max-width:950px;margin:auto}.focus-title,.weekly-title,.homework-title,.subject-title{font-size:32px;margin-bottom:8px}.focus-subtitle,.weekly-subtitle,.homework-subtitle,.subject-subtitle{color:#777;margin-bottom:25px}.focus-controls,.week-controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}.focus-controls select{padding:12px;border-radius:10px;border:1px solid #ccc}.timer{font-size:70px;font-weight:bold;margin:25px 0}.timer-buttons{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.timer-buttons button{min-width:110px}.goal-box{margin-top:25px;background:#f4efff;padding:20px;border-radius:16px}.goal-box input{padding:10px;border-radius:10px;border:1px solid #ccc;width:100px}.study-log{text-align:left;margin-top:25px}.log-item{padding:12px;margin:8px 0;background:#f7f7f7;border-radius:10px}body.dark .goal-box,body.dark .focus-stat,body.dark .log-item,body.dark .stat,body.dark .week-summary-box{background:#33334b}.week-controls{margin-bottom:25px}.week-controls button{padding:10px 15px}.week-range{font-weight:bold;font-size:18px;margin-bottom:20px}.week-days{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}.week-day{background:white;border-radius:16px;padding:15px 10px;box-shadow:0 3px 12px #00000012}.week-day.today{border:2px solid #8b5cf6}.week-day-name{font-weight:bold}.week-day-date{font-size:13px;color:#777;margin:5px 0 12px}.week-day-number{font-size:25px;font-weight:bold;margin:8px 0}.week-day-info{font-size:12px;line-height:1.7}.week-progress{height:10px;margin-top:10px}.homework-list,.subject-list{text-align:left}.homework-details,.subject-details{font-size:12px;color:#777}.homework-empty,.subject-empty{text-align:center;padding:30px;color:#777}body.dark .homework-details,body.dark .subject-details,body.dark .homework-empty,body.dark .subject-empty{color:#bbb}.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}.toast{min-width:240px;max-width:360px;padding:13px 17px;border-radius:14px;background:#8b5cf6;color:white;box-shadow:0 8px 25px #0003;font-weight:bold;text-align:left;animation:toastIn .25s ease,toastOut .25s ease 2.5s forwards}.toast.info{background:#3b82f6}.toast.warning{background:#f59e0b}.toast.achievement{background:#eab308;color:#332600}@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}@keyframes toastOut{to{opacity:0;transform:translateX(30px)}}body.dark .toast{box-shadow:0 8px 25px #0006}@media(max-width:600px){.toast-container{top:12px;left:12px;right:12px}.toast{min-width:0;max-width:none;width:100%}}@media(max-width:800px){.week-days{grid-template-columns:repeat(2,1fr)}.add-task,.homework-form,.subject-form{grid-template-columns:1fr 1fr}}@media(max-width:600px){body{padding:15px}#welcome{margin:40px auto;padding:30px 20px}#welcome h1{font-size:32px}.stats,.focus-stats,.week-summary,.homework-stats,.subject-stats{grid-template-columns:1fr}.task,.homework-item,.subject-item{flex-wrap:wrap}.nav{flex-direction:column}.add-task,.homework-form,.subject-form{grid-template-columns:1fr}.timer{font-size:55px}.week-days{grid-template-columns:1fr}}.reminder-btn{background:#3b82f6;padding:7px 10px;font-size:12px}.reminder-btn.active{background:#10b981}.settings-box{max-width:950px;margin:auto;background:#fffffff2;border-radius:22px;padding:30px;box-shadow:0 8px 30px #0002}.settings-section{background:#f4efff;padding:20px;border-radius:16px;margin:15px 0;text-align:left}.settings-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:10px 0;border-bottom:1px solid #ddd}.settings-row:last-child{border-bottom:0}.settings-row select,.settings-row input{padding:9px;border-radius:9px;border:1px solid #ccc}.settings-help{font-size:13px;color:#777;margin-top:5px}.danger-btn{background:#ef4444}.backup-btn{background:#10b981}.small-text{font-size:14px}.large-text{font-size:18px}.compact .planner,.compact .report,.compact .focus-box,.compact .weekly-box,.compact .homework-box,.compact .subject-box,.compact .settings-box{padding:20px}.compact .task,.compact .homework-item,.compact .subject-item{padding:9px;margin:6px 0}.accent-blue{--accent:#3b82f6}.accent-pink{--accent:#ec4899}.accent-green{--accent:#10b981}.accent-orange{--accent:#f97316}body.dark .settings-box{background:#252538;color:#eee}body.dark .settings-section{background:#33334b}body.dark .settings-row{border-color:#555}body.dark .settings-help{color:#bbb}.daily-goals-box{max-width:950px;margin:auto;background:#fffffff2;border-radius:22px;padding:30px;box-shadow:0 8px 30px #0002}.goals-habits-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}.goal-section,.habit-section{background:#f4efff;padding:20px;border-radius:16px;text-align:left}.goal-form,.habit-form{display:grid;grid-template-columns:1fr auto;gap:8px;margin:15px 0}.goal-form input,.habit-form input{padding:11px;border-radius:10px;border:1px solid #ccc;min-width:0}.goal-item,.habit-item{display:flex;align-items:center;gap:10px;background:white;padding:12px;border-radius:12px;margin:8px 0}.goal-item.done,.habit-item.done{opacity:.6}.goal-item.done span,.habit-item.done span{text-decoration:line-through}.goal-item span,.habit-item span{flex:1;font-weight:bold}.goal-progress-text{font-size:13px;color:#777;margin:8px 0}.empty-goal-habit{text-align:center;color:#777;padding:15px}.habit-streak{font-size:12px;color:#6d42c4}.daily-gh-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin:20px 0}.daily-gh-stat{background:#f4efff;padding:18px;border-radius:16px}.daily-gh-stat strong{display:block;font-size:28px;margin-bottom:5px}body.dark .daily-goals-box{background:#252538;color:#eee}body.dark .goal-section,body.dark .habit-section,body.dark .daily-gh-stat{background:#33334b}body.dark .goal-item,body.dark .habit-item{background:#252538}body.dark .goal-progress-text,.daily-gh-stat{color:inherit}@media(max-width:700px){.goals-habits-grid{grid-template-columns:1fr}.daily-gh-summary{grid-template-columns:1fr}}</style></head><body><div id="toastContainer" class="toast-container"></div><div id="welcome"><div class="dots" onclick="toggleMenu()">⋮</div><div class="menu" id="menu"><button onclick="toggleDarkMode()">🌙 Dark Mode</button><button onclick="setTheme('purple')">💜 Purple</button><button onclick="setTheme('blue')">💙 Blue</button><button onclick="setTheme('green')">💚 Green</button><button onclick="setTheme('peach')">🍑 Peach</button><button onclick="showPage(9);toggleMenu()">⚙️ Settings</button><button onclick="showPage(10);toggleMenu()">🎯 Goals & Habits</button></div><h1>📚 My Daily Planner</h1><p>
+Organize your day, complete your tasks, track your progress,
+and build better study habits.
+</p><button onclick="startPlanner()">Let's Start</button></div><div id="app"><div class="dots" onclick="toggleMenu()">⋮</div><div class="menu" id="menuApp"><button onclick="toggleDarkMode()">🌙 Dark Mode</button><button onclick="setTheme('purple')">💜 Purple</button><button onclick="setTheme('blue')">💙 Blue</button><button onclick="setTheme('green')">💚 Green</button><button onclick="setTheme('peach')">🍑 Peach</button><button onclick="showPage(9);toggleMenu()">⚙️ Settings</button><button onclick="showPage(10);toggleMenu()">🎯 Goals & Habits</button></div><script>const pageInfo=[
 ["🌅 Morning Plan",[
 "Wake up|05:15|High",
 "Make my bed|05:20|Low",
@@ -52,7 +55,7 @@ placeholder="Add a task..."
 ><input
 type="time"
 id="customTime${i}"
-><select id="customPriority${i}"><option>Low</option><option selected>Medium</option><option>High</option></select><select id="customCategory${i}" class="category-select"><option>General</option><option>School</option><option>Study</option><option>Personal</option><option>Health</option><option>Prayer</option><option>Important</option></select><select id="customRepeat${i}"><option value="none">
+><select id="customPriority${i}"><option>Low</option><option selected>Medium</option><option>High</option></select><select id="customRepeat${i}"><option value="none">
 Does not repeat
 </option><option value="daily">
 Every day
@@ -77,7 +80,222 @@ Daily Report →
 </button>`}
 </div></div></section>
 `);
-});</script><section class="page" id="page4"><div class="report"><h1>📊 Daily Report</h1><div class="date-box"><input type="date" id="dateInput5"></div><div class="stats"><div class="stat"><strong id="totalTasks">0</strong> Total Tasks </div><div class="stat"><strong id="completedTasks">0</strong> Completed </div><div class="stat"><strong id="remainingTasks">0</strong> Remaining </div></div><h3>Daily Progress</h3><div class="progress-container"><div class="progress-bar" id="progressBar"></div></div><p id="progressText"> 0% </p><div class="streak"> 🔥 Streak: <strong id="streakCount">0</strong> days </div><div class="message" id="reportMessage"></div><button class="finish-btn" onclick="finishDay()"> Finish Day </button><div class="notes-box"><h2>📝 Daily Notes</h2><textarea id="dailyNotes" placeholder="Write your notes for today..." ></textarea></div><div class="achievements"><h2>🏆 Achievements</h2><div class="achievement-count" id="achievementCount"> 0 / 5 Unlocked </div><div class="achievement-grid" id="achievementGrid"></div></div><div class="nav"><button onclick="showPage(3)"> ← Night </button><button onclick="showPage(5)"> 🎯 Focus Center → </button></div></div></section><section class="page" id="page5"><div class="focus-box"><div class="focus-title"> 🎯 Study Focus Center </div><div class="focus-subtitle"> Focus on one subject and make your study time count. </div><div class="date-box"><input type="date" id="focusDateInput"></div><div class="focus-controls"><select id="subjectSelect"><option>English</option><option>Math</option><option>Arabic</option><option>Science</option><option>Kurdish</option><option>History</option><option>Computer</option><option>Religious Education</option><option>Other</option></select><select id="durationSelect"><option value="5"> 5 minutes </option><option value="10"> 10 minutes </option><option value="15"> 15 minutes </option><option value="20"> 20 minutes </option><option value="25" selected> 25 minutes </option><option value="30"> 30 minutes </option><option value="45"> 45 minutes </option><option value="60"> 60 minutes </option></select></div><div class="timer" id="timer"> 25:00 </div><div class="timer-buttons"><button onclick="startTimer()"> ▶ Start </button><button onclick="pauseTimer()"> ⏸ Pause </button><button onclick="resetTimer()"> 🔄 Reset </button></div><div class="focus-stats"><div class="focus-stat"><strong id="sessionCount">0</strong> Sessions </div><div class="focus-stat"><strong id="studyMinutes">0</strong> Study Minutes </div><div class="focus-stat"><strong id="goalDisplay">60</strong> Daily Goal </div></div><div class="goal-box"><h3>🎯 Daily Study Goal</h3><p> Set how many minutes you want to study today. </p><input type="number" id="dailyGoalInput" min="1" value="60"><button onclick="saveDailyGoal()"> Save Goal </button><div class="goal-progress"><div id="goalProgressBar"></div></div><p id="goalProgressText"> 0 / 60 minutes </p></div><div class="study-log"><h3>📚 Study Log</h3><div id="studyLog"></div></div><div class="nav"><button onclick="showPage(4)"> ← Daily Report </button><button onclick="showPage(6)"> 📅 Weekly Overview → </button></div></div></section><section class="page" id="page6"><div class="weekly-box"><div class="weekly-title"> 📅 Weekly Overview </div><div class="weekly-subtitle"> See your tasks and study progress for the whole week. </div><div class="week-controls"><button onclick="changeWeek(-7)"> ← Previous Week </button><input type="date" id="weekDateInput"><button onclick="changeWeek(7)"> Next Week → </button></div><div class="week-range" id="weekRange"> This Week </div><div class="week-summary"><div class="week-summary-box"><strong id="weeklyTotalTasks"> 0 </strong> Total Tasks </div><div class="week-summary-box"><strong id="weeklyCompletedTasks"> 0 </strong> Completed </div><div class="week-summary-box"><strong id="weeklyStudyMinutes"> 0 </strong> Study Minutes </div></div><h3> Weekly Task Progress </h3><div class="progress-container"><div class="progress-bar" id="weeklyProgressBar"></div></div><p id="weeklyProgressText"> 0% completed </p><div class="week-days" id="weekDays"></div><div class="nav"><button onclick="showPage(5)"> ← Focus Center </button><button onclick="showPage(7)"> 📚 Homework Tracker → </button></div></div></section><section class="page" id="page7"><div class="homework-box"><div class="homework-title"> 📚 Homework Tracker </div><div class="homework-subtitle"> Organize your homework, deadlines, subjects, and priorities. </div><div class="homework-form"><input id="homeworkName" placeholder="Homework name..."><select id="homeworkSubject"><option>English</option><option>Math</option><option>Arabic</option><option>Science</option><option>Kurdish</option><option>History</option><option>Computer</option><option>Religious Education</option><option>Other</option></select><input type="date" id="homeworkDueDate"><select id="homeworkPriority"><option>Low</option><option selected>Medium</option><option>High</option></select><button onclick="addHomework()"> ➕ Add Homework </button></div><div class="homework-stats"><div class="homework-stat"><strong id="homeworkTotal"> 0 </strong> Total Homework </div><div class="homework-stat"><strong id="homeworkCompleted"> 0 </strong> Completed </div><div class="homework-stat"><strong id="homeworkRemaining"> 0 </strong> Remaining </div></div><div class="homework-list" id="homeworkList"></div><div class="nav"><button onclick="showPage(6)"> ← Weekly Overview </button><button onclick="showPage(8)"> 📚 Subject Study Planner → </button></div></div></section><section class="page" id="page8"><div class="subject-box"><div class="subject-title"> 📚 Subject Study Planner </div><div class="subject-subtitle"> Plan what you want to study and organize your study time by subject. </div><div class="subject-form"><select id="studyPlanSubject"><option>English</option><option>Math</option><option>Arabic</option><option>Science</option><option>Kurdish</option><option>History</option><option>Computer</option><option>Religious Education</option><option>Other</option></select><input id="studyPlanTopic" placeholder="What do you want to study?"><input type="date" id="studyPlanDate"><select id="studyPlanDuration"><option value="15"> 15 minutes </option><option value="20"> 20 minutes </option><option value="25"> 25 minutes </option><option value="30" selected> 30 minutes </option><option value="45"> 45 minutes </option><option value="60"> 60 minutes </option><option value="90"> 90 minutes </option><option value="120"> 120 minutes </option></select><select id="studyPlanPriority"><option>Low</option><option selected>Medium</option><option>High</option></select><button onclick="addStudyPlan()"> ➕ Add Study Plan </button></div><div class="subject-stats"><div class="subject-stat"><strong id="studyPlanTotal"> 0 </strong> Total Plans </div><div class="subject-stat"><strong id="studyPlanCompleted"> 0 </strong> Completed </div><div class="subject-stat"><strong id="studyPlanRemaining"> 0 </strong> Remaining </div></div><div class="subject-list" id="studyPlanList"></div><div class="nav"><button onclick="showPage(7)"> ← Homework Tracker </button><button onclick="showPage(10)"> 🎯 Goals & Habits → </button></div></div></section><section class="page" id="page11"><div class="calendar-box"><div class="focus-title">📅 Calendar View</div><div class="focus-subtitle">See your tasks for each day and jump to any date.</div><div class="calendar-controls"><button onclick="changeCalendarMonth(-1)">← Previous</button><div class="calendar-title" id="calendarMonthTitle"></div><button onclick="changeCalendarMonth(1)">Next →</button></div><div class="calendar-grid" id="calendarGrid"></div><div class="nav"><button onclick="showPage(8)">← Subject Study Planner</button><button onclick="showPage(0)">🏠 Morning Plan</button></div></div></section><section class="page" id="page10"><div class="daily-goals-box"><div class="focus-title">🎯 Daily Goals & Habits</div><div class="focus-subtitle">Set your goals and build habits for today.</div><div class="date-box"><input type="date" id="dateInput10" onchange="selectedDate=this.value;syncDates();renderDailyGoalsHabits();"></div><div class="daily-gh-summary"><div class="daily-gh-stat"><strong id="dailyGoalsDone">0 / 0</strong>Goals completed</div><div class="daily-gh-stat"><strong id="dailyHabitsDone">0 / 0</strong>Habits completed</div></div><div class="goals-habits-grid"><div class="goal-section"><h2>🎯 Daily Goals</h2><div class="goal-form"><input id="dailyGoalText" placeholder="Add a goal..."><button onclick="addDailyGoalItem()">Add</button></div><div id="dailyGoalsList"></div></div><div class="habit-section"><h2>🔥 Daily Habits</h2><div class="habit-form"><input id="dailyHabitText" placeholder="Add a habit..."><button onclick="addDailyHabit()">Add</button></div><div id="dailyHabitsList"></div></div></div><div class="nav"><button onclick="showPage(8)">← Subject Study Planner</button><button onclick="showPage(0)">🏠 Morning Plan</button></div></div></section><section class="page" id="page9"><div class="settings-box"><div class="focus-title">⚙️ Settings</div><div class="focus-subtitle">Customize your Daily Planner and protect your data.</div><div class="settings-section"><h3>🎨 Appearance</h3><div class="settings-row"><span>Theme</span><select id="settingsTheme" onchange="setTheme(this.value)"><option value="purple">💜 Purple</option><option value="strawberry">🍓 Strawberry</option><option value="rose">🌹 Rose</option><option value="blue">💙 Blue</option><option value="green">💚 Green</option><option value="mint">🌿 Mint</option><option value="ocean">🌊 Ocean</option><option value="lavender">💜 Lavender</option><option value="peach">🍑 Peach</option></select></div><div class="settings-row"><span>Accent Color</span><select id="settingsAccent" onchange="setAccent(this.value)"><option value="purple">💜 Purple</option><option value="blue">💙 Blue</option><option value="pink">💗 Pink</option><option value="green">💚 Green</option><option value="orange">🧡 Orange</option></select></div><div class="settings-row"><span>Text Size</span><select id="settingsFont" onchange="setFontSize(this.value)"><option value="small">Small</option><option value="normal">Normal</option><option value="large">Large</option></select></div><div class="settings-row"><span>Compact Layout</span><input type="checkbox" id="settingsCompact" onchange="setCompact(this.checked)"></div><div class="settings-row"><span>Dark Mode</span><input type="checkbox" id="settingsDark" onchange="toggleDarkMode()"></div></div><div class="settings-section"><h3>🔔 Smarter Reminders</h3><div class="settings-row"><span>Reminders Enabled</span><input type="checkbox" id="settingsReminders" onchange="setRemindersEnabled(this.checked)"></div><div class="settings-row"><span>Default Reminder Lead Time</span><select id="settingsLead" onchange="setDefaultLead(this.value)"><option value="0">At task time</option><option value="5">5 minutes before</option><option value="10">10 minutes before</option><option value="15">15 minutes before</option></select></div><div class="settings-row"><span>Quiet Hours Start</span><input type="time" id="quietStart" onchange="saveReminderSettings()"></div><div class="settings-row"><span>Quiet Hours End</span><input type="time" id="quietEnd" onchange="saveReminderSettings()"></div><p class="settings-help">Use the 🔔 button on any task to turn on a reminder. Reminders can notify you at the task time or before it, and quiet hours prevent notifications during a chosen period.</p></div><div class="settings-section"><h3>💾 Data Backup & Export</h3><p class="settings-help">Export everything saved by the planner as a JSON backup. You can import the backup later on this device.</p><button class="backup-btn" onclick="exportPlannerData()">⬇️ Export Backup</button><button onclick="document.getElementById('importFile').click()">⬆️ Import Backup</button><input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="importPlannerData(event)"><button class="danger-btn" onclick="resetPlannerData()">🗑️ Reset All Data</button></div><div class="nav"><button onclick="showPage(8)">← Subject Study Planner</button><button onclick="showPage(0)">🏠 Morning Plan</button></div></div></section></div><script>const plans=pageInfo.map(p=>
+});</script><section class="page" id="page4"><div class="report"><h1>📊 Daily Report</h1><div class="date-box"><input type="date" id="dateInput5"></div><div class="stats"><div class="stat"><strong id="totalTasks">0</strong>
+Total Tasks
+</div><div class="stat"><strong id="completedTasks">0</strong>
+Completed
+</div><div class="stat"><strong id="remainingTasks">0</strong>
+Remaining
+</div></div><h3>Daily Progress</h3><div class="progress-container"><div
+class="progress-bar"
+id="progressBar"></div></div><p id="progressText">
+0%
+</p><div class="streak">
+
+🔥 Streak:
+<strong id="streakCount">0</strong>
+days
+
+</div><div
+class="message"
+id="reportMessage"></div><button
+class="finish-btn"
+onclick="finishDay()">
+Finish Day
+</button><div class="notes-box"><h2>📝 Daily Notes</h2><textarea
+id="dailyNotes"
+placeholder="Write your notes for today..."
+></textarea></div><div class="achievements"><h2>🏆 Achievements</h2><div
+class="achievement-count"
+id="achievementCount">
+0 / 5 Unlocked
+</div><div
+class="achievement-grid"
+id="achievementGrid"></div></div><div class="nav"><button onclick="showPage(3)">
+← Night
+</button><button onclick="showPage(5)">
+🎯 Focus Center →
+</button></div></div></section><section class="page" id="page5"><div class="focus-box"><div class="focus-title">
+🎯 Study Focus Center
+</div><div class="focus-subtitle">
+Focus on one subject and make your study time count.
+</div><div class="date-box"><input
+type="date"
+id="focusDateInput"></div><div class="focus-controls"><select id="subjectSelect"><option>English</option><option>Math</option><option>Arabic</option><option>Science</option><option>Kurdish</option><option>History</option><option>Computer</option><option>Religious Education</option><option>Other</option></select><select id="durationSelect"><option value="5">
+5 minutes
+</option><option value="10">
+10 minutes
+</option><option value="15">
+15 minutes
+</option><option value="20">
+20 minutes
+</option><option value="25" selected>
+25 minutes
+</option><option value="30">
+30 minutes
+</option><option value="45">
+45 minutes
+</option><option value="60">
+60 minutes
+</option></select></div><div
+class="timer"
+id="timer">
+25:00
+</div><div class="timer-buttons"><button onclick="startTimer()">
+▶ Start
+</button><button onclick="pauseTimer()">
+⏸ Pause
+</button><button onclick="resetTimer()">
+🔄 Reset
+</button></div><div class="focus-stats"><div class="focus-stat"><strong id="sessionCount">0</strong>
+Sessions
+</div><div class="focus-stat"><strong id="studyMinutes">0</strong>
+Study Minutes
+</div><div class="focus-stat"><strong id="goalDisplay">60</strong>
+Daily Goal
+</div></div><div class="goal-box"><h3>🎯 Daily Study Goal</h3><p>
+Set how many minutes you want to study today.
+</p><input
+type="number"
+id="dailyGoalInput"
+min="1"
+value="60"><button onclick="saveDailyGoal()">
+Save Goal
+</button><div class="goal-progress"><div id="goalProgressBar"></div></div><p id="goalProgressText">
+0 / 60 minutes
+</p></div><div class="study-log"><h3>📚 Study Log</h3><div id="studyLog"></div></div><div class="nav"><button onclick="showPage(4)">
+← Daily Report
+</button><button onclick="showPage(6)">
+📅 Weekly Overview →
+</button></div></div></section><section class="page" id="page6"><div class="weekly-box"><div class="weekly-title">
+📅 Weekly Overview
+</div><div class="weekly-subtitle">
+See your tasks and study progress for the whole week.
+</div><div class="week-controls"><button onclick="changeWeek(-7)">
+← Previous Week
+</button><input
+type="date"
+id="weekDateInput"><button onclick="changeWeek(7)">
+Next Week →
+</button></div><div
+class="week-range"
+id="weekRange">
+This Week
+</div><div class="week-summary"><div class="week-summary-box"><strong id="weeklyTotalTasks">
+0
+</strong>
+
+Total Tasks
+
+</div><div class="week-summary-box"><strong id="weeklyCompletedTasks">
+0
+</strong>
+
+Completed
+
+</div><div class="week-summary-box"><strong id="weeklyStudyMinutes">
+0
+</strong>
+
+Study Minutes
+
+</div></div><h3>
+Weekly Task Progress
+</h3><div class="progress-container"><div
+class="progress-bar"
+id="weeklyProgressBar"></div></div><p id="weeklyProgressText">
+0% completed
+</p><div
+class="week-days"
+id="weekDays"></div><div class="nav"><button onclick="showPage(5)">
+← Focus Center
+</button><button onclick="showPage(7)">
+📚 Homework Tracker →
+</button></div></div></section><section class="page" id="page7"><div class="homework-box"><div class="homework-title">
+📚 Homework Tracker
+</div><div class="homework-subtitle">
+Organize your homework, deadlines, subjects, and priorities.
+</div><div class="homework-form"><input
+id="homeworkName"
+placeholder="Homework name..."><select id="homeworkSubject"><option>English</option><option>Math</option><option>Arabic</option><option>Science</option><option>Kurdish</option><option>History</option><option>Computer</option><option>Religious Education</option><option>Other</option></select><input
+type="date"
+id="homeworkDueDate"><select id="homeworkPriority"><option>Low</option><option selected>Medium</option><option>High</option></select><button onclick="addHomework()">
+➕ Add Homework
+</button></div><div class="homework-stats"><div class="homework-stat"><strong id="homeworkTotal">
+0
+</strong>
+
+Total Homework
+
+</div><div class="homework-stat"><strong id="homeworkCompleted">
+0
+</strong>
+
+Completed
+
+</div><div class="homework-stat"><strong id="homeworkRemaining">
+0
+</strong>
+
+Remaining
+
+</div></div><div
+class="homework-list"
+id="homeworkList"></div><div class="nav"><button onclick="showPage(6)">
+← Weekly Overview
+</button><button onclick="showPage(8)">
+📚 Subject Study Planner →
+</button></div></div></section><section class="page" id="page8"><div class="subject-box"><div class="subject-title">
+📚 Subject Study Planner
+</div><div class="subject-subtitle">
+Plan what you want to study and organize your study time by subject.
+</div><div class="subject-form"><select id="studyPlanSubject"><option>English</option><option>Math</option><option>Arabic</option><option>Science</option><option>Kurdish</option><option>History</option><option>Computer</option><option>Religious Education</option><option>Other</option></select><input
+id="studyPlanTopic"
+placeholder="What do you want to study?"><input
+type="date"
+id="studyPlanDate"><select id="studyPlanDuration"><option value="15">
+15 minutes
+</option><option value="20">
+20 minutes
+</option><option value="25">
+25 minutes
+</option><option value="30" selected>
+30 minutes
+</option><option value="45">
+45 minutes
+</option><option value="60">
+60 minutes
+</option><option value="90">
+90 minutes
+</option><option value="120">
+120 minutes
+</option></select><select id="studyPlanPriority"><option>Low</option><option selected>Medium</option><option>High</option></select><button onclick="addStudyPlan()">
+➕ Add Study Plan
+</button></div><div class="subject-stats"><div class="subject-stat"><strong id="studyPlanTotal">
+0
+</strong>
+
+Total Plans
+
+</div><div class="subject-stat"><strong id="studyPlanCompleted">
+0
+</strong>
+
+Completed
+
+</div><div class="subject-stat"><strong id="studyPlanRemaining">
+0
+</strong>
+
+Remaining
+
+</div></div><div
+class="subject-list"
+id="studyPlanList"></div><div class="nav"><button onclick="showPage(7)">
+← Homework Tracker
+</button><button onclick="showPage(10)">
+🎯 Goals & Habits →
+</button></div></div></section><section class="page" id="page10"><div class="daily-goals-box"><div class="focus-title">🎯 Daily Goals & Habits</div><div class="focus-subtitle">Set your goals and build habits for today.</div><div class="date-box"><input type="date" id="dateInput10" onchange="selectedDate=this.value;syncDates();renderDailyGoalsHabits();"></div><div class="daily-gh-summary"><div class="daily-gh-stat"><strong id="dailyGoalsDone">0 / 0</strong>Goals completed</div><div class="daily-gh-stat"><strong id="dailyHabitsDone">0 / 0</strong>Habits completed</div></div><div class="goals-habits-grid"><div class="goal-section"><h2>🎯 Daily Goals</h2><div class="goal-form"><input id="dailyGoalText" placeholder="Add a goal..."><button onclick="addDailyGoalItem()">Add</button></div><div id="dailyGoalsList"></div></div><div class="habit-section"><h2>🔥 Daily Habits</h2><div class="habit-form"><input id="dailyHabitText" placeholder="Add a habit..."><button onclick="addDailyHabit()">Add</button></div><div id="dailyHabitsList"></div></div></div><div class="nav"><button onclick="showPage(8)">← Subject Study Planner</button><button onclick="showPage(0)">🏠 Morning Plan</button></div></div></section><section class="page" id="page9"><div class="settings-box"><div class="focus-title">⚙️ Settings</div><div class="focus-subtitle">Customize your Daily Planner and protect your data.</div><div class="settings-section"><h3>🎨 Appearance</h3><div class="settings-row"><span>Theme</span><select id="settingsTheme" onchange="setTheme(this.value)"><option value="purple">💜 Purple</option><option value="blue">💙 Blue</option><option value="green">💚 Green</option><option value="peach">🍑 Peach</option></select></div><div class="settings-row"><span>Accent Color</span><select id="settingsAccent" onchange="setAccent(this.value)"><option value="purple">💜 Purple</option><option value="blue">💙 Blue</option><option value="pink">💗 Pink</option><option value="green">💚 Green</option><option value="orange">🧡 Orange</option></select></div><div class="settings-row"><span>Text Size</span><select id="settingsFont" onchange="setFontSize(this.value)"><option value="small">Small</option><option value="normal">Normal</option><option value="large">Large</option></select></div><div class="settings-row"><span>Compact Layout</span><input type="checkbox" id="settingsCompact" onchange="setCompact(this.checked)"></div><div class="settings-row"><span>Dark Mode</span><input type="checkbox" id="settingsDark" onchange="toggleDarkMode()"></div></div><div class="settings-section"><h3>🔔 Smarter Reminders</h3><div class="settings-row"><span>Reminders Enabled</span><input type="checkbox" id="settingsReminders" onchange="setRemindersEnabled(this.checked)"></div><div class="settings-row"><span>Default Reminder Lead Time</span><select id="settingsLead" onchange="setDefaultLead(this.value)"><option value="0">At task time</option><option value="5">5 minutes before</option><option value="10">10 minutes before</option><option value="15">15 minutes before</option></select></div><div class="settings-row"><span>Quiet Hours Start</span><input type="time" id="quietStart" onchange="saveReminderSettings()"></div><div class="settings-row"><span>Quiet Hours End</span><input type="time" id="quietEnd" onchange="saveReminderSettings()"></div><p class="settings-help">Use the 🔔 button on any task to turn on a reminder. Reminders can notify you at the task time or before it, and quiet hours prevent notifications during a chosen period.</p></div><div class="settings-section"><h3>💾 Data Backup & Export</h3><p class="settings-help">Export everything saved by the planner as a JSON backup. You can import the backup later on this device.</p><button class="backup-btn" onclick="exportPlannerData()">⬇️ Export Backup</button><button onclick="document.getElementById('importFile').click()">⬆️ Import Backup</button><input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="importPlannerData(event)"><button class="danger-btn" onclick="resetPlannerData()">🗑️ Reset All Data</button></div><div class="nav"><button onclick="showPage(8)">← Subject Study Planner</button><button onclick="showPage(0)">🏠 Morning Plan</button></div></div></section></div><script>const plans=pageInfo.map(p=>
 p[1].map(x=>{
 const [name,time,priority]=x.split("|");
 return{
@@ -202,8 +420,6 @@ if(n===8)
 renderSubjectStudyPlanner();
 if(n===9)
 loadSettings();
-if(n===11)
-renderCalendar();
 scrollTo({
 top:0,
 behavior:"smooth"
@@ -230,7 +446,11 @@ document.body.classList.contains("dark")
 if(document.getElementById("settingsDark"))document.getElementById("settingsDark").checked=document.body.classList.contains("dark");
 }
 function setTheme(t){
-document.body.classList.remove("blue","green","peach","strawberry","rose","mint","ocean","lavender");
+document.body.classList.remove(
+"blue",
+"green",
+"peach"
+);
 if(t!=="purple")
 document.body.classList.add(t);
 localStorage.setItem(
@@ -318,7 +538,7 @@ ${t.name}
 ${t.time||""}
 </span><span class="priority ${t.priority.toLowerCase()}">
 ${t.priority}
-</span>${t.category?`<span class="category-badge">${t.category}</span>`:""}
+</span>
 ${badge
 ?`<span class="repeat-badge">${badge}</span>`
 :""
@@ -396,10 +616,6 @@ const priority=
 document.getElementById(
 "customPriority"+p
 ).value;
-const category=
-document.getElementById(
-"customCategory"+p
-).value;
 const repeat=
 document.getElementById(
 "customRepeat"+p
@@ -414,8 +630,7 @@ customTasks[selectedDate][p]??=[];
 customTasks[selectedDate][p].push({
 name,
 time,
-priority,
-category
+priority
 });
 save(
 "dailyPlannerCustomTasks",
@@ -427,7 +642,6 @@ id:id("repeat"),
 name,
 time,
 priority,
-category,
 page:p,
 repeat,
 startDate:selectedDate
@@ -446,7 +660,6 @@ document.getElementById(
 document.getElementById(
 "customRepeat"+p
 ).value="none";
-document.getElementById("customCategory"+p).value="General";
 renderPlan(p);
 updateReport();
 renderWeeklyOverview();
@@ -1544,10 +1757,6 @@ function escapeHTML(x){return String(x).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':
 function setAccent(v){document.body.classList.remove("accent-blue","accent-pink","accent-green","accent-orange");const c={blue:"accent-blue",pink:"accent-pink",green:"accent-green",orange:"accent-orange"}[v];if(c)document.body.classList.add(c);save("dailyPlannerAccent",v)}
 function setFontSize(v){document.body.classList.remove("small-text","large-text");if(v!=="normal")document.body.classList.add(v+"-text");save("dailyPlannerFontSize",v)}
 function setCompact(v){document.body.classList.toggle("compact",!!v);save("dailyPlannerCompact",!!v)}
-function calendarTasksForDate(date){const out=[];for(let p=0;p<4;p++){plans[p].forEach((t,i)=>out.push({...t,page:p,done:state(p,date)["preset_"+i]}));(customTasks[date]?.[p]||[]).forEach((t,i)=>out.push({...t,page:p,done:state(p,date)["custom_"+i]}));repeats(p,date).forEach(t=>out.push({...t,page:p,done:state(p,date)["repeat_"+t.id]}));}return out;}
-function changeCalendarMonth(n){const d=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+n,1);calendarMonth=d;renderCalendar();}
-let calendarMonth=new Date();
-function renderCalendar(){const title=document.getElementById("calendarMonthTitle"),grid=document.getElementById("calendarGrid");if(!title||!grid)return;title.textContent=calendarMonth.toLocaleString(undefined,{month:"long",year:"numeric"});grid.innerHTML="";["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(x=>{const h=document.createElement("div");h.className="calendar-head";h.textContent=x;grid.appendChild(h)});const y=calendarMonth.getFullYear(),m=calendarMonth.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();for(let i=0;i<first;i++){const e=document.createElement("div");e.className="calendar-day empty";grid.appendChild(e)}for(let day=1;day<=days;day++){const d=new Date(y,m,day),date=getDateKey(d),cell=document.createElement("div");cell.className="calendar-day"+(date===getToday()?" today":"");cell.onclick=()=>{selectedDate=date;syncDates();showPage(0)};cell.innerHTML=`<div class="calendar-number">${day}</div>`;calendarTasksForDate(date).slice(0,4).forEach(t=>{const x=document.createElement("div");x.className="calendar-task";x.textContent=(t.time?t.time+" ":"")+t.name;x.title=t.name+(t.category?" • "+t.category:"");if(t.done)x.style.textDecoration="line-through";cell.appendChild(x)});grid.appendChild(cell)}}
 function loadSettings(){const theme=localStorage.getItem("dailyPlannerTheme")||"purple",accent=localStorage.getItem("dailyPlannerAccent")||"purple",font=localStorage.getItem("dailyPlannerFontSize")||"normal",compact=localStorage.getItem("dailyPlannerCompact")==="true",dark=localStorage.getItem("dailyPlannerDark")==="true";setTheme(theme);setAccent(accent);setFontSize(font);setCompact(compact);document.body.classList.toggle("dark",dark);document.getElementById("settingsTheme").value=theme;document.getElementById("settingsAccent").value=accent;document.getElementById("settingsFont").value=font;document.getElementById("settingsCompact").checked=compact;document.getElementById("settingsDark").checked=dark;document.getElementById("settingsReminders").checked=!!reminderSettings.enabled;document.getElementById("settingsLead").value=String(reminderSettings.lead??0);document.getElementById("quietStart").value=reminderSettings.quietStart||"";document.getElementById("quietEnd").value=reminderSettings.quietEnd||""}
 function exportPlannerData(){const data={version:1,exportedAt:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith("dailyPlanner")||k.startsWith("dailyNotes_")))data.data[k]=localStorage.getItem(k)}const b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`daily-planner-backup-${getToday()}.json`;a.click();URL.revokeObjectURL(a.href);showToast("💾 Backup exported successfully!","info")}
 function importPlannerData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result),d=x.data||x;if(!d||typeof d!=="object"||Array.isArray(d))throw 0;if(!confirm("Import this backup? Your current planner data will be replaced.")){e.target.value="";return}const oldKeys=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith("dailyPlanner")||k.startsWith("dailyNotes_")))oldKeys.push(k)}oldKeys.forEach(k=>localStorage.removeItem(k));Object.keys(d).forEach(k=>{if(k.startsWith("dailyPlanner")||k.startsWith("dailyNotes_"))localStorage.setItem(k,d[k])});alert("Backup imported successfully. The planner will reload now.");location.reload()}catch(err){alert("This backup file is not valid.")}e.target.value=""};r.readAsText(f)}
