@@ -1,1 +1,1718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Planner</title>
+<style>
+*{box-sizing:border-box}:root{--accent:#8e44ad;--bg1:#ffd6f6;--bg2:#d9c2ff}html{scroll-behavior:smooth;scroll-snap-type:y proximity}body{margin:0;padding:20px;font-family:Arial,sans-serif;color:#333;min-height:100vh;background:linear-gradient(135deg,var(--bg1),var(--bg2));transition:.3s}body.blue{--accent:#3498db;--bg1:#d9f1ff;--bg2:#c9d8ff}body.green{--accent:#27ae60;--bg1:#d9ffe6;--bg2:#c9f3d7}body.peach{--accent:#e67e22;--bg1:#ffe1c7;--bg2:#ffd0b0}body.strawberry{--accent:#e84393;--bg1:#ffd6e9;--bg2:#ffc1d9}body.rose{--accent:#d63031;--bg1:#ffe0e0;--bg2:#ffcaca}body.mint{--accent:#00b894;--bg1:#d8fff4;--bg2:#bff5e8}body.ocean{--accent:#0984e3;--bg1:#d8f5ff;--bg2:#b9dfff}body.lavender{--accent:#6c5ce7;--bg1:#e7e1ff;--bg2:#d4ccff}body.dark{background:#171525;color:#eee}body.dark .card,body.dark .page,body.dark .menu,body.dark .welcome-box,body.dark input,body.dark select,body.dark textarea{background:#252239;color:#eee}body.dark .task,body.dark .list-item,body.dark .week-day,body.dark .calendar div,body.dark .achievement,body.dark .dash-card{background:#302b48}body.small-text{font-size:14px}body.large-text{font-size:18px}body.compact .card,body.compact .page{padding:14px}button,input,select,textarea{font:inherit;border:0;border-radius:12px;padding:10px}button{cursor:pointer;background:var(--accent);color:#fff;font-weight:bold;transition:.2s}button:hover{transform:translateY(-2px);filter:brightness(1.05)}input,select,textarea{background:#fff;border:1px solid #ddd}textarea{width:100%;min-height:120px;resize:vertical}.hidden{display:none!important}.welcome,.app{max-width:1100px;margin:auto}.welcome-box,.card,.page{background:rgba(255,255,255,.84);border-radius:24px;padding:24px;box-shadow:0 8px 30px #0001;margin:14px auto}.welcome-box{max-width:650px;margin-top:7vh;text-align:center}.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px}.icon-btn{width:45px;height:45px;padding:0;border-radius:50%;font-size:22px}.menu{position:absolute;right:20px;top:70px;background:#fff;border-radius:18px;padding:14px;box-shadow:0 8px 30px #0003;z-index:20;display:none}.menu button{display:block;width:190px;margin:5px}.page{display:block;min-height:calc(100vh - 28px);scroll-snap-align:start;scroll-margin-top:14px}.page.active{display:block}.page h2{text-align:center;color:var(--accent)}.nav{display:none}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.task,.list-item{background:#fff;border-radius:15px;padding:12px;margin:8px 0;display:flex;align-items:flex-start;gap:10px;box-shadow:0 2px 8px #0001;text-align:left}.task.done,.list-item.done{opacity:.6}.task.done .task-name,.list-item.done .task-name{text-decoration:line-through}.task-main{flex:1;min-width:0}.task-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.task-name{font-weight:bold}.task-meta{font-size:12px;opacity:.7}.task-actions{display:flex;gap:4px;flex-wrap:wrap}.task-actions button{font-size:11px;padding:7px}.priority-high{border-left:5px solid #e74c3c}.priority-medium{border-left:5px solid #f39c12}.priority-low{border-left:5px solid #2ecc71}.badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#eee;font-size:11px}.rolled{background:#d6f5df;color:#18743b}.subtask-progress{font-size:12px;color:var(--accent);margin-top:5px}.subtasks{display:none;margin-top:9px;padding:10px;border-radius:12px;background:#f5f2fb}.subtasks.open{display:block}.subtask-add{display:flex;gap:5px;margin-bottom:7px}.subtask-add input{flex:1}.subtask{display:flex;align-items:center;gap:7px;padding:5px 0}.subtask span{flex:1}.subtask.done span{text-decoration:line-through;opacity:.6}.subtask button{padding:4px 7px;font-size:11px}.stats,.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:15px 0}.stat,.dash-card{background:rgba(255,255,255,.65);padding:15px;border-radius:16px;text-align:center}.stat b{display:block;font-size:25px;color:var(--accent)}.progress{height:18px;background:#ddd;border-radius:20px;overflow:hidden;margin:10px 0}.progress div{height:100%;background:var(--accent);width:0;transition:.3s}.note-box,.rollover-box,.ambient-box,.filter-box{padding:16px;border-radius:18px;background:#f6f0ff;margin:15px 0}.rollover-box{border:2px dashed var(--accent)}.ambient-buttons,.filter-buttons{display:flex;flex-wrap:wrap;gap:7px}.ambient-buttons button,.filter-buttons button{flex:1;min-width:110px}.volume{width:100%}.timer{font-size:55px;text-align:center;font-weight:bold;color:var(--accent);margin:15px}.timer-buttons{text-align:center}.timer-buttons button{margin:4px}.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.calendar div{min-height:65px;background:#fff;border-radius:10px;padding:6px;font-size:12px}.calendar .head{background:var(--accent);color:#fff;text-align:center;min-height:auto}.calendar .today{outline:3px solid var(--accent)}.cal-day:hover{cursor:pointer;transform:scale(1.02)}.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.week-day{background:#fff;padding:10px;border-radius:15px;min-height:130px}.achievement{padding:12px;margin:7px 0;border-radius:12px;background:#fff}.achievement.locked{opacity:.45}.achievement.unlocked{border:2px solid #f5c542}.settings-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:10px 0;border-bottom:1px solid #ddd}.search{width:100%;margin-bottom:8px}.chart{display:flex;align-items:flex-end;gap:6px;height:180px;padding:10px;background:#f6f0ff;border-radius:16px}.bar{flex:1;min-width:8px;background:var(--accent);border-radius:7px 7px 0 0;position:relative}.bar span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:10px}.quote{padding:18px;border-radius:18px;background:#f6f0ff;font-style:italic;text-align:center}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:12px 20px;border-radius:20px;display:none;z-index:100}.theme-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:15px}.theme-buttons button{width:42px;height:42px;padding:0;border-radius:50%}.page + .page{margin-top:24px}.page:last-child{margin-bottom:24px}@media(max-width:650px){body{padding:10px}.welcome-box,.card,.page{padding:15px}.week-grid{grid-template-columns:1fr}.calendar div{min-height:48px;font-size:10px}.task-actions{width:100%}.nav{flex-direction:column}}
+</style>
+<style>
+.hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:15px 0}.hub-card{background:rgba(255,255,255,.72);border-radius:20px;padding:18px;box-shadow:0 5px 18px #0001}.dark .hub-card{background:#302b48}.hub-card h3{margin-top:0;color:var(--accent)}.hub-list{display:flex;flex-direction:column;gap:7px}.hub-item{display:flex;align-items:center;gap:8px;padding:10px;border-radius:12px;background:rgba(255,255,255,.65)}.dark .hub-item{background:#252239}.hub-item span{flex:1}.pill{display:inline-block;padding:5px 9px;border-radius:999px;background:var(--accent);color:#fff;font-size:11px}.focus-three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.focus-three input{width:100%}.timeline{position:relative;border-left:4px solid var(--accent);padding-left:15px;margin:12px 0}.timeline-item{position:relative;background:rgba(255,255,255,.7);border-radius:14px;padding:11px;margin:8px 0}.dark .timeline-item{background:#252239}.timeline-item:before{content:'';position:absolute;left:-24px;top:15px;width:12px;height:12px;border-radius:50%;background:var(--accent)}.flashcard{min-height:150px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;font-weight:bold;padding:20px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(246,240,255,.9));cursor:pointer}.dark .flashcard{background:#252239}.flashcard small{display:block;font-size:12px;font-weight:normal;opacity:.65;margin-top:10px}.zen-mode .page:not(.active),.zen-mode .topbar h1,.zen-mode .topbar button:first-child{display:none}.zen-mode .topbar{justify-content:flex-end}.zen-mode .topbar button:last-child{display:block}.zen-mode .app{max-width:900px}.hub-progress{height:12px;background:#ddd;border-radius:20px;overflow:hidden}.hub-progress div{height:100%;background:var(--accent);transition:.3s}.mini-actions{display:flex;flex-wrap:wrap;gap:7px}.mini-actions button{flex:1;min-width:100px}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
 
+<section id="welcome" class="welcome">
+<div class="welcome-box">
+<div class="topbar">
+<button class="icon-btn" onclick="toggleMenu('welcomeMenu')">☰</button>
+<button class="icon-btn" onclick="showSettings()">⚙️</button>
+</div>
+<h1>✨ Daily Planner ✨</h1>
+<p>Organize your day, study better and reach your goals!</p>
+<div class="theme-buttons">
+<button onclick="setTheme('')">💜</button>
+<button onclick="setTheme('blue')">💙</button>
+<button onclick="setTheme('green')">💚</button>
+<button onclick="setTheme('peach')">🧡</button>
+<button onclick="setTheme('strawberry')">💗</button>
+<button onclick="setTheme('rose')">❤️</button>
+<button onclick="setTheme('mint')">🌿</button>
+<button onclick="setTheme('ocean')">🌊</button>
+<button onclick="setTheme('lavender')">💜</button>
+</div>
+<button onclick="startPlanner()" style="font-size:18px;padding:14px 28px">✨ Let's Start ✨</button>
+</div>
+<div id="welcomeMenu" class="menu">
+<button onclick="showSettings()">⚙️ Settings</button>
+<button onclick="showAbout()">ℹ️ About</button>
+</div>
+</section>
+
+<main id="app" class="app hidden">
+<div class="topbar">
+<h1>📋 Daily Planner</h1>
+<button class="icon-btn" onclick="showSettings()">⚙️</button>
+</div>
+
+<div id="pages"></div>
+
+<section class="page" id="page4">
+<h2>📊 Daily Report</h2>
+<input id="dateInput5" type="date" onchange="changeDate(this.value)">
+<div class="stats">
+<div class="stat"><b id="reportTotal">0</b>Total Tasks</div>
+<div class="stat"><b id="reportDone">0</b>Completed</div>
+<div class="stat"><b id="reportRate">0%</b>Rate</div>
+</div>
+<div class="progress"><div id="reportProgress"></div></div>
+<div id="reportText"></div>
+</section>
+
+<section class="page" id="page5">
+<h2>🎯 Study Focus</h2>
+<div class="form-grid">
+<select id="focusSubject"></select>
+<input id="focusMinutes" type="number" min="1" value="25" placeholder="Minutes">
+</div>
+<div class="timer" id="timer">25:00</div>
+<div class="timer-buttons">
+<button onclick="startTimer()">▶️ Start</button>
+<button onclick="pauseTimer()">⏸️ Pause</button>
+<button onclick="resetTimer()">🔄 Reset</button>
+</div>
+<div class="ambient-box">
+<h3>🎧 Ambient Sounds</h3>
+<div class="ambient-buttons">
+<button onclick="playAmbient('rain')">🌧️ Rain</button>
+<button onclick="playAmbient('forest')">🌲 Forest</button>
+<button onclick="playAmbient('cafe')">☕ Café</button>
+<button onclick="stopAmbient()">⏹️ Stop</button>
+</div>
+<input class="volume" id="ambientVolume" type="range" min="0" max="1" step=".05" value=".25" oninput="setAmbientVolume(this.value)">
+</div>
+<div id="focusSummary"></div>
+</section>
+
+<section class="page" id="page6">
+<h2>📅 Weekly Planner</h2>
+<input id="weekDateInput" type="date" onchange="changeWeek(this.value)">
+<div id="weeklyGrid" class="week-grid"></div>
+</section>
+
+<section class="page" id="page7">
+<h2>📚 Homework</h2>
+<div class="form-grid">
+<select id="homeworkSubject"></select>
+<input id="homeworkText" placeholder="Homework">
+<input id="homeworkDue" type="date">
+<button onclick="addHomework()">➕ Add</button>
+</div>
+<div id="homeworkList"></div>
+</section>
+
+<section class="page" id="page8">
+<h2>📝 Plans</h2>
+<div class="form-grid">
+<input id="planText" placeholder="Plan">
+<select id="planSubject"></select>
+<input id="planDate" type="date">
+<button onclick="addPlan()">➕ Add</button>
+</div>
+<div id="plansList"></div>
+</section>
+
+<section class="page" id="page9">
+<h2>⚙️ Settings</h2>
+<div class="settings-row">
+<span>🎨 Theme</span>
+<select id="themeSelect" onchange="setTheme(this.value)">
+<option value="">Purple</option>
+<option value="blue">Blue</option>
+<option value="green">Green</option>
+<option value="peach">Peach</option>
+<option value="strawberry">Strawberry</option>
+<option value="rose">Rose</option>
+<option value="mint">Mint</option>
+<option value="ocean">Ocean</option>
+<option value="lavender">Lavender</option>
+</select>
+</div>
+<div class="settings-row">
+<span>🔤 Font Size</span>
+<select id="fontSizeSelect" onchange="setFontSize(this.value)">
+<option value="">Normal</option>
+<option value="small-text">Small</option>
+<option value="large-text">Large</option>
+</select>
+</div>
+<div class="settings-row">
+<span>📦 Compact Mode</span>
+<input id="compactToggle" type="checkbox" onchange="toggleSetting('compact',this.checked)">
+</div>
+<div class="settings-row">
+<span>🌙 Dark Mode</span>
+<input id="darkToggle" type="checkbox" onchange="toggleSetting('dark',this.checked)">
+</div>
+<div class="settings-row">
+<span>🔔 Reminders</span>
+<input id="reminderToggle" type="checkbox" onchange="toggleSetting('reminders',this.checked)">
+</div>
+<div class="settings-row">
+<span>⏰ Reminder Lead Time</span>
+<input id="leadTime" type="number" min="0" onchange="saveSetting('lead',Number(this.value)||0)">
+</div>
+<div class="settings-row">
+<span>🌙 Quiet Start</span>
+<input id="quietStart" type="time" onchange="saveSetting('quietStart',this.value)">
+</div>
+<div class="settings-row">
+<span>🌅 Quiet End</span>
+<input id="quietEnd" type="time" onchange="saveSetting('quietEnd',this.value)">
+</div>
+<div class="settings-row">
+<span>📚 Daily Study Goal</span>
+<input id="studyGoal" type="number" min="1" onchange="saveSetting('studyGoal',Number(this.value)||60)">
+</div>
+</section>
+
+<section class="page" id="page10">
+<h2>🎯 Goals</h2>
+<div class="form-grid">
+<input id="goalText" placeholder="Goal">
+<input id="goalTarget" type="number" min="1" placeholder="Target">
+<button onclick="addGoal()">➕ Add Goal</button>
+</div>
+<div id="goalsList"></div>
+</section>
+
+<section class="page" id="page11">
+<h2>📆 Calendar</h2>
+<div class="calendar" id="mainCalendar"></div>
+</section>
+
+<section class="page" id="page12">
+<h2>🔁 Recurring Tasks</h2>
+<div id="recurringList"></div>
+</section>
+
+<section class="page" id="page13">
+<h2>🏆 Achievements</h2>
+<div id="achievementsList"></div>
+</section>
+
+<section class="page" id="page14">
+<h2>🌤️ Daily Dashboard</h2>
+<div class="dash-grid">
+<div class="dash-card"><b id="dashTasks">0/0</b><br>✅ Tasks</div>
+<div class="dash-card"><b id="dashStudy">0</b><br>📚 Study Minutes</div>
+<div class="dash-card"><b id="dashGoals">0/0</b><br>🎯 Goals</div>
+<div class="dash-card"><b id="dashHabits">0/0</b><br>🔥 Habits</div>
+<div class="dash-card"><b id="dashStreak">0</b><br>🔥 Streak</div>
+<div class="dash-card"><b id="dashAchievements">0</b><br>🏆 Achievements</div>
+</div>
+<div class="progress"><div id="dashProgress"></div></div>
+<div class="quote" id="dailyQuote"></div>
+<h3>⏰ Next Tasks</h3>
+<div id="dashNextTasks"></div>
+</section>
+
+<section class="page" id="page15">
+<h2>📝 Daily Notes</h2>
+<input id="notesDateInput" type="date" onchange="changeDate(this.value)">
+<br><br>
+<textarea id="bigNotes" placeholder="Write your notes here..." oninput="saveNotes('bigNotes')"></textarea>
+</section>
+
+<section class="page" id="page16">
+<h2>🔍 Search & Filters</h2>
+<input class="search" id="taskSearch" placeholder="Search tasks..." oninput="renderSearch()">
+<div class="filter-box">
+<div class="filter-buttons">
+<button onclick="setFilter('all')">All</button>
+<button onclick="setFilter('open')">Open</button>
+<button onclick="setFilter('done')">Completed</button>
+<button onclick="setFilter('high')">High Priority</button>
+<button onclick="setFilter('study')">Study</button>
+</div>
+<br>
+<select id="searchSort" onchange="renderSearch()">
+<option value="time">Sort by time</option>
+<option value="priority">Sort by priority</option>
+<option value="name">Sort by name</option>
+</select>
+</div>
+<div id="searchResults"></div>
+</section>
+
+<section class="page" id="page17">
+<h2>🔥 Streak Calendar</h2>
+<p>Green days are days you finished all of your tasks.</p>
+<div class="calendar" id="streakCalendar"></div>
+<div class="stats">
+<div class="stat"><b id="bestStreak">0</b>Best Streak</div>
+<div class="stat"><b id="currentStreak">0</b>Current Streak</div>
+</div>
+</section>
+
+<section class="page" id="page18">
+<h2>📈 Productivity Statistics</h2>
+<div class="stats">
+<div class="stat"><b id="statTotal">0</b>Total Tasks</div>
+<div class="stat"><b id="statDone">0</b>Completed</div>
+<div class="stat"><b id="statStudy">0</b>Study Minutes</div>
+<div class="stat"><b id="statRate">0%</b>Completion Rate</div>
+</div>
+<h3>Last 7 Days</h3>
+<div class="chart" id="productivityChart"></div>
+<h3>📚 Study by Subject</h3>
+<div id="subjectStats"></div>
+</section>
+
+<section class="page" id="page19">
+<h2>✨ Productivity Hub</h2>
+<p style="text-align:center">New study, productivity, time-management and UI tools — your existing planner stays unchanged.</p>
+
+<div class="hub-grid">
+<div class="hub-card">
+<h3>🧘 Zen Mode</h3>
+<p id="zenStatus">🌸 Zen Mode is OFF — normal view restored.</p>
+<button onclick="toggleZenMode()">🧘 Toggle Zen Mode</button>
+</div>
+
+<div class="hub-card">
+<h3>🎨 Hub Style</h3>
+<p>Change the visual feel of the Productivity Hub.</p>
+<button onclick="cycleHubView()">✨ Change Hub Style</button>
+</div>
+
+<div class="hub-card">
+<h3>⭐ My Top 3 Priorities</h3>
+<div class="focus-three">
+<input id="top1" placeholder="#1 Priority">
+<input id="top2" placeholder="#2 Priority">
+<input id="top3" placeholder="#3 Priority">
+</div>
+<button style="margin-top:8px;width:100%" onclick="saveTopThree()">💾 Save Top 3</button>
+<p id="topSaved"></p>
+</div>
+
+<div class="hub-card">
+<h3>⚡ Productivity Score</h3>
+<div class="stat"><b id="hubScore">0%</b>Today</div>
+<div class="hub-progress"><div id="hubScoreBar"></div></div>
+<p id="hubScoreText"></p>
+</div>
+
+<div class="hub-card">
+<h3>📚 Study Flashcards</h3>
+<input id="flashQ" placeholder="Question / Front">
+<input id="flashA" placeholder="Answer / Back" style="width:100%;margin-top:7px">
+<button style="margin-top:7px;width:100%" onclick="addFlashcard()">➕ Add Flashcard</button>
+<div id="flashcardBox" style="margin-top:10px"></div>
+<div class="mini-actions" style="margin-top:8px">
+<button onclick="prevFlashcard()">⬅️</button>
+<button onclick="flipFlashcard()">🔄 Flip</button>
+<button onclick="nextFlashcard()">➡️</button>
+</div>
+<p id="flashCount"></p>
+</div>
+
+<div class="hub-card">
+<h3>⏰ Daily Timeline</h3>
+<p>Your tasks arranged by time.</p>
+<div id="hubTimeline" class="timeline"></div>
+</div>
+
+<div class="hub-card">
+<h3>⏳ Time Budget</h3>
+<p>Set how many minutes you want to spend on tasks today.</p>
+<div class="form-grid">
+<input id="timeBudget" type="number" min="1" placeholder="Minutes">
+<button onclick="saveTimeBudget()">Save Budget</button>
+</div>
+<div class="stat"><b id="budgetUsed">0</b> min planned</div>
+<div class="hub-progress"><div id="budgetBar"></div></div>
+<p id="budgetText"></p>
+</div>
+
+<div class="hub-card">
+<h3>📌 Smart Task View</h3>
+<p>See the best next actions based on time and priority.</p>
+<div id="smartTasks" class="hub-list"></div>
+</div>
+
+<div class="hub-card">
+<h3>📖 Study Plan Check</h3>
+<p>Quick view of your study goal and completed sessions.</p>
+<div class="stats">
+<div class="stat"><b id="hubStudyMinutes">0</b>Minutes</div>
+<div class="stat"><b id="hubSessions">0</b>Sessions</div>
+</div>
+<div class="hub-progress"><div id="hubStudyBar"></div></div>
+<p id="hubStudyText"></p>
+</div>
+</div>
+</section>
+</main>
+
+<script>
+const pageInfo=[
+['🌅 Morning Plan',[
+['Wake up','05:15','High'],
+['Make my bed','05:20','Low'],
+['Pray','05:25','High'],
+['Important meeting','06:00','High'],
+['Breakfast','07:00','Medium'],
+['Skincare','07:20','Low'],
+['Review homework','07:30','High'],
+['Wear uniform','07:45','Medium'],
+['Go to school','08:00','High']
+]],
+['☀️ Afternoon Plan',[
+['Change your clothes','12:50','Low'],
+['Wash your face','12:55','Low'],
+['Eat lunch','13:00','High'],
+['Check your school schedule for the next day','13:20','Medium'],
+['Pray','13:30','High'],
+['Iron your uniform','14:00','Medium'],
+['Study','15:00','High'],
+['Rest','16:30','Low']
+]],
+['🌆 Evening Plan',[
+['Review','17:00','High'],
+['Pray','18:00','High'],
+['Dinner','19:00','Medium']
+]],
+['🌙 Night Plan',[
+['Game','20:00','Low'],
+['Review','20:30','High'],
+['Pray','21:00','High'],
+['Night routine','21:30','Medium'],
+['Get ready for bed','22:00','High']
+]]
+];
+
+const subjects=['English','Math','Arabic','Science','Kurdish','History','Computer','Religious Education','Other'];
+
+const defaults={
+tasks:{},
+homework:[],
+plans:[],
+studyLogs:{},
+goals:{},
+habits:{},
+notes:{},
+finished:{},
+categories:['School','Study','Health','Personal'],
+recurring:[],
+settings:{
+theme:'',
+font:'',
+compact:false,
+dark:false,
+reminders:false,
+lead:0,
+quietStart:'22:00',
+quietEnd:'07:00',
+studyGoal:60
+}
+};
+
+let data=load(),
+selectedDate=today(),
+weekDate=today(),
+calendarDate=new Date(),
+filter='all',
+timer=null,
+timerSeconds=1500,
+running=false,
+ambient={ctx:null,gain:null,nodes:[]};
+
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function today(){return dateStr(new Date())}
+function dateObj(s){return new Date(s+'T12:00:00')}
+function dateStr(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+
+function load(){
+try{
+let x=JSON.parse(localStorage.getItem('dailyPlannerData_v5')||'null');
+if(!x)return clone(defaults);
+return Object.assign(clone(defaults),x,{settings:Object.assign(clone(defaults.settings),x.settings||{})});
+}catch(e){return clone(defaults)}
+}
+
+function save(){
+localStorage.setItem('dailyPlannerData_v5',JSON.stringify(data));
+}
+
+function esc(s){
+return String(s??'').replace(/[&<>"']/g,m=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#039;'
+}[m]));
+}
+
+function toast(t){
+let e=document.getElementById('toast');
+e.textContent=t;
+e.style.display='block';
+clearTimeout(e._t);
+e._t=setTimeout(()=>e.style.display='none',2200);
+}
+
+function toggleMenu(id){
+let e=document.getElementById(id);
+if(e)e.style.display=e.style.display==='block'?'none':'block';
+}
+
+function startPlanner(){
+document.getElementById('welcome').classList.add('hidden');
+document.getElementById('app').classList.remove('hidden');
+window.scrollTo({top:0,behavior:'smooth'});
+renderAll();
+}
+
+function showSettings(){
+document.getElementById('welcome').classList.add('hidden');
+document.getElementById('app').classList.remove('hidden');
+showPage(9);
+}
+
+function showAbout(){
+alert('✨ Daily Planner\\n\\nOrganize your day, study better, track your progress and reach your goals!');
+}
+
+function setTheme(v){
+document.body.className=document.body.className.replace(/\b(blue|green|peach|strawberry|rose|mint|ocean|lavender)\b/g,'').trim();
+if(v)document.body.classList.add(v);
+data.settings.theme=v;
+save();
+let e=document.getElementById('themeSelect');
+if(e)e.value=v;
+}
+
+function setFontSize(v){
+document.body.classList.remove('small-text','large-text');
+if(v)document.body.classList.add(v);
+data.settings.font=v;
+save();
+}
+
+function toggleSetting(k,v){
+data.settings[k]=v;
+save();
+}
+
+function saveSetting(k,v){
+data.settings[k]=v;
+save();
+}
+
+function ensureDate(d){
+if(!data.tasks[d])data.tasks[d]=[];
+}
+
+function taskForPage(p){
+ensureDate(selectedDate);
+return data.tasks[selectedDate].filter(t=>t.page===p);
+}
+
+function getTasks(p){
+return taskForPage(p);
+}
+
+function ensureTaskCopies(d){
+if(!data.tasks[d])return;
+let originals=data.tasks[d].filter(t=>!t.copyOf);
+
+originals.forEach(t=>{
+if(!data.tasks[d].some(x=>x.copyOf===t.id)){
+data.tasks[d].push({
+...clone(t),
+id:'copy-'+uid(),
+copyOf:t.id,
+completed:false,
+subtasks:(t.subtasks||[]).map(s=>({...s,id:uid(),done:false})),
+open:false,
+rolledOverFrom:null,
+rolledOverSourceId:null
+});
+}
+});
+}
+
+function taskHTML(t,p){
+let cls=t.completed?'task done':'task';
+cls+=' priority-'+String(t.priority||'Medium').toLowerCase();
+
+let subs=t.subtasks||[];
+let doneSubs=subs.filter(s=>s.done).length;
+
+return `
+<div class="${cls}">
+<input type="checkbox" ${t.completed?'checked':''} onchange="toggleTask('${t.id}')">
+<div class="task-main">
+<div class="task-line">
+<span class="task-name">${esc(t.name)}</span>
+${t.copyOf?'<span class="badge">Copy</span>':''}
+${t.rolledOverFrom?'<span class="badge rolled">↪️ Rolled over</span>':''}
+<span class="badge">${esc(t.priority||'Medium')}</span>
+</div>
+<div class="task-meta">
+${t.time?`⏰ ${esc(t.time)} • `:''}${esc(t.category||'')}
+</div>
+${subs.length?`<div class="subtask-progress">☑️ ${doneSubs}/${subs.length} subtasks</div>`:''}
+<div id="subs-${t.id}" class="subtasks ${t.open?'open':''}">
+<div class="subtask-add">
+<input id="subinput-${t.id}" placeholder="Add sub-task">
+<button onclick="addSubtask('${t.id}')">➕</button>
+</div>
+${subs.map(s=>`
+<div class="subtask ${s.done?'done':''}">
+<input type="checkbox" ${s.done?'checked':''} onchange="toggleSubtask('${t.id}','${s.id}')">
+<span>${esc(s.text)}</span>
+<button onclick="deleteSubtask('${t.id}','${s.id}')">🗑️</button>
+</div>`).join('')}
+</div>
+</div>
+<div class="task-actions">
+<button onclick="toggleSubtasks('${t.id}')">☑️</button>
+<button onclick="editTask('${t.id}')">✏️</button>
+<button onclick="deleteTask('${t.id}')">🗑️</button>
+</div>
+</div>`;
+}
+
+function renderPlan(p){
+let e=document.getElementById('tasks'+p);
+if(!e)return;
+
+ensureDate(selectedDate);
+ensureTaskCopies(selectedDate);
+
+e.innerHTML=getTasks(p)
+.sort((a,b)=>(a.time||'').localeCompare(b.time||''))
+.map(t=>taskHTML(t,p)).join('')||'<p>No tasks yet.</p>';
+}
+
+function addCustomTask(p){
+let name=document.getElementById('taskText'+p).value.trim();
+if(!name){
+toast('✏️ Write a task first.');
+return;
+}
+
+ensureDate(selectedDate);
+
+let t={
+id:uid(),
+name,
+time:document.getElementById('taskTime'+p).value,
+priority:document.getElementById('taskPriority'+p).value,
+repeat:document.getElementById('taskRepeat'+p).value,
+category:document.getElementById('taskCategory'+p).value,
+page:p,
+completed:false,
+subtasks:[],
+open:false
+};
+
+data.tasks[selectedDate].push(t);
+ensureTaskCopies(selectedDate);
+
+if(t.repeat!=='none'){
+data.recurring.push({...clone(t),sourceDate:selectedDate});
+}
+
+save();
+document.getElementById('taskText'+p).value='';
+document.getElementById('taskTime'+p).value='';
+renderAll();
+toast('Task added with a copy! ✨');
+}
+
+function toggleTask(id){
+ensureDate(selectedDate);
+let t=data.tasks[selectedDate].find(x=>x.id===id);
+if(!t)return;
+
+t.completed=!t.completed;
+save();
+renderAll();
+}
+
+function deleteTask(id){
+ensureDate(selectedDate);
+data.tasks[selectedDate]=data.tasks[selectedDate].filter(x=>x.id!==id);
+save();
+renderAll();
+}
+
+function editTask(id){
+let t=data.tasks[selectedDate]?.find(x=>x.id===id);
+if(!t)return;
+
+let name=prompt('Edit task:',t.name);
+if(name===null)return;
+
+name=name.trim();
+if(name)t.name=name;
+
+let time=prompt('Edit time:',t.time||'');
+if(time!==null)t.time=time;
+
+save();
+renderAll();
+}
+
+function toggleSubtasks(id){
+let t=data.tasks[selectedDate]?.find(x=>x.id===id);
+if(!t)return;
+t.open=!t.open;
+save();
+renderAll();
+}
+
+function addSubtask(id){
+let t=data.tasks[selectedDate]?.find(x=>x.id===id);
+if(!t)return;
+
+let e=document.getElementById('subinput-'+id);
+let text=e?.value.trim();
+
+if(!text)return;
+
+t.subtasks=t.subtasks||[];
+t.subtasks.push({id:uid(),text,done:false});
+save();
+renderAll();
+}
+
+function toggleSubtask(taskId,subId){
+let t=data.tasks[selectedDate]?.find(x=>x.id===taskId);
+let s=t?.subtasks?.find(x=>x.id===subId);
+
+if(s)s.done=!s.done;
+
+save();
+renderAll();
+}
+
+function deleteSubtask(taskId,subId){
+let t=data.tasks[selectedDate]?.find(x=>x.id===taskId);
+if(!t)return;
+
+t.subtasks=(t.subtasks||[]).filter(x=>x.id!==subId);
+save();
+renderAll();
+}
+
+function changeDate(v){
+if(!v)return;
+selectedDate=v;
+ensureDate(v);
+save();
+renderAll();
+}
+
+function changeWeek(v){
+if(!v)return;
+weekDate=v;
+renderWeekly();
+}
+
+function counts(){
+let a=allTasks();
+return{
+total:a.length,
+done:a.filter(t=>t.completed).length
+};
+}
+
+function allTasks(){
+ensureDate(selectedDate);
+return data.tasks[selectedDate]||[];
+}
+
+function report(){
+let c=counts();
+document.getElementById('reportTotal').textContent=c.total;
+document.getElementById('reportDone').textContent=c.done;
+
+let rate=c.total?Math.round(c.done/c.total*100):0;
+document.getElementById('reportRate').textContent=rate+'%';
+document.getElementById('reportProgress').style.width=rate+'%';
+
+document.getElementById('reportText').innerHTML=
+rate===100&&c.total
+?'🎉 Amazing! You finished everything today!'
+:rate>=50
+?'💪 Good job! Keep going!'
+:'🌱 Start with one small task.';
+}
+
+function studyMinutes(){
+return (data.studyLogs[selectedDate]||[]).reduce((n,x)=>n+(Number(x.minutes)||0),0);
+}
+
+function startTimer(){
+if(running)return;
+
+running=true;
+
+timer=setInterval(()=>{
+if(timerSeconds>0){
+timerSeconds--;
+updateTimer();
+}else{
+clearInterval(timer);
+timer=null;
+running=false;
+finishStudySession();
+}
+},1000);
+}
+
+function pauseTimer(){
+clearInterval(timer);
+timer=null;
+running=false;
+}
+
+function resetTimer(){
+pauseTimer();
+timerSeconds=(Number(document.getElementById('durationSelect')?.value)||25)*60;
+updateTimer();
+}
+
+function finishStudySession(){
+let mins=Math.round((Number(document.getElementById('focusMinutes')?.value)||25));
+data.studyLogs[selectedDate]=data.studyLogs[selectedDate]||[];
+data.studyLogs[selectedDate].push({
+minutes:mins,
+subject:document.getElementById('focusSubject')?.value||'Other',
+time:new Date().toISOString()
+});
+save();
+toast('🎉 Study session completed!');
+renderAll();
+}
+
+function updateTimer(){
+let m=Math.floor(timerSeconds/60);
+let s=timerSeconds%60;
+let e=document.getElementById('timer');
+if(e)e.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function playAmbient(type){
+try{
+stopAmbient();
+
+let ctx=new (window.AudioContext||window.webkitAudioContext)();
+let gain=ctx.createGain();
+gain.gain.value=Number(document.getElementById('ambientVolume')?.value||.25);
+gain.connect(ctx.destination);
+
+let osc=ctx.createOscillator();
+osc.type=type==='cafe'?'triangle':type==='forest'?'sine':'sawtooth';
+osc.frequency.value=type==='rain'?120:type==='forest'?180:90;
+osc.connect(gain);
+osc.start();
+
+ambient={ctx,gain,nodes:[osc]};
+toast('🎧 Ambient sound playing');
+}catch(e){
+toast('Your browser does not support ambient sound.');
+}
+}
+
+function stopAmbient(){
+try{
+ambient.nodes.forEach(n=>n.stop());
+ambient.ctx?.close();
+}catch(e){}
+ambient={ctx:null,gain:null,nodes:[]};
+}
+
+function setAmbientVolume(v){
+if(ambient.gain)ambient.gain.gain.value=Number(v);
+}
+
+function renderFocus(){
+let e=document.getElementById('focusSummary');
+if(!e)return;
+
+let logs=data.studyLogs[selectedDate]||[];
+let mins=studyMinutes();
+
+e.innerHTML=`
+<div class="stats">
+<div class="stat"><b>${mins}</b>Minutes</div>
+<div class="stat"><b>${logs.length}</b>Sessions</div>
+</div>
+`;
+}
+
+function addHomework(){
+let text=document.getElementById('homeworkText').value.trim();
+if(!text)return;
+
+data.homework.push({
+id:uid(),
+text,
+subject:document.getElementById('homeworkSubject').value,
+due:document.getElementById('homeworkDue').value,
+done:false
+});
+
+document.getElementById('homeworkText').value='';
+save();
+renderHomework();
+}
+
+function renderHomework(){
+let e=document.getElementById('homeworkList');
+e.innerHTML=data.homework.length
+?data.homework.map(h=>`
+<div class="list-item ${h.done?'done':''}">
+<input type="checkbox" ${h.done?'checked':''} onchange="toggleHomework('${h.id}')">
+<div class="task-main">
+<b>${esc(h.text)}</b><br>
+<small>${esc(h.subject)} ${h.due?'• Due '+esc(h.due):''}</small>
+</div>
+<button onclick="deleteHomework('${h.id}')">🗑️</button>
+</div>`).join('')
+:'<p>No homework yet.</p>';
+}
+
+function toggleHomework(id){
+let h=data.homework.find(x=>x.id===id);
+if(h)h.done=!h.done;
+save();
+renderHomework();
+}
+
+function deleteHomework(id){
+data.homework=data.homework.filter(x=>x.id!==id);
+save();
+renderHomework();
+}
+
+function addPlan(){
+let text=document.getElementById('planText').value.trim();
+if(!text)return;
+
+data.plans.push({
+id:uid(),
+text,
+subject:document.getElementById('planSubject').value,
+date:document.getElementById('planDate').value,
+done:false
+});
+
+document.getElementById('planText').value='';
+save();
+renderPlans();
+}
+
+function renderPlans(){
+let e=document.getElementById('plansList');
+e.innerHTML=data.plans.length
+?data.plans.map(p=>`
+<div class="list-item ${p.done?'done':''}">
+<input type="checkbox" ${p.done?'checked':''} onchange="togglePlan('${p.id}')">
+<div class="task-main">
+<b>${esc(p.text)}</b><br>
+<small>${esc(p.subject)} ${p.date?'• '+esc(p.date):''}</small>
+</div>
+<button onclick="deletePlan('${p.id}')">🗑️</button>
+</div>`).join('')
+:'<p>No plans yet.</p>';
+}
+
+function togglePlan(id){
+let p=data.plans.find(x=>x.id===id);
+if(p)p.done=!p.done;
+save();
+renderPlans();
+}
+
+function deletePlan(id){
+data.plans=data.plans.filter(x=>x.id!==id);
+save();
+renderPlans();
+}
+
+function addGoal(){
+let text=document.getElementById('goalText').value.trim();
+let target=Number(document.getElementById('goalTarget').value)||1;
+
+if(!text)return;
+
+data.goals[uid()]={text,target,progress:0};
+document.getElementById('goalText').value='';
+document.getElementById('goalTarget').value='';
+save();
+renderGoals();
+}
+
+function renderGoals(){
+let e=document.getElementById('goalsList');
+let a=Object.entries(data.goals);
+
+e.innerHTML=a.length
+?a.map(([id,g])=>{
+let pct=Math.min(100,Math.round((g.progress/g.target)*100));
+return `
+<div class="list-item">
+<div class="task-main">
+<b>${esc(g.text)}</b>
+<div class="progress"><div style="width:${pct}%"></div></div>
+<small>${g.progress}/${g.target}</small>
+</div>
+<button onclick="updateGoal('${id}')">➕</button>
+<button onclick="deleteGoal('${id}')">🗑️</button>
+</div>`;
+}).join('')
+:'<p>No goals yet.</p>';
+}
+
+function updateGoal(id){
+if(data.goals[id]){
+data.goals[id].progress++;
+save();
+renderGoals();
+}
+}
+
+function deleteGoal(id){
+delete data.goals[id];
+save();
+renderGoals();
+}
+
+function renderWeekly(){
+let e=document.getElementById('weeklyGrid');
+let d=dateObj(weekDate);
+let start=new Date(d);
+start.setDate(d.getDate()-d.getDay());
+
+e.innerHTML=Array.from({length:7},(_,i)=>{
+let x=new Date(start);
+x.setDate(start.getDate()+i);
+let ds=dateStr(x);
+let tasks=data.tasks[ds]||[];
+
+return `
+<div class="week-day">
+<b>${x.toLocaleDateString(undefined,{weekday:'short'})}</b>
+<br><small>${ds}</small>
+${tasks.slice(0,5).map(t=>`<p>• ${esc(t.name)}</p>`).join('')}
+</div>`;
+}).join('');
+}
+
+function renderCalendar(){
+let e=document.getElementById('mainCalendar');
+let y=calendarDate.getFullYear();
+let m=calendarDate.getMonth();
+let first=new Date(y,m,1);
+let days=new Date(y,m+1,0).getDate();
+
+let html='';
+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{
+html+=`<div class="head">${d}</div>`;
+});
+
+for(let i=0;i<first.getDay();i++)html+='<div></div>';
+
+for(let day=1;day<=days;day++){
+let ds=dateStr(new Date(y,m,day));
+let tasks=data.tasks[ds]||[];
+let done=tasks.filter(t=>t.completed).length;
+
+html+=`
+<div class="cal-day ${ds===today()?'today':''}" onclick="changeDate('${ds}')">
+<b>${day}</b>
+<br>${tasks.length?`📝 ${done}/${tasks.length}`:''}
+</div>`;
+}
+
+e.innerHTML=html;
+}
+
+function renderRecurring(){
+let e=document.getElementById('recurringList');
+
+e.innerHTML=data.recurring.length
+?data.recurring.map(t=>`
+<div class="list-item">
+<div class="task-main">
+<b>${esc(t.name)}</b><br>
+<small>${esc(t.repeat||'')}</small>
+</div>
+<button onclick="deleteRecurring('${t.id}')">🗑️</button>
+</div>`).join('')
+:'<p>No recurring tasks.</p>';
+}
+
+function deleteRecurring(id){
+data.recurring=data.recurring.filter(x=>x.id!==id);
+save();
+renderRecurring();
+}
+
+function achievements(){
+let c=counts();
+
+return[
+['🌱 First Task',c.total>=1],
+['✅ First Completion',c.done>=1],
+['🔥 5 Tasks Done',c.done>=5],
+['🏆 10 Tasks Done',c.done>=10],
+['📚 Study Session',studyMinutes()>0],
+['🎯 Goal Added',Object.keys(data.goals).length>=1]
+];
+}
+
+function renderAchievements(){
+let e=document.getElementById('achievementsList');
+
+e.innerHTML=achievements().map(a=>`
+<div class="achievement ${a[1]?'unlocked':'locked'}">
+${a[1]?'🏆':'🔒'} ${a[0]}
+</div>`).join('');
+}
+
+function renderDashboard(){
+let c=counts();
+let goals=Object.values(data.goals);
+let habits=Object.values(data.habits);
+
+document.getElementById('dashTasks').textContent=`${c.done}/${c.total}`;
+document.getElementById('dashStudy').textContent=studyMinutes();
+document.getElementById('dashGoals').textContent=`${goals.filter(g=>g.progress>=g.target).length}/${goals.length}`;
+document.getElementById('dashHabits').textContent=`${habits.filter(Boolean).length}/${habits.length}`;
+document.getElementById('dashStreak').textContent=currentStreak();
+document.getElementById('dashAchievements').textContent=achievements().filter(a=>a[1]).length;
+
+let rate=c.total?Math.round(c.done/c.total*100):0;
+document.getElementById('dashProgress').style.width=rate+'%';
+
+let quotes=[
+'✨ You can do hard things.',
+'🌱 Small steps every day.',
+'💪 Keep going!',
+'🧠 Study smart, not just hard.',
+'🌟 You are doing amazing!'
+];
+
+document.getElementById('dailyQuote').textContent=
+quotes[new Date().getDate()%quotes.length];
+
+document.getElementById('dashNextTasks').innerHTML=
+allTasks().filter(t=>!t.completed).slice(0,5)
+.map(t=>`<div class="list-item"><span>${esc(t.name)}</span><small>${esc(t.time||'')}</small></div>`)
+.join('')||'<p>🎉 No unfinished tasks!</p>';
+}
+
+function saveNotes(id){
+data.notes[selectedDate]=document.getElementById(id).value;
+save();
+}
+
+function loadNotes(){
+document.getElementById('notesDateInput').value=selectedDate;
+document.getElementById('bigNotes').value=data.notes[selectedDate]||'';
+}
+
+function renderSearch(){
+let q=(document.getElementById('taskSearch')?.value||'').toLowerCase();
+let sort=document.getElementById('searchSort')?.value||'time';
+
+let a=allTasks().filter(t=>t.name.toLowerCase().includes(q));
+
+if(filter==='open')a=a.filter(t=>!t.completed);
+if(filter==='done')a=a.filter(t=>t.completed);
+if(filter==='high')a=a.filter(t=>t.priority==='High');
+if(filter==='study')a=a.filter(t=>(t.category||'').toLowerCase().includes('study'));
+
+let p={High:0,Medium:1,Low:2};
+
+if(sort==='priority')a.sort((x,y)=>(p[x.priority]??1)-(p[y.priority]??1));
+else if(sort==='name')a.sort((x,y)=>x.name.localeCompare(y.name));
+else a.sort((x,y)=>(x.time||'99:99').localeCompare(y.time||'99:99'));
+
+document.getElementById('searchResults').innerHTML=
+a.map(t=>taskHTML(t,t.page)).join('')||'<p>No matching tasks.</p>';
+}
+
+function setFilter(v){
+filter=v;
+renderSearch();
+}
+
+function streakDone(d){
+let a=data.tasks[d]||[];
+return a.length>0&&a.every(t=>t.completed);
+}
+
+function currentStreak(){
+let d=dateObj(today());
+let n=0;
+
+while(streakDone(dateStr(d))){
+n++;
+d.setDate(d.getDate()-1);
+}
+
+return n;
+}
+
+function bestStreak(){
+let dates=Object.keys(data.tasks).sort();
+let best=0,cur=0,prev=null;
+
+dates.forEach(d=>{
+if(streakDone(d)){
+if(prev){
+let diff=(dateObj(d)-dateObj(prev))/86400000;
+cur=diff===1?cur+1:1;
+}else cur=1;
+best=Math.max(best,cur);
+prev=d;
+}else{
+cur=0;
+}
+});
+
+return best;
+}
+
+function renderStreakCalendar(){
+let e=document.getElementById('streakCalendar');
+let y=calendarDate.getFullYear();
+let m=calendarDate.getMonth();
+let first=new Date(y,m,1);
+let days=new Date(y,m+1,0).getDate();
+
+let html='';
+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{
+html+=`<div class="head">${d}</div>`;
+});
+
+for(let i=0;i<first.getDay();i++)html+='<div></div>';
+
+for(let day=1;day<=days;day++){
+let ds=dateStr(new Date(y,m,day));
+let good=streakDone(ds);
+
+html+=`
+<div class="cal-day ${good?'achievement unlocked':''} ${ds===today()?'today':''}">
+<b>${day}</b><br>${good?'🔥 Done!':'—'}
+</div>`;
+}
+
+e.innerHTML=html;
+document.getElementById('bestStreak').textContent=bestStreak();
+document.getElementById('currentStreak').textContent=currentStreak();
+}
+
+function renderStats(){
+let dates=[];
+let d=dateObj(selectedDate);
+
+for(let i=6;i>=0;i--){
+let x=new Date(d);
+x.setDate(d.getDate()-i);
+dates.push(dateStr(x));
+}
+
+let total=0,done=0,study=0;
+
+dates.forEach(ds=>{
+let a=data.tasks[ds]||[];
+total+=a.length;
+done+=a.filter(t=>t.completed).length;
+study+=(data.studyLogs[ds]||[]).reduce((n,x)=>n+(Number(x.minutes)||0),0);
+});
+
+document.getElementById('statTotal').textContent=total;
+document.getElementById('statDone').textContent=done;
+document.getElementById('statStudy').textContent=study;
+document.getElementById('statRate').textContent=(total?Math.round(done/total*100):0)+'%';
+
+document.getElementById('productivityChart').innerHTML=
+dates.map(ds=>{
+let a=data.tasks[ds]||[];
+let n=a.filter(t=>t.completed).length;
+let h=Math.max(5,Math.min(150,n*20));
+
+return `<div class="bar" style="height:${h}px"><span>${n}</span></div>`;
+}).join('');
+
+let subjectsMap={};
+
+dates.forEach(ds=>{
+(data.studyLogs[ds]||[]).forEach(x=>{
+subjectsMap[x.subject]=(subjectsMap[x.subject]||0)+(Number(x.minutes)||0);
+});
+});
+
+document.getElementById('subjectStats').innerHTML=
+Object.entries(subjectsMap)
+.sort((a,b)=>b[1]-a[1])
+.map(x=>`
+<div class="list-item">
+<span style="flex:1">📚 ${esc(x[0])}</span>
+<b>${x[1]} min</b>
+</div>`)
+.join('')||'<p>No study data yet.</p>';
+}
+
+function renderAll(){
+ensureDate(selectedDate);
+
+for(let i=0;i<4;i++)renderPlan(i);
+
+renderCategories();
+
+if(document.getElementById('page4').classList.contains('active'))report();
+if(document.getElementById('page5').classList.contains('active'))renderFocus();
+if(document.getElementById('page6').classList.contains('active'))renderWeekly();
+if(document.getElementById('page7').classList.contains('active'))renderHomework();
+if(document.getElementById('page8').classList.contains('active'))renderPlans();
+if(document.getElementById('page10').classList.contains('active'))renderGoals();
+if(document.getElementById('page11').classList.contains('active'))renderCalendar();
+if(document.getElementById('page12').classList.contains('active'))renderRecurring();
+if(document.getElementById('page13').classList.contains('active'))renderAchievements();
+if(document.getElementById('page14').classList.contains('active'))renderDashboard();
+if(document.getElementById('page15').classList.contains('active'))loadNotes();
+if(document.getElementById('page16').classList.contains('active'))renderSearch();
+if(document.getElementById('page17').classList.contains('active'))renderStreakCalendar();
+if(document.getElementById('page18').classList.contains('active'))renderStats();
+if(document.getElementById('page19').classList.contains('active'))renderHub();
+
+syncDates();
+}
+
+function showPage(n){
+let e=document.getElementById('page'+n);
+if(e)e.scrollIntoView({behavior:'smooth',block:'start'});
+renderAll();
+}
+
+['taskText','taskTime','taskPriority','taskRepeat','taskCategory'].forEach(()=>{});
+
+for(let i=0;i<4;i++){
+let sec=document.createElement('section');
+sec.className='page';
+sec.id='page'+i;
+
+sec.innerHTML=`
+<h2>${pageInfo[i][0]}</h2>
+
+<input id="dateInput${i}" type="date" onchange="changeDate(this.value)">
+
+<div class="form-grid">
+<input id="taskText${i}" placeholder="Add a task">
+<input id="taskTime${i}" type="time">
+
+<select id="taskPriority${i}">
+<option>High</option>
+<option selected>Medium</option>
+<option>Low</option>
+</select>
+
+<select id="taskRepeat${i}">
+<option value="none">No Repeat</option>
+<option value="daily">Daily</option>
+<option value="weekly">Weekly</option>
+<option value="weekday">Weekdays</option>
+</select>
+
+<select id="taskCategory${i}"></select>
+
+<button onclick="addCustomTask(${i})">➕ Add Task</button>
+</div>
+
+<div id="tasks${i}"></div>
+</section>`;
+
+document.getElementById('pages').appendChild(sec);
+}
+
+function renderCategories(){
+for(let i=0;i<4;i++){
+let e=document.getElementById('taskCategory'+i);
+if(!e)continue;
+
+e.innerHTML=data.categories
+.map(c=>`<option>${esc(c)}</option>`)
+.join('');
+}
+}
+
+function syncDates(){
+for(let i=0;i<4;i++){
+let e=document.getElementById('dateInput'+i);
+if(e)e.value=selectedDate;
+}
+
+let d=document.getElementById('dateInput5');
+if(d)d.value=selectedDate;
+
+let n=document.getElementById('notesDateInput');
+if(n)n.value=selectedDate;
+
+let s=document.getElementById('studyGoal');
+if(s)s.value=data.settings.studyGoal||60;
+}
+
+/* PRODUCTIVITY HUB */
+
+let hubFlashIndex=0,
+hubFlashSide='q',
+hubView=0;
+
+function hubStore(){
+try{
+return JSON.parse(localStorage.getItem('dailyPlannerHub_v1')||'{}');
+}catch(e){
+return {};
+}
+}
+
+function saveHubStore(x){
+localStorage.setItem('dailyPlannerHub_v1',JSON.stringify(x));
+}
+
+function toggleZenMode(){
+document.body.classList.toggle('zen-mode');
+
+let on=document.body.classList.contains('zen-mode');
+
+document.getElementById('zenStatus').textContent=
+on
+?'🧘 Zen Mode is ON — distractions hidden.'
+:'🌸 Zen Mode is OFF — normal view restored.';
+
+let d=hubStore();
+d.zen=on;
+saveHubStore(d);
+}
+
+function cycleHubView(){
+hubView=(hubView+1)%3;
+
+let labels=['✨ Soft','💎 Focused','🌈 Fun'];
+
+document.querySelectorAll('#page19 .hub-card').forEach((e,i)=>{
+e.style.transform=
+hubView===0
+?''
+:hubView===1
+?'translateY(-1px)'
+:'scale(1.01)';
+
+e.style.transition='.2s';
+});
+
+toast('🎨 Hub style: '+labels[hubView]);
+}
+
+function saveTopThree(){
+let d=hubStore();
+
+d.top3=[
+document.getElementById('top1').value.trim(),
+document.getElementById('top2').value.trim(),
+document.getElementById('top3').value.trim()
+];
+
+saveHubStore(d);
+
+document.getElementById('topSaved').textContent=
+'✅ Your Top 3 are saved for this device.';
+}
+
+function loadTopThree(){
+let d=hubStore(),
+a=d.top3||[];
+
+['top1','top2','top3'].forEach((id,i)=>{
+document.getElementById(id).value=a[i]||'';
+});
+}
+
+function flashcards(){
+let d=hubStore();
+d.flashcards??=[];
+return d.flashcards;
+}
+
+function addFlashcard(){
+let q=document.getElementById('flashQ').value.trim();
+let a=document.getElementById('flashA').value.trim();
+
+if(!q||!a){
+toast('✏️ Add both a question and an answer.');
+return;
+}
+
+let d=hubStore();
+
+d.flashcards??=[];
+d.flashcards.push({q,a});
+
+hubFlashIndex=d.flashcards.length-1;
+hubFlashSide='q';
+
+saveHubStore(d);
+
+document.getElementById('flashQ').value='';
+document.getElementById('flashA').value='';
+
+renderHubFlashcards();
+
+toast('📚 Flashcard added!');
+}
+
+function flipFlashcard(){
+hubFlashSide=hubFlashSide==='q'?'a':'q';
+renderHubFlashcards();
+}
+
+function nextFlashcard(){
+let a=flashcards();
+if(!a.length)return;
+
+hubFlashIndex=(hubFlashIndex+1)%a.length;
+hubFlashSide='q';
+renderHubFlashcards();
+}
+
+function prevFlashcard(){
+let a=flashcards();
+if(!a.length)return;
+
+hubFlashIndex=(hubFlashIndex-1+a.length)%a.length;
+hubFlashSide='q';
+renderHubFlashcards();
+}
+
+function renderHubFlashcards(){
+let a=flashcards();
+let box=document.getElementById('flashcardBox');
+
+if(!box)return;
+
+if(!a.length){
+box.innerHTML='<p>No flashcards yet.</p>';
+document.getElementById('flashCount').textContent='';
+return;
+}
+
+if(hubFlashIndex>=a.length)hubFlashIndex=0;
+
+let x=a[hubFlashIndex];
+let text=hubFlashSide==='q'?x.q:x.a;
+
+box.innerHTML=
+'<div class="flashcard" onclick="flipFlashcard">'+
+esc(text)+
+'<small>Tap Flip to see '+
+(hubFlashSide==='q'?'the answer':'the question')+
+'</small></div>';
+
+document.getElementById('flashCount').textContent=
+'Card '+(hubFlashIndex+1)+' of '+a.length;
+}
+
+function renderHubTimeline(){
+let a=allTasks()
+.filter(t=>t.time)
+.slice()
+.sort((x,y)=>(x.time||'').localeCompare(y.time||''));
+
+let el=document.getElementById('hubTimeline');
+
+el.innerHTML=a.length
+?a.map(t=>`
+<div class="timeline-item">
+<b>${esc(t.time)}</b> — ${esc(t.name)}
+${t.completed?' ✅':''}
+${t.priority?'<br><span class="pill">'+esc(t.priority)+'</span>':''}
+</div>`).join('')
+:'<p>No timed tasks today. Add a time to a task to see it here.</p>';
+}
+
+function taskMinutes(t){
+return Number(t.duration||t.estimatedMinutes||0)||0;
+}
+
+function renderHubBudget(){
+let d=hubStore();
+let budget=Number(d.timeBudget||0);
+let used=allTasks().reduce((n,t)=>n+taskMinutes(t),0);
+
+document.getElementById('timeBudget').value=budget||'';
+document.getElementById('budgetUsed').textContent=used;
+
+let pct=budget?Math.min(100,used/budget*100):0;
+
+document.getElementById('budgetBar').style.width=pct+'%';
+
+document.getElementById('budgetText').textContent=
+budget
+?(used<=budget
+?'✅ '+(budget-used)+' minutes left in your budget.'
+:'⚠️ '+(used-budget)+' minutes over your budget.')
+:'Set a budget to track planned time.';
+}
+
+function saveTimeBudget(){
+let v=Math.max(0,Number(document.getElementById('timeBudget').value)||0);
+let d=hubStore();
+
+d.timeBudget=v;
+saveHubStore(d);
+
+renderHubBudget();
+toast('⏳ Time budget saved!');
+}
+
+function renderSmartTasks(){
+let a=allTasks()
+.filter(t=>!t.completed)
+.slice()
+.sort((x,y)=>{
+let p={High:0,Medium:1,Low:2};
+
+let px=p[x.priority]??1,
+py=p[y.priority]??1;
+
+if(px!==py)return px-py;
+
+return (x.time||'99:99').localeCompare(y.time||'99:99');
+});
+
+document.getElementById('smartTasks').innerHTML=
+a.slice(0,6)
+.map(t=>`
+<div class="hub-item">
+<span>
+<b>${esc(t.name)}</b><br>
+<small>${t.time||'No time set'} • ${t.priority||'Medium'}</small>
+</span>
+<button onclick="changeDate('${selectedDate}');showPage(${t.page})">Open</button>
+</div>`)
+.join('')||'<p>🎉 Everything is completed!</p>';
+}
+
+function renderHubStudy(){
+let m=studyMinutes();
+let l=data.studyLogs[selectedDate]||[];
+let g=Number(data.settings.studyGoal||60);
+
+document.getElementById('hubStudyMinutes').textContent=m;
+document.getElementById('hubSessions').textContent=l.length;
+
+document.getElementById('hubStudyBar').style.width=
+Math.min(100,m/g*100)+'%';
+
+document.getElementById('hubStudyText').textContent=
+m>=g
+?'🎉 Daily study goal reached!'
+:(g-m)+' minutes left to reach your goal.';
+}
+
+function renderHub(){
+loadTopThree();
+renderHubFlashcards();
+renderHubTimeline();
+renderHubBudget();
+renderSmartTasks();
+renderHubStudy();
+
+let c=counts();
+let score=c.total?Math.round(c.done/c.total*100):0;
+
+document.getElementById('hubScore').textContent=score+'%';
+document.getElementById('hubScoreBar').style.width=score+'%';
+
+document.getElementById('hubScoreText').textContent=
+score>=80
+?'🔥 Great productivity today!'
+:score>=50
+?'💪 Keep going!'
+:'🌱 Start with one small task.';
+
+let d=hubStore();
+
+if(d.zen&&!document.body.classList.contains('zen-mode'))
+document.body.classList.add('zen-mode');
+
+document.getElementById('zenStatus').textContent=
+document.body.classList.contains('zen-mode')
+?'🧘 Zen Mode is ON — distractions hidden.'
+:'🌸 Zen Mode is OFF — normal view restored.';
+}
+
+function init(){
+setTheme(data.settings.theme||'');
+setFontSize(data.settings.font||'');
+
+document.body.classList.toggle('compact',!!data.settings.compact);
+document.body.classList.toggle('dark',!!data.settings.dark);
+
+let t=document.getElementById('themeSelect');
+if(t)t.value=data.settings.theme||'';
+
+let f=document.getElementById('fontSizeSelect');
+if(f)f.value=data.settings.font||'';
+
+let c=document.getElementById('compactToggle');
+if(c)c.checked=!!data.settings.compact;
+
+let dm=document.getElementById('darkToggle');
+if(dm)dm.checked=!!data.settings.dark;
+
+let r=document.getElementById('reminderToggle');
+if(r)r.checked=!!data.settings.reminders;
+
+let lead=document.getElementById('leadTime');
+if(lead)lead.value=data.settings.lead||0;
+
+let qs=document.getElementById('quietStart');
+if(qs)qs.value=data.settings.quietStart||'22:00';
+
+let qe=document.getElementById('quietEnd');
+if(qe)qe.value=data.settings.quietEnd||'07:00';
+
+subjects.forEach(s=>{
+['focusSubject','homeworkSubject','planSubject'].forEach(id=>{
+let e=document.getElementById(id);
+if(e)e.innerHTML+=`<option>${s}</option>`;
+});
+});
+
+for(let i=0;i<4;i++){
+let e=document.getElementById('taskCategory'+i);
+if(e)e.innerHTML=data.categories.map(c=>`<option>${esc(c)}</option>`).join('');
+
+let date=document.getElementById('dateInput'+i);
+if(date)date.value=selectedDate;
+}
+
+let week=document.getElementById('weekDateInput');
+if(week)week.value=weekDate;
+
+let duration=document.getElementById('durationSelect');
+if(duration)duration.value='25';
+
+updateTimer();
+renderAll();
+}
+
+init();
+</script>
+</body>
+</html>
