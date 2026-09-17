@@ -1,1 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Planner</title>
+<style>
+*{box-sizing:border-box}
+:root{--accent:#8e44ad;--bg1:#ffd6f6;--bg2:#d9c2ff}
+html{scroll-behavior:smooth;scroll-snap-type:y proximity}
+body{margin:0;padding:20px;font-family:Arial,sans-serif;color:#333;min-height:100vh;background:linear-gradient(135deg,var(--bg1),var(--bg2));transition:.3s}
+body.blue{--accent:#3498db;--bg1:#d9f1ff;--bg2:#c9d8ff}
+body.green{--accent:#27ae60;--bg1:#d9ffe6;--bg2:#c9f3d7}
+body.peach{--accent:#e67e22;--bg1:#ffe1c7;--bg2:#ffd0b0}
+body.strawberry{--accent:#e84393;--bg1:#ffd6e9;--bg2:#ffc1d9}
+body.rose{--accent:#d63031;--bg1:#ffe0e0;--bg2:#ffcaca}
+body.mint{--accent:#00b894;--bg1:#d8fff4;--bg2:#bff5e8}
+body.ocean{--accent:#0984e3;--bg1:#d8f5ff;--bg2:#b9dfff}
+body.lavender{--accent:#6c5ce7;--bg1:#e7e1ff;--bg2:#d4ccff}
+body.dark{background:#171525;color:#eee}
+body.dark .card,body.dark .page,body.dark .menu,body.dark .welcome-box,body.dark input,body.dark select,body.dark textarea{background:#252239;color:#eee}
+body.dark .task,body.dark .list-item,body.dark .week-day,body.dark .calendar div,body.dark .achievement,body.dark .dash-card{background:#302b48}
+body.small-text{font-size:14px}body.large-text{font-size:18px}body.compact .card,body.compact .page{padding:14px}
+button,input,select,textarea{font:inherit;border:0;border-radius:12px;padding:10px}
+button{cursor:pointer;background:var(--accent);color:#fff;font-weight:bold;transition:.2s}
+button:hover{transform:translateY(-2px);filter:brightness(1.05)}
+input,select,textarea{background:#fff;border:1px solid #ddd}
+textarea{width:100%;min-height:120px;resize:vertical}.hidden{display:none!important}
+.welcome,.app{max-width:1100px;margin:auto}
+.welcome-box,.card,.page{background:rgba(255,255,255,.84);border-radius:24px;padding:24px;box-shadow:0 8px 30px #0001;margin:14px auto}
+.welcome-box{max-width:650px;margin-top:7vh;text-align:center}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.icon-btn{width:45px;height:45px;padding:0;border-radius:50%;font-size:22px}
+.menu{position:absolute;right:20px;top:70px;background:#fff;border-radius:18px;padding:14px;box-shadow:0 8px 30px #0003;z-index:20;display:none}
+.menu button{display:block;width:190px;margin:5px}
+.page{display:block;min-height:calc(100vh - 28px);scroll-snap-align:start;scroll-margin-top:14px}
+.page.active{display:block}.page h2{text-align:center;color:var(--accent)}.nav{display:none}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.task,.list-item{background:#fff;border-radius:15px;padding:12px;margin:8px 0;display:flex;align-items:flex-start;gap:10px;box-shadow:0 2px 8px #0001;text-align:left}
+.task.done,.list-item.done{opacity:.6}.task.done .task-name,.list-item.done .task-name{text-decoration:line-through}
+.task-main{flex:1;min-width:0}.task-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.task-name{font-weight:bold}.task-meta{font-size:12px;opacity:.7}
+.task-actions{display:flex;gap:4px;flex-wrap:wrap}.task-actions button{font-size:11px;padding:7px}
+.priority-high{border-left:5px solid #e74c3c}.priority-medium{border-left:5px solid #f39c12}.priority-low{border-left:5px solid #2ecc71}
+.badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#eee;font-size:11px}.rolled{background:#d6f5df;color:#18743b}
+.subtask-progress{font-size:12px;color:var(--accent);margin-top:5px}
+.subtasks{display:none;margin-top:9px;padding:10px;border-radius:12px;background:#f5f2fb}.subtasks.open{display:block}
+.subtask-add{display:flex;gap:5px;margin-bottom:7px}.subtask-add input{flex:1}.subtask{display:flex;align-items:center;gap:7px;padding:5px 0}.subtask span{flex:1}
+.subtask.done span{text-decoration:line-through;opacity:.6}.subtask button{padding:4px 7px;font-size:11px}
+.stats,.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:15px 0}
+.stat,.dash-card{background:rgba(255,255,255,.65);padding:15px;border-radius:16px;text-align:center}.stat b{display:block;font-size:25px;color:var(--accent)}
+.progress{height:18px;background:#ddd;border-radius:20px;overflow:hidden;margin:10px 0}.progress div{height:100%;background:var(--accent);width:0;transition:.3s}
+.note-box,.rollover-box,.ambient-box,.filter-box{padding:16px;border-radius:18px;background:#f6f0ff;margin:15px 0}
+.rollover-box{border:2px dashed var(--accent)}.ambient-buttons,.filter-buttons{display:flex;flex-wrap:wrap;gap:7px}.ambient-buttons button,.filter-buttons button{flex:1;min-width:110px}.volume{width:100%}
+.timer{font-size:55px;text-align:center;font-weight:bold;color:var(--accent);margin:15px}.timer-buttons{text-align:center}.timer-buttons button{margin:4px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.calendar div{min-height:65px;background:#fff;border-radius:10px;padding:6px;font-size:12px}
+.calendar .head{background:var(--accent);color:#fff;text-align:center;min-height:auto}.calendar .today{outline:3px solid var(--accent)}.cal-day:hover{cursor:pointer;transform:scale(1.02)}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.week-day{background:#fff;padding:10px;border-radius:15px;min-height:130px}
+.achievement{padding:12px;margin:7px 0;border-radius:12px;background:#fff}.achievement.locked{opacity:.45}.achievement.unlocked{border:2px solid #f5c542}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:10px 0;border-bottom:1px solid #ddd}.search{width:100%;margin-bottom:8px}
+.chart{display:flex;align-items:flex-end;gap:6px;height:180px;padding:10px;background:#f6f0ff;border-radius:16px}.bar{flex:1;min-width:8px;background:var(--accent);border-radius:7px 7px 0 0;position:relative}.bar span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:10px}
+.quote{padding:18px;border-radius:18px;background:#f6f0ff;font-style:italic;text-align:center}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:12px 20px;border-radius:20px;display:none;z-index:100}
+.theme-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:15px}.theme-buttons button{width:42px;height:42px;padding:0;border-radius:50%}
+.page + .page{margin-top:24px}.page:last-child{margin-bottom:24px}
+.hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:15px 0}.hub-card{background:rgba(255,255,255,.72);border-radius:20px;padding:18px;box-shadow:0 5px 18px #0001}.dark .hub-card{background:#302b48}.hub-card h3{margin-top:0;color:var(--accent)}
+.hub-list{display:flex;flex-direction:column;gap:7px}.hub-item{display:flex;align-items:center;gap:8px;padding:10px;border-radius:12px;background:rgba(255,255,255,.65)}.dark .hub-item{background:#252239}.hub-item span{flex:1}.pill{display:inline-block;padding:5px 9px;border-radius:999px;background:var(--accent);color:#fff;font-size:11px}.focus-three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.focus-three input{width:100%}
+.timeline{position:relative;border-left:4px solid var(--accent);padding-left:15px;margin:12px 0}.timeline-item{position:relative;background:rgba(255,255,255,.7);border-radius:14px;padding:11px;margin:8px 0}.dark .timeline-item{background:#252239}.timeline-item:before{content:'';position:absolute;left:-24px;top:15px;width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.flashcard{min-height:150px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;font-weight:bold;padding:20px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(246,240,255,.9));cursor:pointer}.dark .flashcard{background:#252239}.flashcard small{display:block;font-size:12px;font-weight:normal;opacity:.65;margin-top:10px}
+.zen-mode .page:not(#page19),.zen-mode .topbar h1,.zen-mode .topbar button:first-child{display:none}.zen-mode .topbar{justify-content:flex-end}.zen-mode .app{max-width:900px}
+.hub-progress{height:12px;background:#ddd;border-radius:20px;overflow:hidden}.hub-progress div{height:100%;background:var(--accent);transition:.3s}.mini-actions{display:flex;flex-wrap:wrap;gap:7px}.mini-actions button{flex:1;min-width:100px}
+#page19 .score-breakdown,#page19 .time-summary{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}#page19 .score-breakdown span,#page19 .time-summary span{flex:1;min-width:95px;padding:8px;border-radius:12px;background:rgba(127,127,127,.08);text-align:center}#page19.hub-compact .hub-card{padding:10px}#page19.hub-spacious .hub-card{padding:22px}
+#page20 .advanced-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin:15px 0}#page20 .advanced-card{background:rgba(255,255,255,.72);border-radius:20px;padding:18px;box-shadow:0 5px 18px #0001}.dark #page20 .advanced-card{background:#302b48}#page20 .advanced-card h3{margin-top:0;color:var(--accent)}#page20 .advanced-list{display:flex;flex-direction:column;gap:8px}#page20 .advanced-item{padding:11px;border-radius:13px;background:rgba(255,255,255,.65);display:flex;align-items:center;gap:8px}.dark #page20 .advanced-item{background:#252239}#page20 .advanced-item span{flex:1}#page20 .drop-zone{border:2px dashed var(--accent);border-radius:14px;padding:14px;text-align:center;margin-top:8px}#page20 .drag-task{cursor:grab}#page20 .drag-task:active{cursor:grabbing}#page20 .suggestion{padding:10px;border-radius:12px;background:rgba(127,127,127,.08);margin:7px 0}
+#page21 .productivity-tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}#page21 .tool-card{background:rgba(255,255,255,.72);border-radius:20px;padding:18px;box-shadow:0 5px 18px #0001}.dark #page21 .tool-card{background:#302b48}#page21 .tool-card h3{margin-top:0;color:var(--accent)}.focus-box{padding:15px;border-radius:16px;background:rgba(127,127,127,.08)}.ring-wrap{display:flex;justify-content:center;align-items:center;padding:15px}.progress-ring{width:150px;height:150px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:conic-gradient(var(--accent) 0deg,#ddd 0deg)}.progress-ring:before{content:'';position:absolute;width:112px;height:112px;border-radius:50%;background:rgba(255,255,255,.9)}.dark .progress-ring:before{background:#252239}.ring-text{position:relative;z-index:2;text-align:center;font-weight:bold}.ring-text span{font-size:25px;color:var(--accent)}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.summary-stat{padding:12px;border-radius:14px;background:rgba(127,127,127,.08);text-align:center}.summary-stat b{display:block;font-size:22px;color:var(--accent)}
+@media(max-width:650px){body{padding:10px}.welcome-box,.card,.page{padding:15px}.week-grid{grid-template-columns:1fr}.calendar div{min-height:48px;font-size:10px}.task-actions{width:100%}.nav{flex-direction:column}.summary-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<section id="welcome" class="welcome">
+<div class="welcome-box">
+<div class="topbar"><button class="icon-btn" onclick="toggleMenu('welcomeMenu')">☰</button><button class="icon-btn" onclick="showSettings()">⚙️</button></div>
+<h1>✨ Daily Planner ✨</h1><p>Organize your day, study better and reach your goals!</p>
+<div class="theme-buttons">
+<button onclick="setTheme('')">💜</button><button onclick="setTheme('blue')">💙</button><button onclick="setTheme('green')">💚</button><button onclick="setTheme('peach')">🧡</button><button onclick="setTheme('strawberry')">💗</button><button onclick="setTheme('rose')">❤️</button><button onclick="setTheme('mint')">🌿</button><button onclick="setTheme('ocean')">🌊</button><button onclick="setTheme('lavender')">💜</button>
+</div>
+<button onclick="startPlanner()" style="font-size:18px;padding:14px 28px">✨ Let's Start ✨</button>
+</div>
+<div id="welcomeMenu" class="menu"><button onclick="showSettings()">⚙️ Settings</button><button onclick="showAbout()">ℹ️ About</button></div>
+</section>
+<main id="app" class="app hidden">
+<div class="topbar"><h1>📋 Daily Planner</h1><button class="icon-btn" onclick="showSettings()">⚙️</button></div>
+<div id="pages"></div>
+<section class="page" id="page4">
+<h2>📊 Daily Report</h2><input id="dateInput5" type="date" onchange="changeDate(this.value)">
+<div class="stats"><div class="stat"><b id="reportTotal">0</b>Total Tasks</div><div class="stat"><b id="reportDone">0</b>Completed</div><div class="stat"><b id="reportRemain">0</b>Remaining</div><div class="stat"><b id="reportStreak">0</b>🔥 Streak</div></div>
+<h3>Daily Progress</h3><div class="progress"><div id="dailyProgress"></div></div><p id="reportMessage"></p>
+<div class="rollover-box"><h3>↪️ Task Rollover</h3><p>Move unfinished non-repeating tasks to tomorrow while keeping today's history.</p><button onclick="rolloverUnfinished()">➡️ Rollover Unfinished Tasks</button><p id="rolloverInfo"></p></div>
+<button onclick="finishDay()">🏆 Finish Day</button>
+<div class="note-box"><h3>📝 Daily Notes</h3><textarea id="dailyNotes" oninput="saveNotes('dailyNotes')" placeholder="Write something about your day..."></textarea></div>
+<h3>🏆 Achievements</h3><div id="achievements"></div>
+</section>
+<section class="page" id="page5">
+<h2>🎯 Study Focus Center</h2><input id="focusDateInput" type="date" onchange="changeDate(this.value)">
+<div class="form-grid"><select id="focusSubject"></select><select id="durationSelect" onchange="setTimerDuration()"><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="20">20 minutes</option><option value="25" selected>25 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option></select></div>
+<div class="timer" id="timer">25:00</div>
+<div class="timer-buttons"><button onclick="startTimer()">▶️ Start</button><button onclick="pauseTimer()">⏸️ Pause</button><button onclick="resetTimer()">🔄 Reset</button></div>
+<div class="stats"><div class="stat"><b id="sessionCount">0</b>Sessions</div><div class="stat"><b id="studyMinutes">0</b>Study Minutes</div><div class="stat"><b id="studyGoal">60</b>Daily Goal</div></div>
+<div class="card"><h3>🎯 Daily Study Goal</h3><div class="form-grid"><input id="goalInput" type="number" min="1" value="60"><button onclick="saveDailyGoal()">Save Goal</button></div><div class="progress"><div id="studyProgress"></div></div></div>
+<div class="ambient-box"><h3>🎧 Ambient Sounds</h3><p>Choose a relaxing sound while you study.</p>
+<div class="ambient-buttons"><button onclick="playAmbient('rain')">🌧️ Rain</button><button onclick="playAmbient('ocean')">🌊 Ocean</button><button onclick="playAmbient('fire')">🔥 Fireplace</button><button onclick="playAmbient('forest')">🌲 Forest</button><button onclick="playAmbient('white')">🤫 White Noise</button><button onclick="stopAmbient()">⏹️ Stop</button></div>
+<label>🔊 Volume</label><input class="volume" id="ambientVolume" type="range" min="0" max="1" step=".01" value=".35" oninput="setAmbientVolume(this.value)"><p id="ambientStatus">No sound playing</p></div>
+<h3>📚 Study Log</h3><div id="studyLog"></div>
+</section>
+<section class="page" id="page6"><h2>📅 Weekly Overview</h2><input id="weekDateInput" type="date" onchange="weekDate=this.value;renderWeekly()">
+<div class="nav"><button onclick="changeWeek(-7)">⬅️ Previous</button><button onclick="changeWeek(7)">Next ➡️</button></div><h3 id="weekRange"></h3>
+<div class="stats"><div class="stat"><b id="weekTasks">0</b>Tasks</div><div class="stat"><b id="weekDone">0</b>Completed</div><div class="stat"><b id="weekStudy">0</b>Study Minutes</div></div><div class="progress"><div id="weekProgress"></div></div><div class="week-grid" id="weekGrid"></div></section>
+<section class="page" id="page7"><h2>📚 Homework Tracker</h2><div class="form-grid"><input id="homeworkName" placeholder="Homework"><select id="homeworkSubject"></select><input id="homeworkDue" type="date"><select id="homeworkPriority"><option>High</option><option selected>Medium</option><option>Low</option></select><button onclick="addHomework()">Add Homework</button></div><div class="stats"><div class="stat"><b id="hwTotal">0</b>Total</div><div class="stat"><b id="hwDone">0</b>Done</div><div class="stat"><b id="hwRemain">0</b>Remaining</div></div><div id="homeworkList"></div></section>
+<section class="page" id="page8"><h2>📖 Subject Study Planner</h2><div class="form-grid"><select id="planSubject"></select><input id="planTopic" placeholder="Topic"><input id="planDate" type="date"><input id="planDuration" type="number" placeholder="Minutes"><select id="planPriority"><option>High</option><option selected>Medium</option><option>Low</option></select><button onclick="addStudyPlan()">Add Study Plan</button></div><div class="stats"><div class="stat"><b id="planTotal">0</b>Total</div><div class="stat"><b id="planDone">0</b>Done</div><div class="stat"><b id="planMinutes">0</b>Minutes</div></div><div id="studyPlanList"></div></section>
+<section class="page" id="page9"><h2>⚙️ Settings</h2>
+<div class="settings-row"><span>🎨 Theme</span><select id="themeSelect" onchange="setTheme(this.value)"><option value="">Purple</option><option value="blue">Blue</option><option value="green">Green</option><option value="peach">Peach</option><option value="strawberry">Strawberry</option><option value="rose">Rose</option><option value="mint">Mint</option><option value="ocean">Ocean</option><option value="lavender">Lavender</option></select></div>
+<div class="settings-row"><span>🔤 Text Size</span><select id="fontSizeSelect" onchange="setFontSize(this.value)"><option value="">Normal</option><option value="small-text">Small</option><option value="large-text">Large</option></select></div>
+<div class="settings-row"><span>📦 Compact Layout</span><input id="compactToggle" type="checkbox" onchange="setCompact(this.checked)"></div>
+<div class="settings-row"><span>🌙 Dark Mode</span><input id="darkToggle" type="checkbox" onchange="toggleDarkMode(this.checked)"></div>
+<h3>🔔 Reminders</h3><div class="settings-row"><span>Enable reminders</span><input id="reminderToggle" type="checkbox" onchange="setRemindersEnabled(this.checked)"></div>
+<div class="form-grid"><label>Lead time <select id="leadTime" onchange="saveReminderSettings()"><option value="0">At task time</option><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option></select></label><label>Quiet start <input id="quietStart" type="time"></label><label>Quiet end <input id="quietEnd" type="time"></label></div>
+<button onclick="saveReminderSettings()">Save Reminder Settings</button><h3>💾 Data</h3><button onclick="exportPlannerData()">⬇️ Export</button><button onclick="document.getElementById('importFile').click()">⬆️ Import</button><input id="importFile" type="file" accept=".json" hidden onchange="importPlannerData(event)"><button onclick="resetPlannerData()">🗑️ Reset Data</button>
+</section>
+<section class="page" id="page10"><h2>🎯 Daily Goals & Habits</h2><input id="dateInput10" type="date" onchange="changeDate(this.value)"><div class="stats"><div class="stat"><b id="goalCount">0</b>Goals</div><div class="stat"><b id="goalDone">0</b>Goals Done</div><div class="stat"><b id="habitCount">0</b>Habits</div><div class="stat"><b id="habitDone">0</b>Habits Done</div></div><div class="form-grid"><input id="dailyGoalInput" placeholder="Add a goal"><button onclick="addDailyGoalItem()">Add Goal</button><input id="dailyHabitInput" placeholder="Add a habit"><button onclick="addDailyHabit()">Add Habit</button></div><h3>🎯 Goals</h3><div id="dailyGoalsList"></div><h3>🔄 Habits</h3><div id="dailyHabitsList"></div></section>
+<section class="page" id="page11"><h2>🗓️ Monthly Calendar</h2><div class="nav"><button onclick="changeCalendarMonth(-1)">⬅️</button><h3 id="calendarTitle"></h3><button onclick="changeCalendarMonth(1)">➡️</button></div><div class="calendar" id="calendar"></div></section>
+<section class="page" id="page12"><h2>🔁 Recurring Tasks</h2><p>Tasks marked Daily, Weekly or Weekdays repeat automatically.</p><div id="recurringList"></div></section>
+<section class="page" id="page13"><h2>🏷️ Task Categories</h2><div class="form-grid"><input id="categoryInput" placeholder="New category"><button onclick="addCategory()">Add Category</button></div><div id="categoryList"></div></section>
+<section class="page" id="page14"><h2>🌤️ Daily Dashboard</h2><p>Everything important in one place.</p>
+<div class="dash-grid"><div class="dash-card"><b id="dashTasks">0/0</b> ✅ Tasks</div><div class="dash-card"><b id="dashStudy">0</b> 📚 Study Minutes</div><div class="dash-card"><b id="dashGoals">0/0</b> 🎯 Goals</div><div class="dash-card"><b id="dashHabits">0/0</b> 🔥 Habits</div><div class="dash-card"><b id="dashStreak">0</b> 🔥 Streak</div><div class="dash-card"><b id="dashAchievements">0</b> 🏆 Achievements</div></div>
+<div class="progress"><div id="dashProgress"></div></div><div class="quote" id="dailyQuote"></div><h3>⏰ Next Tasks</h3><div id="dashNextTasks"></div>
+<div class="hub-card" style="margin-top:15px"><h3>💖 Daily Check-in</h3><p>How are you feeling today?</p><div class="mini-actions"><button onclick="setMood('😊 Great')">😊 Great</button><button onclick="setMood('🙂 Good')">🙂 Good</button><button onclick="setMood('😐 Okay')">😐 Okay</button><button onclick="setMood('😴 Tired')">😴 Tired</button></div><p id="moodStatus"></p></div></section>
+<section class="page" id="page15"><h2>📝 Daily Notes</h2><input id="notesDateInput" type="date" onchange="changeDate(this.value)"><textarea id="bigNotes" placeholder="Write your notes here..." oninput="saveNotes('bigNotes')"></textarea></section>
+<section class="page" id="page16"><h2>🔍 Search & Filters</h2><input class="search" id="taskSearch" placeholder="Search tasks..." oninput="renderSearch()"><div class="filter-box"><div class="filter-buttons"><button onclick="setFilter('all')">All</button><button onclick="setFilter('open')">Open</button><button onclick="setFilter('done')">Completed</button><button onclick="setFilter('high')">High Priority</button><button onclick="setFilter('study')">Study</button></div><select id="searchSort" onchange="renderSearch()"><option value="time">Sort by time</option><option value="priority">Sort by priority</option><option value="name">Sort by name</option></select></div><div id="searchResults"></div></section>
+<section class="page" id="page17"><h2>🔥 Streak Calendar</h2><p>Green days are days you finished all of your tasks.</p><div class="calendar" id="streakCalendar"></div><div class="stats"><div class="stat"><b id="bestStreak">0</b>Best Streak</div><div class="stat"><b id="currentStreak">0</b>Current Streak</div></div></section>
+<section class="page" id="page18"><h2>📈 Productivity Statistics</h2><div class="stats"><div class="stat"><b id="statTotal">0</b>Total Tasks</div><div class="stat"><b id="statDone">0</b>Completed</div><div class="stat"><b id="statStudy">0</b>Study Minutes</div><div class="stat"><b id="statRate">0%</b>Completion Rate</div></div><h3>Last 7 Days</h3><div class="chart" id="productivityChart"></div><h3>📚 Study by Subject</h3><div id="subjectStats"></div></section>
+<section class="page" id="page19"><h2>✨ Productivity Hub</h2><p style="text-align:center">New study, productivity, time-management and UI tools — your existing planner stays unchanged.</p><div class="hub-grid">
+<div class="hub-card"><h3>🎨 UI & Design</h3><p>Customize how your planner looks and feels.</p><div class="mini-actions"><button onclick="toggleZenMode()">🧘 Zen Mode</button><button onclick="cycleHubView()">✨ Hub Style</button><button onclick="cycleHubDensity()">📐 Density</button></div><p id="zenStatus"></p><p id="designStatus"></p></div>
+<div class="hub-card"><h3>🧠 Top 3 Priorities</h3><div class="focus-three"><input id="top1" placeholder="#1 Priority"><input id="top2" placeholder="#2 Priority"><input id="top3" placeholder="#3 Priority"></div><button style="margin-top:8px;width:100%" onclick="saveTopThree()">💾 Save Top 3</button><p id="topSaved"></p></div>
+<div class="hub-card"><h3>⚡ Productivity Score</h3><div class="stat"><b id="hubScore">0%</b>Today</div><div class="hub-progress"><div id="hubScoreBar"></div></div><p id="hubScoreText"></p><div class="score-breakdown"><span>Tasks <b id="scoreTasks">0%</b></span><span>Goals <b id="scoreGoals">0%</b></span><span>Habits <b id="scoreHabits">0%</b></span></div></div>
+<div class="hub-card"><h3>📚 Study Flashcards</h3><input id="flashQ" placeholder="Question / Front"><input id="flashA" placeholder="Answer / Back" style="width:100%;margin-top:7px"><button style="margin-top:7px;width:100%" onclick="addFlashcard()">➕ Add Flashcard</button><div id="flashcardBox" style="margin-top:10px"></div><div class="mini-actions" style="margin-top:8px"><button onclick="prevFlashcard()">⬅️</button><button onclick="flipFlashcard()">🔄 Flip</button><button onclick="nextFlashcard()">➡️</button><button onclick="deleteFlashcard()">🗑️ Delete</button></div><p id="flashCount"></p><hr><h4>🧠 Flashcard Quiz Mode</h4><div class="mini-actions"><button onclick="startFlashQuiz()">▶️ Start Quiz</button><button onclick="restartFlashQuiz()">🔄 Restart</button></div><div id="quizBox" style="margin-top:10px"></div></div>
+<div class="hub-card"><h3>⏰ Time Management</h3><p>Plan your day, see your timeline, and manage your available time.</p><div class="time-summary"><span>⏱️ Planned <b id="timelinePlanned">0</b> min</span><span>📝 Tasks <b id="timelineTasks">0</b></span></div><div id="hubTimeline" class="timeline"></div></div>
+<div class="hub-card"><h3>⏳ Time Budget</h3><p>Set how many minutes you want to spend on tasks today.</p><div class="form-grid"><input id="timeBudget" type="number" min="1" placeholder="Minutes"><button onclick="saveTimeBudget()">Save Budget</button></div><div class="stat"><b id="budgetUsed">0</b> min planned</div><div class="hub-progress"><div id="budgetBar"></div></div><p id="budgetText"></p></div>
+<div class="hub-card"><h3>📌 Smart Task View</h3><p>See the best next actions based on time and priority.</p><div id="smartTasks" class="hub-list"></div></div>
+<div class="hub-card"><h3>📖 Study Plan Check</h3><p>Quick view of your study goal and completed sessions.</p><div class="stats"><div class="stat"><b id="hubStudyMinutes">0</b>Minutes</div><div class="stat"><b id="hubSessions">0</b>Sessions</div></div><div class="hub-progress"><div id="hubStudyBar"></div></div><p id="hubStudyText"></p></div>
+</div></section>
+<section class="page" id="page20"><h2>🚀 Advanced Planner Tools</h2><p style="text-align:center">Smart tools to help you plan faster while keeping your existing planner features unchanged.</p><div class="advanced-grid">
+<div class="advanced-card"><h3>🤖 Smart Daily Suggestions</h3><p>Get useful next-task suggestions based on priority, time, and study tasks.</p><button style="width:100%" onclick="generateSmartSuggestions()">✨ Generate Suggestions</button><div id="smartSuggestions" style="margin-top:10px"></div></div>
+<div class="advanced-card"><h3>🧩 Task Dependencies</h3><div class="form-grid"><select id="dependencyTask"></select><select id="dependencyPrerequisite"></select></div><div class="mini-actions" style="margin-top:8px"><button onclick="addTaskDependency()">➕ Add Dependency</button><button onclick="clearTaskDependency()">🗑️ Clear</button></div><div id="dependencyList" style="margin-top:10px"></div></div>
+<div class="advanced-card"><h3>📦 Task Templates</h3><div class="form-grid"><select id="templateTask"></select><input id="templateName" placeholder="Template name"></div><select id="savedTemplate" style="width:100%;margin-top:8px"></select><div class="mini-actions" style="margin-top:8px"><button onclick="saveTaskTemplate()">💾 Save Template</button><button onclick="useTaskTemplate()">➕ Use Template</button></div><div id="templateList" style="margin-top:10px"></div></div>
+<div class="advanced-card"><h3>🔀 Drag & Drop Tasks</h3><p>Drag a task into another plan to move it there.</p><div id="dragTaskList" class="advanced-list"></div><div class="advanced-grid" style="margin:8px 0 0;grid-template-columns:repeat(2,1fr)"><div class="drop-zone" data-page="0" ondragover="allowTaskDrop(event)" ondrop="dropTaskToPage(event,0)">🌅 Morning</div><div class="drop-zone" data-page="1" ondragover="allowTaskDrop(event)" ondrop="dropTaskToPage(event,1)">☀️ Afternoon</div><div class="drop-zone" data-page="2" ondragover="allowTaskDrop(event)" ondrop="dropTaskToPage(event,2)">🌆 Evening</div><div class="drop-zone" data-page="3" ondragover="allowTaskDrop(event)" ondrop="dropTaskToPage(event,3)">🌙 Night</div></div></div>
+<div class="advanced-card"><h3>🕐 Automatic Schedule Builder</h3><p>Give the planner a time window and it will schedule your untimed tasks automatically.</p><div class="form-grid"><input id="autoStart" type="time" value="08:00"><input id="autoEnd" type="time" value="22:00"><input id="autoGap" type="number" min="5" value="30" placeholder="Minutes per task"></div><button style="width:100%;margin-top:8px" onclick="buildAutomaticSchedule()">⚡ Build Schedule</button><p id="autoScheduleStatus"></p></div>
+</div></section>
+<section class="page" id="page21"><h2>🛠️ Today's Productivity Tools</h2><div class="productivity-tools-grid">
+<div class="tool-card"><h3>➕ Quick Add Task</h3><p>Add a task quickly without opening the normal task form.</p><div class="form-grid"><input id="quickTaskName" placeholder="Task name"><input id="quickTaskTime" type="time"><select id="quickTaskPriority"><option>High</option><option selected>Medium</option><option>Low</option></select><select id="quickTaskPlan"><option value="0">🌅 Morning</option><option value="1">☀️ Afternoon</option><option value="2">🌆 Evening</option><option value="3">🌙 Night</option></select></div><button style="width:100%;margin-top:8px" onclick="quickAddTask()">➕ Quick Add</button></div>
+<div class="tool-card"><h3>⏰ Overdue Tasks</h3><p>Tasks whose time has already passed today.</p><div id="overdueTasksList"></div></div>
+<div class="tool-card"><h3>🎯 Focus Mode</h3><p>Choose one task and focus on it.</p><select id="focusTaskSelect" style="width:100%"></select><button style="width:100%;margin-top:8px" onclick="startTodayFocus()">Start Focus Mode</button><div id="todayFocusBox" class="focus-box" style="margin-top:10px"><span>No task selected.</span></div></div>
+<div class="tool-card"><h3>📈 Daily Progress</h3><p>See how much of today's task list is complete.</p><div class="ring-wrap"><div id="dailyProgressRing" class="progress-ring"><div class="ring-text"><span id="dailyProgressPercent">0%</span> <small>complete</small></div></div></div></div>
+<div class="tool-card"><h3>↩️ Undo Task Changes</h3><p>Undo recent task completion, deletion, or movement.</p><button style="width:100%" onclick="undoTaskChange()">Undo Last Change</button><p id="undoStatus">No changes to undo.</p></div>
+<div class="tool-card"><h3>📋 Today's Summary</h3><p>A quick overview of today's workload.</p><div class="summary-grid"><div class="summary-stat"><b id="summaryTotal">0</b>Total</div><div class="summary-stat"><b id="summaryDone">0</b>Completed</div><div class="summary-stat"><b id="summaryRemaining">0</b>Remaining</div><div class="summary-stat"><b id="summaryHigh">0</b>High Priority</div><div class="summary-stat"><b id="summaryOverdue">0</b>Overdue</div><div class="summary-stat"><b id="summaryPercent">0%</b>Progress</div></div></div>
+</div></section>
+</main>
+<script>
+// Embedded previews may block localStorage; normal browser storage is unchanged.
+(() => {
+  try { const key='__planner_storage_check__'; localStorage.setItem(key,'1'); localStorage.removeItem(key); }
+  catch (_) {
+    const memory=new Map();
+    Object.defineProperty(window,'localStorage',{configurable:true,value:{
+      getItem:key=>memory.has(String(key))?memory.get(String(key)):null,
+      setItem:(key,value)=>memory.set(String(key),String(value)),
+      removeItem:key=>memory.delete(String(key)),clear:()=>memory.clear()
+    }});
+    const notice=document.createElement('p');
+    notice.textContent='Preview mode: changes are temporary. Download this HTML and open it in your browser to save your planner.';
+    notice.style.cssText='padding:12px;background:#fff3cf;color:#503d13;border-radius:12px;text-align:center';
+    document.body.prepend(notice);
+  }
+})();
+const pageInfo=[['🌅 Morning Plan',[]],['☀️ Afternoon Plan',[]],['🌆 Evening Plan',[]],['🌙 Night Plan',[]]];
+const subjects=['English','Math','Arabic','Science','Kurdish','History','Computer','Religious Education','Other'];
+const defaults={tasks:{},deletedTasks:{},homework:[],plans:[],studyLogs:{},goals:{},habits:{},notes:{},moods:{},finished:{},categories:['School','Study','Health','Personal'],recurring:[],settings:{theme:'',font:'',compact:false,dark:false,reminders:false,lead:0,quietStart:'22:00',quietEnd:'07:00',studyGoal:60}};
+let data=load(),selectedDate=today(),weekDate=today(),calendarDate=new Date(),filter='all',timer=null,timerSeconds=1500,running=false,ambient={ctx:null,gain:null,nodes:[]};
+function clone(x){return JSON.parse(JSON.stringify(x));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function today(){return dateStr(new Date());}
+function dateObj(s){return new Date(s+'T12:00:00');}
+function dateStr(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function addDays(s,n){let d=dateObj(s);d.setDate(d.getDate()+n);return dateStr(d);}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function save(){localStorage.setItem('dailyPlannerData_v5',JSON.stringify(data));}
+function load(){try{let x=JSON.parse(localStorage.getItem('dailyPlannerData_v5'));if(!x)return clone(defaults);let d=clone(defaults);Object.assign(d,x);d.tasks=x.tasks||{};Object.keys(d.tasks).forEach(day=>{d.tasks[day]=(d.tasks[day]||[]).filter(t=>!t.copyOf&&!t.isDefault&&!String(t.id||'').startsWith('default-'));});d.deletedTasks=x.deletedTasks||{};d.homework=Array.isArray(x.homework)?x.homework:[];d.plans=Array.isArray(x.plans)?x.plans:[];d.studyLogs=x.studyLogs||{};d.goals=x.goals||{};d.habits=x.habits||{};d.notes=x.notes||{};d.moods=x.moods||{};d.finished=x.finished||{};d.categories=Array.isArray(x.categories)?x.categories:clone(defaults.categories);d.recurring=Array.isArray(x.recurring)?x.recurring:[];d.settings=Object.assign(clone(defaults.settings),x.settings||{});return d;}catch(e){return clone(defaults);}}
+function toast(m){let e=document.getElementById('toast');e.textContent=m;e.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>e.style.display='none',2500);}
+function toggleMenu(id){let e=document.getElementById(id);e.style.display=e.style.display==='block'?'none':'block';}
+function showAbout(){toast('✨ Daily Planner — plan, study, track and grow!');}
+function startPlanner(){document.getElementById('welcome').classList.add('hidden');document.getElementById('app').classList.remove('hidden');showPage(0);}
+function showSettings(){document.getElementById('welcome').classList.add('hidden');document.getElementById('app').classList.remove('hidden');showPage(9);}
+function setTheme(v){document.body.className=document.body.className.replace(/\b(blue|green|peach|strawberry|rose|mint|ocean|lavender)\b/g,'').trim();if(v)document.body.classList.add(v);data.settings.theme=v;save();let e=document.getElementById('themeSelect');if(e)e.value=v;}
+function setFontSize(v){document.body.classList.remove('small-text','large-text');if(v)document.body.classList.add(v);data.settings.font=v;save();}
+function setCompact(v){document.body.classList.toggle('compact',v);data.settings.compact=v;save();}
+function toggleDarkMode(v){data.settings.dark=!!v;document.body.classList.toggle('dark',!!v);save();}
+function ensureDate(d){if(!data.tasks[d])data.tasks[d]=[];data.deletedTasks??={};data.deletedTasks[d]??=[];data.tasks[d]=data.tasks[d].filter(t=>!t.isDefault&&!String(t.id||'').startsWith('default-'));data.recurring.forEach(r=>{if(r.sourceDate===d){data.tasks[d]=data.tasks[d].filter(t=>t.id!==r.id);}if(repeatsOn(r,d)&&!data.tasks[d].some(t=>t.id===`rec-${r.id}-${d}`)){data.tasks[d].push({...clone(r),id:`rec-${r.id}-${d}`,completed:false,subtasks:[],rolledOverFrom:null});}});save();}
+function repeatsOn(r,d){if(d<r.sourceDate)return false;if(r.repeat==='daily')return true;if(r.repeat==='weekly')return dateObj(d).getDay()===dateObj(r.sourceDate).getDay();if(r.repeat==='weekday'){let n=dateObj(d).getDay();return n>=1&&n<=5;}return false;}
+function findTask(id){for(let d in data.tasks){let t=data.tasks[d].find(x=>x.id===id);if(t)return{task:t,date:d};}}
+function getTasks(p,d=selectedDate){ensureDate(d);return data.tasks[d].filter(t=>t.page===p);}
+function taskHTML(t){let s=t.subtasks||[],dn=s.filter(x=>x.done).length,open=t.open?'open':'';return `
+<div class="task priority-${t.priority.toLowerCase()} ${t.completed?'done':''}">
+<input type="checkbox" ${t.completed?'checked':''} onchange="toggleTask('${t.id}')">
+<div class="task-main"><div class="task-line"><span class="task-name">${esc(t.name)}</span><span class="badge">${esc(t.time)}</span><span class="badge">${esc(t.priority)}</span><span class="badge">${esc(t.category||'')}</span>${t.rolledOverFrom?'<span class="badge rolled">↪️ Rolled over</span>':''}</div>
+<div class="task-meta">${t.repeat!=='none'?'🔁 '+esc(t.repeat):''}${t.reminder?' 🔔 Reminder on':''}</div>
+<div class="subtask-progress">☑️ ${dn}/${s.length} sub-tasks</div>
+<div class="subtasks ${open}" id="subs-${t.id}"><div class="subtask-add"><input id="subin-${t.id}" placeholder="New sub-task"><button onclick="addSubtask('${t.id}')">Add</button></div>
+${s.map(x=>`<div class="subtask ${x.done?'done':''}"><input type="checkbox" ${x.done?'checked':''} onchange="toggleSubtask('${t.id}','${x.id}')"><span>${esc(x.text)}</span><button onclick="deleteSubtask('${t.id}','${x.id}')">✕</button></div>`).join('')}
+</div></div><div class="task-actions"><button onclick="toggleChecklist('${t.id}')">☑️</button><button onclick="editTask('${t.id}')">✏️</button><button onclick="toggleReminder('${t.id}')">🔔</button><button onclick="deleteTask('${t.id}')">🗑️</button></div></div>`;}
+function renderPlan(p){let e=document.getElementById('tasks'+p);if(!e)return;ensureDate(selectedDate);e.innerHTML=getTasks(p).sort((a,b)=>(a.time||'').localeCompare(b.time||'')).map(taskHTML).join('')||'<p>No tasks yet.</p>';}
+function addCustomTask(p){let name=document.getElementById('taskText'+p)?.value?.trim();if(!name)return;let t={id:uid(),page:p,name,time:document.getElementById('taskTime'+p)?.value||'00:00',priority:document.getElementById('taskPriority'+p)?.value||'Medium',repeat:document.getElementById('taskRepeat'+p)?.value||'none',category:document.getElementById('taskCategory'+p)?.value||data.categories[0],completed:false,subtasks:[],reminder:false};ensureDate(selectedDate);if(t.repeat==='none'){data.tasks[selectedDate].push(t);}else{data.recurring.push({...clone(t),sourceDate:selectedDate});}document.getElementById('taskText'+p).value='';save();renderAll();toast('Task added! ✨');}
+function toggleTask(id){let x=findTask(id);if(!x)return;saveUndoSnapshot();x.task.completed=!x.task.completed;save();renderAll();}
+function editTask(id){let x=findTask(id);if(!x)return;let n=prompt('Edit task name:',x.task.name);if(n===null)return;if(n.trim())x.task.name=n.trim();save();renderAll();}
+function deleteTask(id){let x=findTask(id);if(!x)return;if(!confirm('Delete this task?'))return;saveUndoSnapshot();let task=x.task;data.deletedTasks??={};data.deletedTasks[x.date]??=[];if(task.isDefault&&!data.deletedTasks[x.date].includes(id)){data.deletedTasks[x.date].push(id);}data.tasks[x.date]=data.tasks[x.date].filter(t=>t.id!==id);if(task.repeat!=='none'&&!String(id).startsWith('rec-')){data.recurring=data.recurring.filter(r=>r.id!==id);}save();renderAll();}
+function toggleReminder(id){let x=findTask(id);if(!x)return;x.task.reminder=!x.task.reminder;if(x.task.reminder&&data.settings.reminders&&'Notification'in window){Notification.requestPermission().catch(()=>{});}save();renderAll();}
+function toggleChecklist(id){let x=findTask(id);if(!x)return;x.task.open=!x.task.open;save();renderAll();}
+function addSubtask(id){let x=findTask(id),e=document.getElementById('subin-'+id);if(!x||!e||!e.value.trim())return;x.task.subtasks=x.task.subtasks||[];x.task.subtasks.push({id:uid(),text:e.value.trim(),done:false});x.task.open=true;save();renderAll();}
+function toggleSubtask(tid,sid){let x=findTask(tid),s=x?.task.subtasks?.find(a=>a.id===sid);if(s)s.done=!s.done;save();renderAll();}
+function deleteSubtask(tid,sid){let x=findTask(tid);if(x){x.task.subtasks=(x.task.subtasks||[]).filter(s=>s.id!==sid);}save();renderAll();}
+function changeDate(v){if(!v)return;selectedDate=v;ensureDate(v);syncDates();renderAll();}
+function syncDates(){['dateInput5','focusDateInput','dateInput10','notesDateInput'].forEach(id=>{let e=document.getElementById(id);if(e)e.value=selectedDate;});loadNotes();}
+function rolloverUnfinished(){ensureDate(selectedDate);let to=addDays(selectedDate,1),n=0;data.tasks[selectedDate].forEach(t=>{if(t.completed||t.repeat!=='none')return;if(data.tasks[to].some(x=>x.rolledOverSourceId===t.id&&x.rolledOverFrom===selectedDate))return;data.tasks[to].push({...clone(t),id:'roll-'+uid(),completed:false,rolledOverFrom:selectedDate,rolledOverSourceId:t.id,subtasks:(t.subtasks||[]).map(s=>({...s,id:uid()}))});n++;});save();toast(n?`↪️ ${n} task(s) rolled over!`:'Nothing to roll over.');renderAll();}
+function allTasks(d=selectedDate){ensureDate(d);return data.tasks[d]||[];}
+function counts(d=selectedDate){let a=allTasks(d),done=a.filter(x=>x.completed).length;return{total:a.length,done,remaining:a.length-done};}
+function isDayDone(d){let c=counts(d);return c.total>0&&c.done===c.total;}
+function streakFrom(d){let n=0;while(isDayDone(d)){n++;d=addDays(d,-1);}return n;}
+function bestStreak(){let days=Object.keys(data.tasks).sort(),best=0;days.forEach(d=>{let n=streakFrom(d);if(n>best)best=n;});return best;}
+const achievements=[['🌱','First Step','Complete your first task',()=>Object.values(data.tasks).some(a=>a.some(t=>t.completed))],['🔥','3-Day Streak','Finish all tasks for 3 days in a row',()=>streakFrom(selectedDate)>=3],['📚','Study Master','Complete 5 focus sessions in one day',()=>((data.studyLogs[selectedDate]||[]).length>=5)],['🎯','Goal Getter','Reach your study goal',()=>studyMinutes(selectedDate)>=Number(data.settings.studyGoal||60)],['⭐','Super Productive','Complete 10 tasks in one day',()=>counts().done>=10],['🏆','Perfect Day','Complete every task today',()=>isDayDone(selectedDate)],['☑️','Checklist Hero','Complete 10 sub-tasks',()=>Object.values(data.tasks).flat().reduce((n,t)=>n+(t.subtasks||[]).filter(s=>s.done).length,0)>=10],['📅','Planner Explorer','Use the calendar',()=>true]];
+function renderAchievements(){let e=document.getElementById('achievements');e.innerHTML=achievements.map(a=>`<div class="achievement ${a[3]?'unlocked':'locked'}">${a[0]} <b>${a[1]}</b> <small>${a[2]}</small> ${a[3]()?'🏆 Unlocked':'🔒 Locked'}</div>`).join('');}
+function report(){let c=counts(),p=c.total?c.done/c.total*100:0;document.getElementById('reportTotal').textContent=c.total;document.getElementById('reportDone').textContent=c.done;document.getElementById('reportRemain').textContent=c.remaining;document.getElementById('reportStreak').textContent=streakFrom(selectedDate);document.getElementById('dailyProgress').style.width=p+'%';document.getElementById('reportMessage').textContent=p===100?'🎉 Perfect day!':p>=70?'🌟 Great job!':p>=40?'💪 Keep going!':'🌱 You can do it!';let r=addDays(selectedDate,1),n=(data.tasks[r]||[]).filter(t=>t.rolledOverFrom===selectedDate).length;document.getElementById('rolloverInfo').textContent=n?`${n} task(s) already rolled over to tomorrow.`:'';renderAchievements();}
+function finishDay(){if(counts().total){data.finished[selectedDate]=true;save();renderAll();toast('🏆 Day finished!');}}
+function loadNotes(){let v=data.notes[selectedDate]||'';['dailyNotes','bigNotes'].forEach(id=>{let e=document.getElementById(id);if(e)e.value=v;});}
+function saveNotes(id){let e=document.getElementById(id);if(e){data.notes[selectedDate]=e.value;save();}}
+function setTimerDuration(){if(running)return;timerSeconds=Number(document.getElementById('durationSelect').value)*60;updateTimer();}
+function updateTimer(){let m=Math.floor(timerSeconds/60),s=timerSeconds%60;document.getElementById('timer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
+function startTimer(){if(running)return;running=true;timer=setInterval(()=>{if(timerSeconds<=1){clearInterval(timer);running=false;completeStudySession();toast('🎉 Study session complete!');timerSeconds=Number(document.getElementById('durationSelect').value)*60;updateTimer();}else{timerSeconds--;updateTimer();}},1000);}
+function pauseTimer(){clearInterval(timer);timer=null;running=false;}
+function resetTimer(){pauseTimer();setTimerDuration();}
+function completeStudySession(){data.studyLogs[selectedDate]??=[];data.studyLogs[selectedDate].push({id:uid(),subject:document.getElementById('focusSubject').value,minutes:Number(document.getElementById('durationSelect').value)});save();renderFocus();}
+function studyMinutes(d=selectedDate){return(data.studyLogs[d]||[]).reduce((n,x)=>n+Number(x.minutes||0),0);}
+function saveDailyGoal(){data.settings.studyGoal=Math.max(1,Number(document.getElementById('goalInput').value)||60);save();renderFocus();}
+function renderFocus(){let l=data.studyLogs[selectedDate]||[],m=studyMinutes(),g=Number(data.settings.studyGoal||60);document.getElementById('sessionCount').textContent=l.length;document.getElementById('studyMinutes').textContent=m;document.getElementById('studyGoal').textContent=g;document.getElementById('goalInput').value=g;document.getElementById('studyProgress').style.width=Math.min(100,m/g*100)+'%';document.getElementById('studyLog').innerHTML=l.length?l.slice().reverse().map(x=>`<div class="list-item">📚 ${esc(x.subject)} — ${x.minutes} min</div>`).join(''):'<p>No study sessions yet.</p>';}
+function playAmbient(type){stopAmbient(false);try{let AC=AudioContext||webkitAudioContext,ctx=new AC(),gain=ctx.createGain();gain.gain.value=Number(document.getElementById('ambientVolume').value);gain.connect(ctx.destination);let b=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);let c=b.getChannelData(0),last=0;for(let i=0;i<c.length;i++){let n=Math.random()*2-1;if(type==='ocean'||type==='fire')n=last*.96+n*.04;else if(type==='forest')n=last*.8+n*.2;last=n;c[i]=n;}let src=ctx.createBufferSource(),f=ctx.createBiquadFilter();src.buffer=b;src.loop=true;f.type=type==='rain'?'bandpass':type==='white'?'allpass':'lowpass';f.frequency.value=type==='rain'?2500:type==='ocean'?1000:type==='fire'?1500:1200;src.connect(f);f.connect(gain);src.start();ambient={ctx,gain,nodes:[src,f]};document.getElementById('ambientStatus').textContent='🔊 Playing: '+type;}catch(e){toast('Could not start sound.');}}
+function stopAmbient(show=true){try{ambient.nodes.forEach(n=>{try{n.stop?.()}catch(e){}try{n.disconnect()}catch(e){}});ambient.ctx?.close();}catch(e){}ambient={ctx:null,gain:null,nodes:[]};let e=document.getElementById('ambientStatus');if(e)e.textContent='No sound playing';if(show)toast('⏹️ Ambient sound stopped.');}
+function setAmbientVolume(v){if(ambient.gain)ambient.gain.gain.value=Number(v);}
+function weekStart(s){let d=dateObj(s),n=d.getDay();d.setDate(d.getDate()-(n===0?6:n-1));return dateStr(d);}
+function changeWeek(n){weekDate=addDays(weekDate,n);document.getElementById('weekDateInput').value=weekDate;renderWeekly();}
+function renderWeekly(){let st=weekStart(weekDate),ds=[...Array(7)].map((_,i)=>addDays(st,i)),tot=0,dn=0,sm=0;ds.forEach(d=>{let c=counts(d);tot+=c.total;dn+=c.done;sm+=studyMinutes(d);});document.getElementById('weekRange').textContent=`${st} → ${ds[6]}`;document.getElementById('weekTasks').textContent=tot;document.getElementById('weekDone').textContent=dn;document.getElementById('weekStudy').textContent=sm;document.getElementById('weekProgress').style.width=(tot?dn/tot*100:0)+'%';document.getElementById('weekGrid').innerHTML=ds.map(d=>{let c=counts(d);return `<div class="week-day" onclick="changeDate('${d}');showPage(0)"><b>${dateObj(d).toLocaleDateString('en',{weekday:'short'})}</b><p>${d}</p><p>✅ ${c.done}/${c.total}</p><p>📚 ${studyMinutes(d)} min</p></div>`;}).join('');}
+function addHomework(){let n=document.getElementById('homeworkName').value.trim();if(!n)return;data.homework.push({id:uid(),name:n,subject:document.getElementById('homeworkSubject').value,due:document.getElementById('homeworkDue').value,priority:document.getElementById('homeworkPriority').value,completed:false});document.getElementById('homeworkName').value='';save();renderHomework();}
+function renderHomework(){let a=data.homework,d=a.filter(x=>x.completed).length;document.getElementById('hwTotal').textContent=a.length;document.getElementById('hwDone').textContent=d;document.getElementById('hwRemain').textContent=a.length-d;document.getElementById('homeworkList').innerHTML=a.length?a.map(x=>`<div class="list-item ${x.completed?'done':''}"><input type="checkbox" ${x.completed?'checked':''} onchange="toggleHomework('${x.id}')"><span style="flex:1"><b>${esc(x.name)}</b> ${esc(x.subject)} • ${x.due||'No due date'} • ${x.priority}</span><button onclick="deleteHomework('${x.id}')">🗑️</button></div>`).join(''):'<p>No homework yet.</p>';}
+function toggleHomework(id){let x=data.homework.find(a=>a.id===id);if(x)x.completed=!x.completed;save();renderHomework();}
+function deleteHomework(id){data.homework=data.homework.filter(x=>x.id!==id);save();renderHomework();}
+function addStudyPlan(){let topic=document.getElementById('planTopic').value.trim();if(!topic)return;data.plans.push({id:uid(),subject:document.getElementById('planSubject').value,topic,date:document.getElementById('planDate').value||selectedDate,duration:Number(document.getElementById('planDuration').value)||25,priority:document.getElementById('planPriority').value,completed:false});document.getElementById('planTopic').value='';save();renderPlans();}
+function renderPlans(){let a=data.plans,d=a.filter(x=>x.completed).length;document.getElementById('planTotal').textContent=a.length;document.getElementById('planDone').textContent=d;document.getElementById('planMinutes').textContent=a.reduce((n,x)=>n+Number(x.duration),0);document.getElementById('studyPlanList').innerHTML=a.length?a.map(x=>`<div class="list-item ${x.completed?'done':''}"><input type="checkbox" ${x.completed?'checked':''} onchange="togglePlan('${x.id}')"><span style="flex:1"><b>${esc(x.topic)}</b> ${esc(x.subject)} • ${x.date} • ${x.duration} min</span><button onclick="deletePlan('${x.id}')">🗑️</button></div>`).join(''):'<p>No study plans yet.</p>';}
+function togglePlan(id){let x=data.plans.find(a=>a.id===id);if(x)x.completed=!x.completed;save();renderPlans();}
+function deletePlan(id){data.plans=data.plans.filter(x=>x.id!==id);save();renderPlans();}
+function addDailyGoalItem(){let e=document.getElementById('dailyGoalInput'),v=e.value.trim();if(!v)return;data.goals[selectedDate]??=[];data.goals[selectedDate].push({id:uid(),text:v,done:false});e.value='';save();renderGoals();}
+function addDailyHabit(){let e=document.getElementById('dailyHabitInput'),v=e.value.trim();if(!v)return;data.habits[selectedDate]??=[];data.habits[selectedDate].push({id:uid(),text:v,done:false});e.value='';save();renderGoals();}
+function renderGoals(){let g=data.goals[selectedDate]||[],h=data.habits[selectedDate]||[];document.getElementById('goalCount').textContent=g.length;document.getElementById('goalDone').textContent=g.filter(x=>x.done).length;document.getElementById('habitCount').textContent=h.length;document.getElementById('habitDone').textContent=h.filter(x=>x.done).length;document.getElementById('dailyGoalsList').innerHTML=g.length?g.map((x,i)=>`<div class="list-item ${x.done?'done':''}"><input type="checkbox" ${x.done?'checked':''} onchange="toggleGoal(${i})"><span class="task-name">${esc(x.text)}</span><button onclick="deleteGoal(${i})">🗑️</button></div>`).join(''):'<p>No goals yet.</p>';document.getElementById('dailyHabitsList').innerHTML=h.length?h.map((x,i)=>`<div class="list-item ${x.done?'done':''}"><input type="checkbox" ${x.done?'checked':''} onchange="toggleHabit(${i})"><span class="task-name">${esc(x.text)}</span><button onclick="deleteHabit(${i})">🗑️</button></div>`).join(''):'<p>No habits yet.</p>';}
+function toggleGoal(i){data.goals[selectedDate][i].done=!data.goals[selectedDate][i].done;save();renderGoals();}
+function deleteGoal(i){data.goals[selectedDate].splice(i,1);save();renderGoals();}
+function toggleHabit(i){data.habits[selectedDate][i].done=!data.habits[selectedDate][i].done;save();renderGoals();}
+function deleteHabit(i){data.habits[selectedDate].splice(i,1);save();renderGoals();}
+function changeCalendarMonth(n){calendarDate.setMonth(calendarDate.getMonth()+n);renderCalendar();}
+function renderCalendar(){let y=calendarDate.getFullYear(),m=calendarDate.getMonth(),first=new Date(y,m,1).getDay(),off=first===0?6:first-1,days=new Date(y,m+1,0).getDate();let h=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div class="head">${x}</div>`).join('');for(let i=0;i<off;i++)h+='<div></div>';for(let d=1;d<=days;d++){let s=dateStr(new Date(y,m,d)),c=counts(s);h+=`<div class="cal-day ${s===today()?'today':''}" onclick="changeDate('${s}');showPage(0)"><b>${d}</b> ✅ ${c.done}/${c.total} 📚 ${studyMinutes(s)}m</div>`;}document.getElementById('calendarTitle').textContent=calendarDate.toLocaleDateString('en',{month:'long',year:'numeric'});document.getElementById('calendar').innerHTML=h;}
+function renderRecurring(){document.getElementById('recurringList').innerHTML=data.recurring.length?data.recurring.map(r=>`<div class="list-item"><span style="flex:1"><b>${esc(r.name)}</b> ${r.time} • ${r.repeat}</span><button onclick="editRecurring('${r.id}')">✏️</button><button onclick="deleteRecurring('${r.id}')">🗑️</button></div>`).join(''):'<p>No recurring tasks.</p>';}
+function editRecurring(id){let r=data.recurring.find(x=>x.id===id);if(!r)return;let n=prompt('Task name:',r.name);if(n===null||!n.trim())return;r.name=n.trim();Object.keys(data.tasks).forEach(d=>{let t=data.tasks[d].find(x=>x.id===`rec-${id}-${d}`);if(t)t.name=r.name;});save();renderAll();}
+function deleteRecurring(id){if(!confirm('Delete this recurring task?'))return;data.recurring=data.recurring.filter(r=>r.id!==id);Object.keys(data.tasks).forEach(d=>{data.tasks[d]=data.tasks[d].filter(t=>t.id!==`rec-${id}-${d}`);});save();renderAll();}
+function addCategory(){let e=document.getElementById('categoryInput'),v=e.value.trim();if(!v||data.categories.includes(v))return;data.categories.push(v);e.value='';save();renderAll();}
+function deleteCategory(i){if(i<4)return;data.categories.splice(i,1);save();renderAll();}
+function renderCategories(){document.getElementById('categoryList').innerHTML=data.categories.map((c,i)=>`<div class="list-item"><span style="flex:1">🏷️ ${esc(c)}</span>${i>3?`<button onclick="deleteCategory(${i})">🗑️</button>`:''}</div>`).join('');}
+function setRemindersEnabled(v){data.settings.reminders=v;if(v&&'Notification'in window)Notification.requestPermission().catch(()=>{});save();}
+function saveReminderSettings(){data.settings.lead=Number(document.getElementById('leadTime').value);data.settings.quietStart=document.getElementById('quietStart').value;data.settings.quietEnd=document.getElementById('quietEnd').value;save();toast('🔔 Reminder settings saved!');}
+function quietNow(){let a=data.settings.quietStart,b=data.settings.quietEnd;if(!a||!b)return false;let n=new Date().toTimeString().slice(0,5);return a>b?(n>=a||n<b):(n>=a&&n<b);}
+function leadFor(){return Number(data.settings.lead||0);}
+setInterval(()=>{if(!data.settings.reminders||quietNow())return;let now=new Date(),mins=now.getHours()*60+now.getMinutes();allTasks(today()).forEach(t=>{if(!t.reminder||t.completed)return;let [h,m]=t.time.split(':').map(Number),target=h*60+m-leadFor(t);if(Math.abs(mins-target)<1){toast('🔔 Reminder: '+t.name);if('Notification'in window&&Notification.permission==='granted'){new Notification('Daily Planner',{body:t.name});}}});},30000);
+function exportPlannerData(){let b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='daily-planner-backup.json';a.click();URL.revokeObjectURL(a.href);}
+function importPlannerData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x||typeof x!=='object')throw 0;data=Object.assign(clone(defaults),x);save();location.reload();}catch(err){toast('❌ Invalid backup file.');}e.target.value='';};r.readAsText(f);}
+function resetPlannerData(){if(confirm('Delete all planner data?')){localStorage.removeItem('dailyPlannerData_v5');localStorage.removeItem('dailyPlannerHub_v1');location.reload();}}
+function setFilter(v){filter=v;renderSearch();}
+function renderSearch(){let input=document.getElementById('taskSearch'),q=(input?.value||'').trim().toLowerCase(),box=document.getElementById('searchResults');if(!q){box.innerHTML='<p>🔎 Type a task name to search for it.</p>';return;}let a=[],seen=new Set();Object.keys(data.tasks).forEach(d=>(data.tasks[d]||[]).forEach(t=>{if(t.copyOf||t.isDefault||String(t.id||'').startsWith('default-')||String(t.id||'').startsWith('rec-'))return;let ok=String(t.name||'').toLowerCase().includes(q),f=filter==='all'||filter==='open'&&!t.completed||filter==='done'&&t.completed||filter==='high'&&t.priority==='High'||filter==='study'&&/study|homework|review/i.test(t.name);if(ok&&f){let key=`task|${String(t.name||'').toLowerCase()}|${t.page}|${t.time||''}|${t.priority||''}`;if(!seen.has(key)){seen.add(key);a.push({...t,date:d,originalDate:d,recurring:false});}}}));(data.recurring||[]).forEach(r=>{let ok=String(r.name||'').toLowerCase().includes(q),f=filter==='all'||filter==='open'||filter==='done'||filter==='high'&&r.priority==='High'||filter==='study'&&/study|homework|review/i.test(r.name),originalDate=r.sourceDate;if(ok&&f&&originalDate){let key=`repeat|${r.id}`;if(!seen.has(key)){seen.add(key);a.push({...r,date:originalDate,originalDate,recurring:true});}}});let s=document.getElementById('searchSort')?.value||'time';a.sort((x,y)=>s==='name'?x.name.localeCompare(y.name):s==='priority'?({High:0,Medium:1,Low:2}[x.priority]??9)-({High:0,Medium:1,Low:2}[y.priority]??9):(x.time||'').localeCompare(y.time||'')||(x.originalDate||'').localeCompare(y.originalDate||''));box.innerHTML=a.length?a.map(x=>`<div class="list-item ${x.completed?'done':''}"><span style="flex:1"><b>${esc(x.name)}</b> ${x.originalDate} • ${x.time} • ${x.priority}${x.recurring?' • 🔄':''}</span><button onclick="changeDate('${x.originalDate}');showPage(${x.page})">Open</button></div>`).join(''):'<p>No matching tasks.</p>';}
+function setMood(v){data.moods??={};data.moods[selectedDate]=v;save();renderDashboard();toast('💖 Mood saved!');}
+function renderDashboard(){let c=counts(),g=data.goals[selectedDate]||[],h=data.habits[selectedDate]||[],doneA=achievements.filter(a=>a[3]()).length;document.getElementById('dashTasks').textContent=`${c.done}/${c.total}`;document.getElementById('dashStudy').textContent=studyMinutes();document.getElementById('dashGoals').textContent=`${g.filter(x=>x.done).length}/${g.length}`;document.getElementById('dashHabits').textContent=`${h.filter(x=>x.done).length}/${h.length}`;document.getElementById('dashStreak').textContent=streakFrom(selectedDate);document.getElementById('dashAchievements').textContent=`${doneA}/${achievements.length}`;document.getElementById('dashProgress').style.width=(c.total?c.done/c.total*100:0)+'%';let quotes=['Small steps every day become big results. 🌱','You do not have to be perfect—just keep going. 💜','Your future self will thank you for studying today. 📚','One task at a time. You’ve got this! ⭐'];document.getElementById('dailyQuote').textContent='“'+quotes[dateObj(selectedDate).getDate()%quotes.length]+'”';document.getElementById('moodStatus').textContent=data.moods?.[selectedDate]?('Today: '+data.moods[selectedDate]):'No mood saved yet.';document.getElementById('dashNextTasks').innerHTML=allTasks().filter(t=>!t.completed).sort((a,b)=>a.time.localeCompare(b.time)).slice(0,5).map(t=>`<div class="list-item">⏰ <b>${esc(t.time)}</b> — ${esc(t.name)}</div>`).join('')||'<p>🎉 No unfinished tasks!</p>';}
+function renderStreakCalendar(){let y=calendarDate.getFullYear(),m=calendarDate.getMonth(),first=new Date(y,m,1).getDay(),off=first===0?6:first-1,days=new Date(y,m+1,0).getDate();let h=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div class="head">${x}</div>`).join('');for(let i=0;i<off;i++)h+='<div></div>';for(let d=1;d<=days;d++){let s=dateStr(new Date(y,m,d)),ok=isDayDone(s);h+=`<div onclick="changeDate('${s}');showPage(0)" style="background:${ok?'#d6f5df':''}"><b>${d}</b> ${ok?'🔥 Finished':'○ Not finished'}</div>`;}document.getElementById('streakCalendar').innerHTML=h;document.getElementById('bestStreak').textContent=bestStreak();document.getElementById('currentStreak').textContent=streakFrom(selectedDate);}
+function renderStats(){let dates=[...Array(7)].map((_,i)=>addDays(selectedDate,i-6)),tot=0,dn=0,sm=0;dates.forEach(d=>{let c=counts(d);tot+=c.total;dn+=c.done;sm+=studyMinutes(d);});document.getElementById('statTotal').textContent=tot;document.getElementById('statDone').textContent=dn;document.getElementById('statStudy').textContent=sm;document.getElementById('statRate').textContent=(tot?Math.round(dn/tot*100):0)+'%';document.getElementById('productivityChart').innerHTML=dates.map(d=>{let c=counts(d),p=c.total?Math.round(c.done/c.total*100):0;return `<div class="bar" style="height:${Math.max(5,p)}%"><span>${p}%</span></div>`;}).join('');let by={};Object.values(data.studyLogs).flat().forEach(x=>{by[x.subject]=(by[x.subject]||0)+Number(x.minutes||0);});document.getElementById('subjectStats').innerHTML=Object.keys(by).length?Object.entries(by).sort((a,b)=>b[1]-a[1]).map(x=>`<div class="list-item"><span style="flex:1">📚 ${esc(x[0])}</span><b>${x[1]} min</b></div>`).join(''):'<p>No study data yet.</p>';}
+function renderAll(){ensureDate(selectedDate);for(let i=0;i<4;i++)renderPlan(i);renderCategories();report();renderFocus();renderWeekly();renderHomework();renderPlans();renderGoals();renderCalendar();renderRecurring();renderDashboard();loadNotes();renderSearch();renderStreakCalendar();renderStats();renderHub();renderAdvanced();renderTodayTools();syncDates();}
+function showPage(n){let e=document.getElementById('page'+n);if(e){e.scrollIntoView({behavior:'smooth',block:'start'});}renderAll();}
+for(let i=0;i<4;i++){let sec=document.createElement('section');sec.className='page';sec.id='page'+i;sec.innerHTML=`
+<h2>${pageInfo[i][0]}</h2><input id="dateInput${i}" type="date" onchange="changeDate(this.value)">
+<div class="form-grid"><input id="taskText${i}" placeholder="Add a task"><input id="taskTime${i}" type="time"><select id="taskPriority${i}"><option>High</option><option selected>Medium</option><option>Low</option></select><select id="taskRepeat${i}"><option value="none">No Repeat</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="weekday">Weekdays</option></select><select id="taskCategory${i}"></select><button onclick="addCustomTask(${i})">➕ Add Task</button></div>
+<div id="tasks${i}"></div><div class="nav">${i?`<button onclick="showPage(${i-1})">⬅️ Previous</button>`:''}${i<3?`<button onclick="showPage(${i+1})">Next ➡️</button>`:`<button onclick="showPage(4)">📊 Daily Report</button>`}</div>`;document.getElementById('pages').append(sec);}
+/* PRODUCTIVITY HUB */
+let hubFlashIndex=0,hubFlashSide='q',hubView=0,hubDensity=0;
+function hubStore(){try{return JSON.parse(localStorage.getItem('dailyPlannerHub_v1')||'{}');}catch(e){return {};}}
+function saveHubStore(x){localStorage.setItem('dailyPlannerHub_v1',JSON.stringify(x));}
+function toggleZenMode(){document.body.classList.toggle('zen-mode');let on=document.body.classList.contains('zen-mode');document.getElementById('zenStatus').textContent=on?'🧘 Zen Mode is ON — distractions hidden.':'🌸 Zen Mode is OFF — normal view restored.';let d=hubStore();d.zen=on;saveHubStore(d);}
+function cycleHubView(){hubView=(hubView+1)%3;let labels=['✨ Soft','💎 Focused','🌈 Fun'];document.querySelectorAll('#page19 .hub-card').forEach(e=>{e.style.transform=hubView===0?'':hubView===1?'translateY(-2px)':'scale(1.01)';e.style.transition='.2s';});document.getElementById('designStatus').textContent='Current style: '+labels[hubView];toast('🎨 Hub style: '+labels[hubView]);}
+function cycleHubDensity(){hubDensity=(hubDensity+1)%3;let labels=['Comfortable','Compact','Spacious'];let d=hubStore();d.density=hubDensity;saveHubStore(d);document.getElementById('page19').classList.toggle('hub-compact',hubDensity===1);document.getElementById('page19').classList.toggle('hub-spacious',hubDensity===2);document.getElementById('designStatus').textContent='Layout: '+labels[hubDensity];toast('📐 Layout: '+labels[hubDensity]);}
+function saveTopThree(){let d=hubStore();d.top3=[document.getElementById('top1').value.trim(),document.getElementById('top2').value.trim(),document.getElementById('top3').value.trim()];saveHubStore(d);document.getElementById('topSaved').textContent='✅ Your Top 3 are saved for today.';}
+function loadTopThree(){let d=hubStore(),a=d.top3||[];['top1','top2','top3'].forEach((id,i)=>{document.getElementById(id).value=a[i]||'';});hubDensity=Number(d.density||0);document.getElementById('page19').classList.toggle('hub-compact',hubDensity===1);document.getElementById('page19').classList.toggle('hub-spacious',hubDensity===2);}
+function flashcards(){let d=hubStore();d.flashcards??=[];return d.flashcards;}
+function addFlashcard(){let q=document.getElementById('flashQ').value.trim(),a=document.getElementById('flashA').value.trim();if(!q||!a){toast('✏️ Add both a question and an answer.');return;}let d=hubStore();d.flashcards??=[];d.flashcards.push({q,a});hubFlashIndex=d.flashcards.length-1;hubFlashSide='q';saveHubStore(d);document.getElementById('flashQ').value='';document.getElementById('flashA').value='';renderHubFlashcards();toast('📚 Flashcard added!');}
+function deleteFlashcard(){let d=hubStore(),a=d.flashcards||[];if(!a.length)return;if(!confirm('Delete this flashcard?'))return;a.splice(hubFlashIndex,1);d.flashcards=a;if(hubFlashIndex>=a.length)hubFlashIndex=Math.max(0,a.length-1);hubFlashSide='q';saveHubStore(d);renderHubFlashcards();toast('🗑️ Flashcard deleted!');}
+let quizState={active:false,index:0,score:0,answered:false,answeredCount:0,results:[],order:[]};
+function startFlashQuiz(){const a=flashcards();if(!a.length){toast('📚 Add flashcards before starting a quiz.');return;}quizState={active:true,index:0,score:0,answered:false,answeredCount:0,results:[],order:Array.from({length:a.length},(_,i)=>i).sort(()=>Math.random()-.5)};renderFlashQuiz();}
+function restartFlashQuiz(){startFlashQuiz();}
+function renderFlashQuiz(){const box=document.getElementById('quizBox');if(!box)return;const a=flashcards();if(!quizState.active||!a.length){box.innerHTML='<p>Start a quiz to test yourself on your flashcards.</p>';return;}if(quizState.index>=quizState.order.length){const total=quizState.order.length,pct=total?Math.round(quizState.score/total*100):0;box.innerHTML='<div class="quiz-result">'+'<h3>🏆 Quiz Complete!</h3>'+'<p><b>'+quizState.score+' / '+total+'</b> correct</p>'+'<p>Score: <b>'+pct+'%</b></p>'+'<p>'+(pct>=80?'🌟 Excellent work!':pct>=60?'💪 Good job! Keep practicing!':'🌱 Nice try! Review your flashcards and try again.')+'</p>'+'<button onclick="startFlashQuiz()">🔄 Try Again</button>'+'</div>';return;}const card=a[quizState.order[quizState.index]],answered=quizState.answered;box.innerHTML='<div class="quiz-question">'+'<small>Question '+(quizState.index+1)+' of '+quizState.order.length+'</small>'+'<h3>'+esc(card.q)+'</h3>'+(answered?'<div class="quiz-answer"><b>Answer:</b><br>'+esc(card.a)+'</div>':'<button onclick="revealQuizAnswer()">👀 Reveal Answer</button>')+'</div>'+(answered?'<div class="mini-actions" style="margin-top:8px">'+'<button onclick="markQuizAnswer(true)">✅ Correct</button>'+'<button onclick="markQuizAnswer(false)">❌ Wrong</button>'+'<button onclick="nextQuizQuestion()">➡️ Next Question</button>'+'</div>':'')+'<p>Score: <b>'+quizState.score+'</b> / '+quizState.answeredCount+'</p>';}
+function revealQuizAnswer(){if(!quizState.active||quizState.answered)return;quizState.answered=true;renderFlashQuiz();}
+function markQuizAnswer(correct){if(!quizState.active||!quizState.answered)return;if(correct)quizState.score++;quizState.results.push({index:quizState.index,correct:!!correct});quizState.answeredCount++;quizState.answered=false;renderFlashQuiz();}
+function nextQuizQuestion(){if(!quizState.active)return;if(quizState.answered){toast('✅ Choose Correct or Wrong first.');return;}if(quizState.answeredCount>=quizState.order.length){quizState.index=quizState.order.length;}else{quizState.index=quizState.answeredCount;}renderFlashQuiz();}
+function flipFlashcard(){hubFlashSide=hubFlashSide==='q'?'a':'q';renderHubFlashcards();}
+function nextFlashcard(){let a=flashcards();if(!a.length)return;hubFlashIndex=(hubFlashIndex+1)%a.length;hubFlashSide='q';renderHubFlashcards();}
+function prevFlashcard(){let a=flashcards();if(!a.length)return;hubFlashIndex=(hubFlashIndex-1+a.length)%a.length;hubFlashSide='q';renderHubFlashcards();}
+function renderHubFlashcards(){let a=flashcards(),box=document.getElementById('flashcardBox');if(!box)return;if(!a.length){box.innerHTML='<p>No flashcards yet.</p>';document.getElementById('flashCount').textContent='';return;}if(hubFlashIndex>=a.length)hubFlashIndex=0;let x=a[hubFlashIndex],text=hubFlashSide==='q'?x.q:x.a;box.innerHTML='<div class="flashcard" onclick="flipFlashcard()">'+esc(text)+'<small>Tap Flip to see '+(hubFlashSide==='q'?'the answer':'the question')+'</small>'+'</div>';document.getElementById('flashCount').textContent='Card '+(hubFlashIndex+1)+' of '+a.length;}
+function renderHubTimeline(){let a=allTasks().filter(t=>t.time).slice().sort((x,y)=>(x.time||'').localeCompare(y.time||''));let el=document.getElementById('hubTimeline');let planned=a.reduce((n,t)=>n+taskMinutes(t),0);document.getElementById('timelinePlanned').textContent=planned;document.getElementById('timelineTasks').textContent=a.length;el.innerHTML=a.length?a.map(t=>`<div class="timeline-item"><b>${esc(t.time)}</b> — ${esc(t.name)}${t.completed?' ✅':''}${t.duration?'<br><small>⏱️ '+Number(t.duration)+' min</small>':''}${t.priority?'<br><span class="pill">'+esc(t.priority)+'</span>':''}</div>`).join(''):'<p>No timed tasks today. Add a time to a task to see it here.</p>';}
+function taskMinutes(t){return Number(t.duration||t.estimatedMinutes||0)||0;}
+function renderHubBudget(){let d=hubStore(),budget=Number(d.timeBudget||0),used=allTasks().reduce((n,t)=>n+taskMinutes(t),0);document.getElementById('timeBudget').value=budget||'';document.getElementById('budgetUsed').textContent=used;let pct=budget?Math.min(100,used/budget*100):0;document.getElementById('budgetBar').style.width=pct+'%';document.getElementById('budgetText').textContent=budget?(used<=budget?'✅ '+(budget-used)+' minutes left in your budget.':'⚠️ '+(used-budget)+' minutes over your budget.'):'Set a budget to track planned time.';}
+function saveTimeBudget(){let v=Math.max(0,Number(document.getElementById('timeBudget').value)||0);let d=hubStore();d.timeBudget=v;saveHubStore(d);renderHubBudget();toast('⏳ Time budget saved!');}
+function renderSmartTasks(){let a=allTasks().filter(t=>!t.completed).slice().sort((x,y)=>{let p={High:0,Medium:1,Low:2};let px=p[x.priority]??1,py=p[y.priority]??1;if(px!==py)return px-py;return(x.time||'99:99').localeCompare(y.time||'99:99');});document.getElementById('smartTasks').innerHTML=a.slice(0,6).map(t=>`<div class="hub-item"><span><b>${esc(t.name)}</b> <small>${t.time||'No time set'} • ${t.priority||'Medium'}</small></span><button onclick="changeDate('${selectedDate}');showPage(${t.page})">Open</button></div>`).join('')||'<p>🎉 Everything is completed!</p>';}
+function renderHubStudy(){let m=studyMinutes(),l=data.studyLogs[selectedDate]||[],g=Number(data.settings.studyGoal||60);document.getElementById('hubStudyMinutes').textContent=m;document.getElementById('hubSessions').textContent=l.length;document.getElementById('hubStudyBar').style.width=Math.min(100,m/g*100)+'%';document.getElementById('hubStudyText').textContent=m>=g?'🎉 Daily study goal reached!':(g-m)+' minutes left to reach your goal.';}
+function renderHub(){loadTopThree();renderHubFlashcards();renderHubTimeline();renderHubBudget();renderSmartTasks();renderHubStudy();let c=counts(),taskScore=c.total?Math.round(c.done/c.total*100):0;let goals=Object.values(data.goals[selectedDate]||[]),habits=Object.values(data.habits[selectedDate]||[]);let goalScore=goals.length?Math.round(goals.filter(x=>x.done).length/goals.length*100):0;let habitScore=habits.length?Math.round(habits.filter(x=>x.done).length/habits.length*100):0;let score=Math.round(taskScore*.6+goalScore*.2+habitScore*.2);if(!c.total&&!goals.length&&!habits.length)score=0;document.getElementById('hubScore').textContent=score+'%';document.getElementById('hubScoreBar').style.width=score+'%';document.getElementById('scoreTasks').textContent=taskScore+'%';document.getElementById('scoreGoals').textContent=goalScore+'%';document.getElementById('scoreHabits').textContent=habitScore+'%';document.getElementById('hubScoreText').textContent=score>=80?'🔥 Excellent — you are having a highly productive day!':score>=60?'💪 Great progress — keep going!':score>=30?'🌱 Good start — finish a few more priorities.':'✨ Start with one small task and build momentum.';let d=hubStore();if(d.zen&&!document.body.classList.contains('zen-mode')){document.body.classList.add('zen-mode');}document.getElementById('zenStatus').textContent=document.body.classList.contains('zen-mode')?'🧘 Zen Mode is ON — distractions hidden.':'🌸 Zen Mode is OFF — normal view restored.';document.getElementById('designStatus').textContent='Layout: '+(['Comfortable','Compact','Spacious'][Number(d.density||0)]);}
+/* ADVANCED TOOLS */
+function advancedStore(){let d=hubStore();d.advanced??={templates:[],dependencies:{}};d.advanced.templates??=[];d.advanced.dependencies??={};return d;}
+function saveAdvancedStore(d){saveHubStore(d);}
+function advancedTasks(){return allTasks().filter(t=>!t.isDefault&&!String(t.id||'').startsWith('default-'));}
+function renderAdvanced(){let tasks=advancedTasks(),d=advancedStore(),deps=d.advanced.dependencies||{},templates=d.advanced.templates||[];['dependencyTask','dependencyPrerequisite','templateTask'].forEach(id=>{let e=document.getElementById(id);if(!e)return;let old=e.value;e.innerHTML=tasks.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}${t.time&&t.time!=='00:00'?' • '+esc(t.time):''}</option>`).join('');if(tasks.some(t=>t.id===old))e.value=old;});let depNames=new Map(tasks.map(t=>[t.id,t.name]));let depRows=[];Object.keys(deps).forEach(id=>(deps[id]||[]).forEach(pre=>{depRows.push(`<div class="advanced-item"><span>🔗 <b>${esc(depNames.get(id)||'Task')}</b> ← ${esc(depNames.get(pre)||'Task')}</span><button onclick="removeTaskDependency('${esc(id)}','${esc(pre)}')">✕</button></div>`);}));document.getElementById('dependencyList').innerHTML=depRows.join('')||'<p>No dependencies yet.</p>';let se=document.getElementById('savedTemplate'),oldTemplate=se?.value||'';if(se){se.innerHTML=templates.map(t=>`<option value="${esc(t.id)}">📦 ${esc(t.name)}</option>`).join('');if(templates.some(t=>t.id===oldTemplate))se.value=oldTemplate;}document.getElementById('templateList').innerHTML=templates.length?templates.map(t=>`<div class="advanced-item"><span>📦 <b>${esc(t.name)}</b> <small>${esc(t.task.name)} • ${esc(t.task.priority||'Medium')}</small></span><button onclick="deleteTaskTemplate('${esc(t.id)}')">✕</button></div>`).join(''):'<p>No templates yet.</p>';document.getElementById('dragTaskList').innerHTML=tasks.length?tasks.map(t=>`<div class="advanced-item drag-task" draggable="true" ondragstart="startTaskDrag(event,'${esc(t.id)}')"><span>↕️ <b>${esc(t.name)}</b> <small>${['🌅 Morning','☀️ Afternoon','🌆 Evening','🌙 Night'][t.page]||'Plan'} • ${esc(t.time||'')}</small></span></div>`).join(''):'<p>No tasks today.</p>';}
+function generateSmartSuggestions(){let a=advancedTasks().filter(t=>!t.completed).slice().sort((x,y)=>{let p={High:0,Medium:1,Low:2};let px=p[x.priority]??1,py=p[y.priority]??1;if(px!==py)return px-py;let xs=String(x.time||'99:99'),ys=String(y.time||'99:99');return xs.localeCompare(ys);}).slice(0,5);let d=advancedStore(),deps=d.advanced.dependencies||{};let suggestions=a.map(t=>{let blocked=(deps[t.id]||[]).some(id=>{let x=advancedTasks().find(q=>q.id===id);return x&&!x.completed;});let reason=blocked?'⛔ Finish its prerequisite first':t.priority==='High'?'🔥 High priority — good next choice':/study|homework|review/i.test(t.name)?'📚 Good study choice':'✨ Easy next action';return `<div class="suggestion"><b>${esc(t.name)}</b> <small>${reason}</small></div>`;}).join('');document.getElementById('smartSuggestions').innerHTML=suggestions||'<p>🎉 No unfinished tasks to suggest.</p>';}
+function addTaskDependency(){let task=document.getElementById('dependencyTask').value,pre=document.getElementById('dependencyPrerequisite').value;if(!task||!pre||task===pre){toast('⚠️ Choose two different tasks.');return;}let d=advancedStore();d.advanced.dependencies[task]??=[];if(!d.advanced.dependencies[task].includes(pre)){d.advanced.dependencies[task].push(pre);}saveAdvancedStore(d);renderAdvanced();toast('🧩 Dependency added!');}
+function removeTaskDependency(a,b){let d=advancedStore();d.advanced.dependencies[a]=(d.advanced.dependencies[a]||[]).filter(x=>x!==b);if(!d.advanced.dependencies[a].length)delete d.advanced.dependencies[a];saveAdvancedStore(d);renderAdvanced();}
+function clearTaskDependency(){let task=document.getElementById('dependencyTask').value;if(!task)return;let d=advancedStore();delete d.advanced.dependencies[task];saveAdvancedStore(d);renderAdvanced();toast('🗑️ Dependencies cleared.');}
+function saveTaskTemplate(){let taskId=document.getElementById('templateTask').value,name=document.getElementById('templateName').value.trim();if(!taskId||!name){toast('✏️ Choose a task and template name.');return;}let task=advancedTasks().find(t=>t.id===taskId);if(!task)return;let d=advancedStore();d.advanced.templates.push({id:uid(),name,task:clone(task)});saveAdvancedStore(d);document.getElementById('templateName').value='';renderAdvanced();toast('📦 Template saved!');}
+function useTaskTemplate(){let id=document.getElementById('savedTemplate').value,d=advancedStore(),t=d.advanced.templates.find(x=>x.id===id);if(!t){toast('📦 Choose a template first.');return;}let task={...clone(t.task),id:uid(),completed:false,page:0};data.tasks[selectedDate]??=[];data.tasks[selectedDate].push(task);save();renderAll();toast('➕ Template added as a new task!');}
+function deleteTaskTemplate(id){let d=advancedStore();d.advanced.templates=d.advanced.templates.filter(t=>t.id!==id);saveAdvancedStore(d);renderAdvanced();}
+function startTaskDrag(e,id){e.dataTransfer.setData('text/plain',id);e.dataTransfer.effectAllowed='move';}
+function allowTaskDrop(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
+function dropTaskToPage(e,page){e.preventDefault();let id=e.dataTransfer.getData('text/plain');let x=findTask(id);if(!x)return;saveUndoSnapshot();x.task.page=page;save();renderAll();toast('🔀 Task moved!');}
+function buildAutomaticSchedule(){let start=document.getElementById('autoStart').value,end=document.getElementById('autoEnd').value,gap=Number(document.getElementById('autoGap').value)||30;if(!start||!end){toast('⏰ Choose a start and end time.');return;}let startMin=Number(start.split(':')[0])*60+Number(start.split(':')[1]);let endMin=Number(end.split(':')[0])*60+Number(end.split(':')[1]);let tasks=advancedTasks().filter(t=>!t.completed&&(!t.time||t.time==='00:00'));let scheduled=0;tasks.forEach(t=>{if(startMin+gap>endMin)return;let h=Math.floor(startMin/60),m=startMin%60;t.time=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;startMin+=gap;scheduled++;});save();renderAll();document.getElementById('autoScheduleStatus').textContent=scheduled?`⚡ Scheduled ${scheduled} task(s).`:'No untimed tasks could be scheduled.';}
+/* NEW PRODUCTIVITY TOOLS */
+let undoSnapshot=null;
+function saveUndoSnapshot(){undoSnapshot=clone(data);let e=document.getElementById('undoStatus');if(e)e.textContent='↩️ Last change can be undone.';}
+function undoTaskChange(){if(!undoSnapshot){toast('↩️ Nothing to undo.');return;}data=clone(undoSnapshot);undoSnapshot=null;save();renderAll();document.getElementById('undoStatus').textContent='✅ Last change undone.';toast('↩️ Change undone!');}
+function quickAddTask(){let name=document.getElementById('quickTaskName').value.trim();if(!name){toast('✏️ Enter a task name.');return;}let page=Number(document.getElementById('quickTaskPlan').value);let t={id:uid(),page,name,time:document.getElementById('quickTaskTime').value||'00:00',priority:document.getElementById('quickTaskPriority').value||'Medium',repeat:'none',category:data.categories[0]||'Personal',completed:false,subtasks:[],reminder:false};ensureDate(selectedDate);data.tasks[selectedDate].push(t);document.getElementById('quickTaskName').value='';document.getElementById('quickTaskTime').value='';save();renderAll();toast('⚡ Quick task added!');}
+function isOverdueToday(t){if(selectedDate!==today())return false;if(t.completed)return false;if(!t.time||t.time==='00:00')return false;let now=new Date();let current=now.getHours()*60+now.getMinutes();let parts=t.time.split(':').map(Number);let taskTime=parts[0]*60+parts[1];return taskTime<current;}
+function renderTodayTools(){let tasks=allTasks(today());let overdue=tasks.filter(isOverdueToday);document.getElementById('overdueTasksList').innerHTML=overdue.length?overdue.map(t=>`<div class="list-item"><span style="flex:1"><b>⏰ ${esc(t.time)}</b> ${esc(t.name)} <small>${esc(t.priority)}</small></span></div>`).join(''):'<p>🎉 No overdue tasks!</p>';let unfinished=tasks.filter(t=>!t.completed);let select=document.getElementById('focusTaskSelect');select.innerHTML=unfinished.length?unfinished.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}${t.time&&t.time!=='00:00'?' • '+esc(t.time):''}</option>`).join(''):'<option value="">No unfinished tasks</option>';let c=counts(today());let percent=c.total?Math.round(c.done/c.total*100):0;document.getElementById('dailyProgressPercent').textContent=percent+'%';document.getElementById('dailyProgressRing').style.background=`conic-gradient(var(--accent) ${percent*3.6}deg,#ddd ${percent*3.6}deg)`;document.getElementById('summaryTotal').textContent=c.total;document.getElementById('summaryDone').textContent=c.done;document.getElementById('summaryRemaining').textContent=c.remaining;document.getElementById('summaryHigh').textContent=tasks.filter(t=>!t.completed&&t.priority==='High').length;document.getElementById('summaryOverdue').textContent=overdue.length;document.getElementById('summaryPercent').textContent=percent+'%';}
+function startTodayFocus(){let id=document.getElementById('focusTaskSelect').value;if(!id){document.getElementById('todayFocusBox').innerHTML='<span>🎉 No task selected.</span>';return;}let x=findTask(id);if(!x){document.getElementById('todayFocusBox').innerHTML='<span>Task not found.</span>';return;}document.getElementById('todayFocusBox').innerHTML=`<div><h3>🎯 ${esc(x.task.name)}</h3><p>⏰ ${esc(x.task.time||'No time')} • ${esc(x.task.priority||'Medium')}</p><button onclick="completeFocusedTask('${esc(x.task.id)}')">☑️ Mark Complete</button></div>`;}
+function completeFocusedTask(id){let x=findTask(id);if(!x)return;saveUndoSnapshot();x.task.completed=true;save();renderAll();document.getElementById('todayFocusBox').innerHTML='<span>🎉 Task completed! Great job!</span>';toast('🎯 Focus task completed!');}
+/* INITIALIZATION */
+function initializePlanner(){setTheme(data.settings.theme||'');setFontSize(data.settings.font||'');setCompact(!!data.settings.compact);toggleDarkMode(!!data.settings.dark);let theme=document.getElementById('themeSelect');if(theme)theme.value=data.settings.theme||'';let font=document.getElementById('fontSizeSelect');if(font)font.value=data.settings.font||'';let compact=document.getElementById('compactToggle');if(compact)compact.checked=!!data.settings.compact;let dark=document.getElementById('darkToggle');if(dark)dark.checked=!!data.settings.dark;let reminder=document.getElementById('reminderToggle');if(reminder)reminder.checked=!!data.settings.reminders;let lead=document.getElementById('leadTime');if(lead)lead.value=String(data.settings.lead||0);let qs=document.getElementById('quietStart');if(qs)qs.value=data.settings.quietStart||'22:00';let qe=document.getElementById('quietEnd');if(qe)qe.value=data.settings.quietEnd||'07:00';['focusSubject','homeworkSubject','planSubject'].forEach(id=>{let e=document.getElementById(id);if(e){e.innerHTML=subjects.map(s=>`<option>${esc(s)}</option>`).join('');}});document.querySelectorAll('[id^="taskCategory"]').forEach(e=>{e.innerHTML=data.categories.map(c=>`<option>${esc(c)}</option>`).join('');});document.querySelectorAll('[id^="dateInput"]').forEach(e=>{if(e.type==='date')e.value=selectedDate;});let planDate=document.getElementById('planDate');if(planDate)planDate.value=selectedDate;let weekInput=document.getElementById('weekDateInput');if(weekInput)weekInput.value=weekDate;loadNotes();renderAll();}
+initializePlanner();
+setInterval(()=>{renderTodayTools();},30000);
+</script>
+<script>
+(() => {
+'use strict';
+function installDailyExtras() {
+  if (document.getElementById('dp-extras')) return;
+  let planner;
+  try { planner = data; } catch (_) { /* Original script did not initialize. */ }
+  if (!planner || typeof renderAll !== 'function') {
+    const warning = document.createElement('p');
+    warning.textContent = 'Daily Planner additions could not start. Fix the three original JavaScript strings listed in INSTALL.md first.';
+    warning.style.cssText = 'background:#fff0f0;color:#8b1616;padding:20px;border-radius:12px';
+    document.body.prepend(warning);
+    return;
+  }
+  const $ = id => document.getElementById(id);
+  const extraState = () => {
+    data.dailyExtras ??= {};
+    const s = data.dailyExtras;
+    s.themes ??= [];
+    s.favorites ??= [];
+    return s;
+  };
+  extraState();
+  const style = document.createElement('style');
+  style.textContent = `
+    #dp-extras{min-height:0;scroll-margin-top:20px}
+    #dp-extras .dp-intro{text-align:center;opacity:.8}
+    .dp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .dp-card{padding:20px;border-radius:18px;background:rgba(255,255,255,.74);min-width:0}
+    .dp-card h3{margin-top:0;color:var(--accent)}
+    .dp-wide{grid-column:1/-1}
+    .dp-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+    .dp-row>input:not([type=checkbox]):not([type=color]),.dp-row>select{flex:1;min-width:130px}
+    .dp-row>label{flex:1;min-width:130px}
+    .dp-row label input,.dp-row label select{width:100%}
+    .dp-muted{font-size:.88em;opacity:.78}
+    .dp-quote{font-size:1.18em;line-height:1.6;margin:18px 0}
+    .dp-item{display:flex;align-items:center;gap:10px;background:rgba(127,127,127,.07);padding:12px;border-radius:12px;margin:8px 0}
+    .dp-item .dp-task-text{flex:1;min-width:0;overflow-wrap:anywhere}
+    .dp-item.dp-done .dp-name{text-decoration:line-through;opacity:.6}
+    .dp-item button{padding:8px;font-size:.85em}
+    .dp-item input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent);flex-shrink:0}
+    .dp-badge{padding:5px 9px;border-radius:20px;background:rgba(127,127,127,.1);font-size:.8em}
+    #dp-extras progress{width:100%;height:18px;accent-color:var(--accent)}
+    #dp-extras button:disabled,#dp-focus-dialog button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    #dp-extras button[aria-pressed=true]{outline:3px solid currentColor;outline-offset:2px}
+    #dp-theme-preview{padding:22px;border-radius:15px;text-align:center;color:#242032;margin:12px 0}
+    #dp-theme-preview span{display:inline-block;padding:10px 16px;border-radius:12px;font-weight:bold}
+    #dp-extras input[type=color]{height:45px;padding:4px;cursor:pointer}
+    .dark .dp-card{background:#302b48}
+    .dark #dp-theme-preview{color:#242032}
+    #dp-focus-dialog{border:0;border-radius:24px;padding:28px;width:min(540px,calc(100% - 24px));max-height:90vh;overflow:auto;background:#fff;color:#333;box-shadow:0 16px 70px #0005}
+    #dp-focus-dialog::backdrop{background:rgba(18,15,30,.86)}
+    .dark #dp-focus-dialog{background:#252239;color:#eee}
+    #dp-focus-dialog h2{overflow-wrap:anywhere}
+    #dp-focus-clock{font-size:clamp(48px,12vw,76px);font-variant-numeric:tabular-nums;font-weight:bold;color:var(--accent);text-align:center;margin:22px 0}
+    #dp-focus-dialog .dp-row button{flex:1}
+    .dp-shortcut{font-size:.85em;padding:10px 14px}
+    body.dp-custom-theme button{color:var(--dp-button-ink,#fff)}
+    body.dp-custom-theme .calendar .head,body.dp-custom-theme .pill{color:var(--dp-button-ink,#fff)}
+    #dp-extras :focus-visible,#dp-focus-dialog :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+    @media(max-width:650px){.dp-grid{grid-template-columns:1fr}.dp-card{padding:15px}.dp-item{flex-wrap:wrap}.dp-item .dp-task-text{min-width:55%}}
+    @media(prefers-reduced-motion:reduce){#dp-extras *,#dp-focus-dialog *{transition:none!important}}
+  `;
+  document.head.append(style);
+  const section = document.createElement('section');
+  section.id = 'dp-extras';
+  section.className = 'page';
+  section.innerHTML = `
+    <h2>✨ Your Daily Boost</h2>
+    <p class="dp-intro">A little motivation. One clear next step.</p>
+    <div class="dp-row"><label>Planner date <input id="dp-date" type="date"></label><button id="dp-today">Today</button></div>
+    <p class="dp-muted">The to-do list, motivation, challenge and focus sessions below use this selected planner date.</p>
+    <div class="dp-grid">
+      <article class="dp-card">
+        <h3>🌟 Daily Motivation</h3>
+        <span class="dp-badge">A new message each day</span>
+        <blockquote id="dp-quote" class="dp-quote"></blockquote>
+        <p id="dp-nudge" class="dp-muted"></p>
+        <button id="dp-favorite" aria-pressed="false">♡ Save message</button>
+        <details style="margin-top:16px"><summary>My saved motivation</summary><div id="dp-favorites"></div></details>
+      </article>
+      <article class="dp-card">
+        <h3>🎯 Daily Challenge</h3>
+        <span id="dp-challenge-badge" class="dp-badge"></span>
+        <h4 id="dp-challenge-title"></h4>
+        <p id="dp-challenge-description"></p>
+        <label for="dp-challenge-progress">Challenge progress</label>
+        <progress id="dp-challenge-progress" max="100" value="0"></progress>
+        <p id="dp-challenge-status" role="status"></p>
+        <p class="dp-muted">Progress updates automatically from your tasks and completed focus sessions. No manual check-off needed.</p>
+      </article>
+      <article class="dp-card dp-wide">
+        <h3>📋 To-Do List</h3>
+        <p class="dp-muted">One combined view of your Morning, Afternoon, Evening and Night tasks — not a separate list.</p>
+        <form id="dp-todo-form">
+          <div class="dp-row">
+            <input id="dp-task-name" aria-label="Task name" placeholder="What would you like to do?" maxlength="300" required>
+            <select id="dp-task-plan" aria-label="Time of day"><option value="0">🌅 Morning</option><option value="1">☀️ Afternoon</option><option value="2">🌆 Evening</option><option value="3">🌙 Night</option></select>
+            <select id="dp-task-priority" aria-label="Priority"><option>High</option><option selected>Medium</option><option>Low</option></select>
+            <button type="submit">＋ Add task</button>
+          </div>
+        </form>
+        <div class="dp-row">
+          <input id="dp-task-search" type="search" aria-label="Search this to-do list" placeholder="Search this day's tasks…">
+          <select id="dp-task-filter" aria-label="Filter tasks"><option value="all">All tasks</option><option value="open">Remaining</option><option value="done">Completed</option></select>
+          <span id="dp-todo-count" class="dp-badge"></span>
+        </div>
+        <div id="dp-todo-list"></div>
+      </article>
+      <article class="dp-card">
+        <h3>🧠 Focus Mode</h3>
+        <p>Hide distractions and give one task your attention.</p>
+        <label for="dp-focus-task">Choose an unfinished task</label>
+        <select id="dp-focus-task" style="width:100%;margin:8px 0"></select>
+        <div class="dp-row">
+          <label>Minutes <input id="dp-focus-duration" type="number" min="1" max="180" step="1" value="25"></label>
+          <label>Log under <select id="dp-focus-subject"></select></label>
+        </div>
+        <button id="dp-focus-open" style="width:100%">Enter Focus Mode</button>
+        <p class="dp-muted">Pause, resume or reset your timer. A finished timer logs one study session; completing the task is a separate action. Keep this tab open.</p>
+      </article>
+      <article class="dp-card">
+        <h3>🎨 Custom Themes</h3>
+        <p>Your colors, your planner. Existing preset themes still work.</p>
+        <label for="dp-theme-name">Theme name</label>
+        <input id="dp-theme-name" placeholder="My peaceful theme" maxlength="40" style="width:100%;margin:8px 0">
+        <div class="dp-row">
+          <label>Accent <input id="dp-color-accent" type="color" value="#8e44ad"></label>
+          <label>Background 1 <input id="dp-color-bg1" type="color" value="#ffd6f6"></label>
+          <label>Background 2 <input id="dp-color-bg2" type="color" value="#d9c2ff"></label>
+        </div>
+        <div id="dp-theme-preview"><span>Your daily planner</span></div>
+        <button id="dp-theme-save">Save & apply theme</button>
+        <div class="dp-row"><select id="dp-theme-saved" aria-label="Saved custom themes"></select><button id="dp-theme-apply">Apply</button><button id="dp-theme-delete">Delete</button></div>
+        <button id="dp-theme-reset">Use default purple</button>
+        <p id="dp-theme-status" class="dp-muted" role="status"></p>
+        <p class="dp-muted">Dark mode stays independent: turn it off to see your background gradient. Themes and favorites are included in your existing planner export.</p>
+      </article>
+    </div>`;
+  $('app').insertBefore(section, $('pages'));
+  const dialog = document.createElement('dialog');
+  dialog.id = 'dp-focus-dialog';
+  dialog.setAttribute('aria-labelledby', 'dp-focus-title');
+  dialog.innerHTML = `
+    <div class="dp-row"><span class="dp-badge">🧠 One task at a time</span><button id="dp-focus-exit" style="margin-left:auto">Exit focus ✕</button></div>
+    <h2 id="dp-focus-title"></h2><p id="dp-focus-meta" class="dp-muted"></p>
+    <div id="dp-focus-clock" role="timer" aria-label="Time remaining">25:00</div>
+    <p id="dp-focus-status" role="status" style="text-align:center"></p>
+    <div class="dp-row"><button id="dp-focus-toggle">Start</button><button id="dp-focus-reset">Reset timer</button></div>
+    <button id="dp-focus-complete" style="width:100%;margin-top:10px">✓ Mark task complete</button>
+    <p class="dp-muted">Escape exits focus. Leaving early does not log an unfinished session.</p>`;
+  document.body.append(dialog);
+  function jumpToExtras() {
+    // Temporarily leave the existing Hub's Zen Mode so this section is visible.
+    if (document.body.classList.contains('zen-mode')) toggleZenMode();
+    $('welcome').classList.add('hidden');
+    $('app').classList.remove('hidden');
+    section.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  function shortcut(parent, text) {
+    if (!parent) return;
+    const b = document.createElement('button');
+    b.className = 'dp-shortcut';
+    b.textContent = text;
+    b.addEventListener('click', jumpToExtras);
+    parent.append(b);
+  }
+  shortcut(document.querySelector('#app > .topbar'), '✨ Daily Boost');
+  shortcut($('page9'), '🎨 Open custom themes & daily tools');
+  const quotes = [
+    'Small steps every day become big results. 🌱',
+    'You do not have to finish everything to make meaningful progress. 💜',
+    'Start with five minutes. Let the next step come after that. ✨',
+    'One task at a time. Your attention is enough for this moment. 🧠',
+    'Rest belongs in your plan, too. A pause is not a failure. 🌿',
+    'Make today a little easier for your future self. 📚',
+    'Progress can be quiet. Show up, try, and keep learning. 🌟',
+    'A small completed task is better than a perfect unwritten plan. ✅',
+    'You can begin again at any point in your day. 🌅',
+    'Choose what matters, then give it a little space. 🎯',
+    'Your pace does not have to look like anyone else’s. 💛',
+    'Be proud of the effort, not only the outcome. 🌸',
+    'The next small step counts, even on a difficult day. 🌱',
+    'Put one distraction aside and make room for one good thing. ✨'
+  ];
+  function dayNumber(date) {
+    const [y,m,d] = date.split('-').map(Number);
+    return Math.floor(Date.UTC(y,m-1,d)/86400000);
+  }
+  function quoteForDate() { return quotes[((dayNumber(selectedDate)%quotes.length)+quotes.length)%quotes.length]; }
+  function renderMotivation(tasks) {
+    const q = quoteForDate();
+    $('dp-quote').textContent = '“' + q + '”';
+    const remaining = tasks.filter(t => !t.completed).length;
+    $('dp-nudge').textContent = !tasks.length ? 'Begin by adding one small task below.' : remaining ? `${remaining} task${remaining===1?'':'s'} left. Pick just one to start.` : 'Your list is complete. Make a little time to recharge.';
+    const liked = extraState().favorites.includes(q);
+    $('dp-favorite').textContent = liked ? '♥ Message saved' : '♡ Save message';
+    $('dp-favorite').setAttribute('aria-pressed', String(liked));
+    $('dp-favorites').replaceChildren();
+    if (!extraState().favorites.length) $('dp-favorites').textContent = 'Your saved messages will appear here.';
+    extraState().favorites.forEach(text => {
+      const row = document.createElement('div'); row.className = 'dp-item';
+      const span = document.createElement('span'); span.className = 'dp-task-text'; span.textContent = text;
+      const b = document.createElement('button'); b.textContent = 'Remove';
+      b.addEventListener('click', () => { extraState().favorites = extraState().favorites.filter(q => q !== text); save(); renderExtras(); });
+      row.append(span,b); $('dp-favorites').append(row);
+    });
+  }
+  function renderChallenge(tasks) {
+    const definitions = [
+      {title:'Build a little momentum', description:'Complete 3 tasks on this planner date.', target:3, unit:'tasks', value:tasks.filter(t=>t.completed).length},
+      {title:'Make room for focus', description:'Log 10 study minutes on this planner date using either focus timer.', target:10, unit:'minutes', value:studyMinutes(selectedDate)},
+      {title:'Make your priorities count', description:'Complete 2 high-priority tasks on this planner date.', target:2, unit:'high-priority tasks', value:tasks.filter(t=>t.completed&&t.priority==='High').length}
+    ];
+    const c = definitions[((dayNumber(selectedDate)%3)+3)%3];
+    const done = c.value >= c.target;
+    $('dp-challenge-title').textContent = c.title;
+    $('dp-challenge-description').textContent = c.description;
+    $('dp-challenge-badge').textContent = done ? '🏆 Challenge complete' : '🎯 Challenge for ' + selectedDate;
+    $('dp-challenge-progress').value = Math.min(100,c.value/c.target*100);
+    $('dp-challenge-status').textContent = `${Math.min(c.value,c.target)} / ${c.target} ${c.unit}` + (done ? ' — Nicely done! 🎉' : ' — Every step counts.');
+  }
+  const planNames = ['Morning','Afternoon','Evening','Night'];
+  function renderTodos(tasks) {
+    const query = $('dp-task-search').value.trim().toLowerCase();
+    const f = $('dp-task-filter').value;
+    const done = tasks.filter(t=>t.completed).length;
+    $('dp-todo-count').textContent = `${done}/${tasks.length} complete`;
+    const visible = tasks.filter(t => String(t.name).toLowerCase().includes(query) && (f==='all'||(f==='done'?t.completed:!t.completed)));
+    visible.sort((a,b)=>Number(a.completed)-Number(b.completed) || ({High:0,Medium:1,Low:2}[a.priority]??1)-({High:0,Medium:1,Low:2}[b.priority]??1));
+    const list = $('dp-todo-list'); list.replaceChildren();
+    if (!visible.length) { const p=document.createElement('p'); p.textContent=tasks.length?'No tasks match this filter.':'Your list is clear. Add your first task above!'; list.append(p); }
+    visible.forEach(t => {
+      const row=document.createElement('div'); row.className='dp-item'+(t.completed?' dp-done':'');
+      const check=document.createElement('input'); check.type='checkbox'; check.checked=!!t.completed; check.setAttribute('aria-label','Complete '+t.name);
+      check.addEventListener('change',()=>toggleTask(t.id));
+      const text=document.createElement('div'); text.className='dp-task-text';
+      const name=document.createElement('div'); name.className='dp-name'; name.textContent=t.name;
+      const meta=document.createElement('small'); meta.className='dp-muted'; meta.textContent=`${planNames[t.page]||'Plan'} • ${t.priority||'Medium'}${t.time&&t.time!=='00:00'?' • '+t.time:''}`;
+      text.append(name,meta);
+      row.append(check,text);
+      const action=(label,handler)=>{ const b=document.createElement('button'); b.textContent=label; b.addEventListener('click',handler); row.append(b); };
+      if (!t.completed) action('🧠 Focus',()=>openFocus(t.id));
+      action('Open',()=>showPage(t.page));
+      list.append(row);
+    });
+  }
+  function renderFocusChoices(tasks) {
+    const e=$('dp-focus-task'), previous=e.value;
+    e.replaceChildren();
+    tasks.filter(t=>!t.completed).forEach(t=>e.add(new Option(t.name,t.id)));
+    if (!e.options.length) e.add(new Option('No unfinished tasks',''));
+    if ([...e.options].some(o=>o.value===previous)) e.value=previous;
+    $('dp-focus-open').disabled=!e.value;
+  }
+  function renderExtras() {
+    const tasks=data.tasks[selectedDate]||[];
+    $('dp-date').value=selectedDate;
+    renderTodos(tasks); renderMotivation(tasks); renderChallenge(tasks); renderFocusChoices(tasks);
+    renderSavedThemes();
+  }
+  $('dp-date').addEventListener('change',e=>{if(e.target.value) changeDate(e.target.value);});
+  $('dp-today').addEventListener('click',()=>changeDate(today()));
+  $('dp-todo-form').addEventListener('submit',e=>{
+    e.preventDefault();
+    const name=$('dp-task-name').value.trim(); if(!name) return;
+    ensureDate(selectedDate); saveUndoSnapshot();
+    data.tasks[selectedDate].push({id:uid(),page:Number($('dp-task-plan').value),name,time:'00:00',priority:$('dp-task-priority').value,repeat:'none',category:data.categories[0]||'Personal',completed:false,subtasks:[],reminder:false});
+    $('dp-task-name').value=''; save(); renderAll(); $('dp-task-name').focus(); toast('✅ Task added to your planner!');
+  });
+  $('dp-task-search').addEventListener('input',()=>renderTodos(data.tasks[selectedDate]||[]));
+  $('dp-task-filter').addEventListener('change',()=>renderTodos(data.tasks[selectedDate]||[]));
+  $('dp-favorite').addEventListener('click',()=>{
+    const s=extraState(),q=quoteForDate();
+    s.favorites=s.favorites.includes(q)?s.favorites.filter(x=>x!==q):[...s.favorites,q];
+    save(); renderMotivation(data.tasks[selectedDate]||[]);
+  });
 
+  // Distraction-free timer. A deadline avoids interval drift in background tabs.
+  // The task, date, duration and subject are captured at the start of the session.
+  let focus=null, tick=null, returnFocus=null;
+  subjects.forEach(s=>$('dp-focus-subject').add(new Option(s,s)));
+  $('dp-focus-subject').value='Other';
+  function openFocus(id) {
+    const x=findTask(id);
+    if(!x||x.task.completed) { toast('Choose an unfinished task first.'); return; }
+    const minutes=Number($('dp-focus-duration').value);
+    if(!Number.isInteger(minutes)||minutes<1||minutes>180) { toast('Choose a whole number from 1 to 180 minutes.'); $('dp-focus-duration').focus(); return; }
+    if (typeof dialog.showModal!=='function') {toast('Focus mode needs a modern browser with dialog support.');return;}
+    returnFocus=document.activeElement;
+    focus={id,date:x.date,subject:$('dp-focus-subject').value||'Other',minutes,remaining:minutes*60000,deadline:0,running:false,logged:false};
+    $('dp-focus-title').textContent=x.task.name;
+    $('dp-focus-meta').textContent=`${x.date} • ${x.task.priority||'Medium'} priority • ${focus.subject}`;
+    $('dp-focus-complete').disabled=false;
+    paintClock(); dialog.showModal(); $('dp-focus-toggle').focus();
+  }
+  function paintClock() {
+    if(!focus)return;
+    const sec=Math.max(0,Math.ceil(focus.remaining/1000));
+    $('dp-focus-clock').textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+    $('dp-focus-toggle').textContent=focus.running?'Pause':focus.remaining===focus.minutes*60000?'Start':'Resume';
+    $('dp-focus-toggle').disabled=focus.logged;
+    $('dp-focus-status').textContent=focus.logged?'🎉 Session saved. Take a breath!':focus.running?'Just this task. Everything else can wait.':'Ready when you are.';
+  }
+  function updateClock() {
+    if(!focus?.running)return;
+    focus.remaining=Math.max(0,focus.deadline-Date.now());
+    if(focus.remaining===0) {
+      clearInterval(tick); tick=null; focus.running=false;
+      if(!focus.logged) {
+        focus.logged=true;
+        data.studyLogs[focus.date]??=[];
+        data.studyLogs[focus.date].push({id:uid(),subject:focus.subject,minutes:focus.minutes,taskId:focus.id,source:'daily-extras-focus'});
+        save(); renderAll(); toast('🎉 Focus session completed and logged!');
+      }
+    }
+    paintClock();
+  }
+  function pauseFocus() {
+    updateClock();
+    clearInterval(tick); tick=null;
+    if(focus)focus.running=false;
+    paintClock();
+  }
+  function closeFocus() {
+    pauseFocus();
+    if(focus&&!focus.logged&&focus.remaining<focus.minutes*60000 && !confirm('Exit focus? This unfinished timer will not be logged.')) return;
+    dialog.close(); focus=null; returnFocus?.focus();
+  }
+  $('dp-focus-open').addEventListener('click',()=>openFocus($('dp-focus-task').value));
+  $('dp-focus-toggle').addEventListener('click',()=>{
+    if(!focus||focus.logged)return;
+    if(focus.running){pauseFocus();return;}
+    if(running) { pauseTimer(); toast('Your Study Focus Center timer was paused.'); }
+    focus.deadline=Date.now()+focus.remaining; focus.running=true;
+    tick=setInterval(updateClock,250); paintClock();
+  });
+  $('dp-focus-reset').addEventListener('click',()=>{
+    if(!focus)return;
+    pauseFocus();
+    if(focus.remaining<focus.minutes*60000&&!focus.logged&&!confirm('Reset this unfinished timer?'))return;
+    focus.remaining=focus.minutes*60000; focus.logged=false; paintClock();
+  });
+  $('dp-focus-exit').addEventListener('click',closeFocus);
+  dialog.addEventListener('cancel',e=>{e.preventDefault();closeFocus();});
+  $('dp-focus-complete').addEventListener('click',()=>{
+    pauseFocus();
+    if(!focus)return;
+    const x=findTask(focus.id);
+    if(!x){toast('This task no longer exists.');return;}
+    if(!focus.logged&&focus.remaining<focus.minutes*60000&&!confirm('Complete the task and exit? Your unfinished timer will not be logged.'))return;
+    if(!x.task.completed){saveUndoSnapshot();x.task.completed=true;save();renderAll();}
+    dialog.close(); focus=null; returnFocus?.focus(); toast('✅ Focus task completed!');
+  });
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateClock();});
+  window.addEventListener('beforeunload',e=>{if(focus&&!focus.logged&&focus.remaining<focus.minutes*60000){e.preventDefault();e.returnValue='';}});
+
+  // Custom themes reuse the planner's CSS variables. Standard theme buttons
+  // remove the custom override, while dark, compact and font settings survive.
+  const originalSetTheme=setTheme;
+  const validColor=x=>/^#[0-9a-f]{6}$/i.test(x);
+  function buttonInk(hex) {
+    const rgb=hex.slice(1).match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
+    const luminance=.2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];
+    return luminance>.179?'#171525':'#ffffff';
+  }
+  function clearCustomCSS() {
+    ['--accent','--bg1','--bg2','--dp-button-ink'].forEach(p=>document.body.style.removeProperty(p));
+    document.body.classList.remove('dp-custom-theme');
+  }
+  function paintTheme(t) {
+    if(!t||![t.accent,t.bg1,t.bg2].every(validColor)){clearCustomCSS();return;}
+    document.body.style.setProperty('--accent',t.accent);
+    document.body.style.setProperty('--bg1',t.bg1);
+    document.body.style.setProperty('--bg2',t.bg2);
+    document.body.style.setProperty('--dp-button-ink',buttonInk(t.accent));
+    document.body.classList.add('dp-custom-theme');
+  }
+  setTheme=function(value) {
+    extraState().activeTheme=null; clearCustomCSS(); originalSetTheme(value); renderSavedThemes();
+  };
+  function themeDraft() {return {name:$('dp-theme-name').value.trim(),accent:$('dp-color-accent').value,bg1:$('dp-color-bg1').value,bg2:$('dp-color-bg2').value};}
+  function previewTheme() {
+    const t=themeDraft();
+    $('dp-theme-preview').style.background=`linear-gradient(135deg,${t.bg1},${t.bg2})`;
+    const chip=$('dp-theme-preview').firstElementChild;
+    chip.style.background=t.accent; chip.style.color=buttonInk(t.accent);
+  }
+  function applyCustomTheme(id) {
+    const t=extraState().themes.find(t=>t.id===id); if(!t)return;
+    originalSetTheme(''); extraState().activeTheme=id; paintTheme(t); save(); renderSavedThemes();
+  }
+  function renderSavedThemes() {
+    const s=extraState(), e=$('dp-theme-saved'); if(!e)return;
+    const old=e.value; e.replaceChildren();
+    s.themes.forEach(t=>e.add(new Option(t.name,t.id)));
+    if(!e.options.length)e.add(new Option('No custom themes saved',''));
+    if(s.themes.some(t=>t.id===old))e.value=old;
+    else if(s.activeTheme)e.value=s.activeTheme;
+    $('dp-theme-apply').disabled=!s.themes.length;
+    $('dp-theme-delete').disabled=!s.themes.length;
+    const active=s.themes.find(t=>t.id===s.activeTheme);
+    $('dp-theme-status').textContent=active?'Active custom theme: '+active.name:'Using your standard planner theme.';
+  }
+  ['dp-color-accent','dp-color-bg1','dp-color-bg2'].forEach(id=>$(id).addEventListener('input',previewTheme));
+  $('dp-theme-save').addEventListener('click',()=>{
+    const t=themeDraft();
+    if(!t.name){toast('Give your theme a name first.');$('dp-theme-name').focus();return;}
+    const s=extraState(),existing=s.themes.find(x=>x.name.toLowerCase()===t.name.toLowerCase());
+    if(existing){if(!confirm('Replace the saved theme with this name?'))return;Object.assign(existing,t);t.id=existing.id;}
+    else{t.id=uid();s.themes.push(t);}
+    applyCustomTheme(t.id);$('dp-theme-saved').value=t.id;toast('🎨 Theme saved and applied!');
+  });
+  $('dp-theme-apply').addEventListener('click',()=>applyCustomTheme($('dp-theme-saved').value));
+  $('dp-theme-delete').addEventListener('click',()=>{
+    const s=extraState(),id=$('dp-theme-saved').value;
+    if(!id||!confirm('Delete this saved theme?'))return;
+    s.themes=s.themes.filter(t=>t.id!==id);
+    if(s.activeTheme===id)setTheme('');
+    save();renderSavedThemes();
+  });
+  $('dp-theme-reset').addEventListener('click',()=>setTheme(''));
+  $('dp-theme-saved').addEventListener('change',()=>{
+    const t=extraState().themes.find(t=>t.id===$('dp-theme-saved').value);if(!t)return;
+    $('dp-theme-name').value=t.name;$('dp-color-accent').value=t.accent;$('dp-color-bg1').value=t.bg1;$('dp-color-bg2').value=t.bg2;previewTheme();
+  });
+  // Refresh the additions whenever the original planner performs a full render.
+  const originalRenderAll=renderAll;
+  renderAll=function(...args){const result=originalRenderAll.apply(this,args);renderExtras();return result;};
+  // Its original study timer only refreshes renderFocus(), so also hook completion.
+  const originalStudyComplete=completeStudySession;
+  completeStudySession=function(...args){const result=originalStudyComplete.apply(this,args);renderAll();return result;};
+  paintTheme(extraState().themes.find(t=>t.id===extraState().activeTheme));
+  previewTheme(); renderExtras();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installDailyExtras,{once:true});
+else installDailyExtras();
+})();
+</script>
+<script>
+/* Layout only: move the existing elements. No tasks, settings or feature data are replaced. */
+(() => {
+  function organizePlanner() {
+    const $ = id => document.getElementById(id);
+    const app = $('app');
+    if (!app || app.classList.contains('single-page') || !$('dp-extras')) return;
+    const originalElements = new Set(app.querySelectorAll('[id]'));
+    app.classList.add('single-page');
+    document.documentElement.classList.add('single-page-planner');
+    const style = document.createElement('style');
+    style.textContent = `
+      html.single-page-planner{scroll-snap-type:none}
+      .single-page>.topbar{flex-wrap:wrap}
+      .planner-jumps{position:sticky;top:10px;z-index:30;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px;margin:14px 0 22px;border-radius:18px;background:rgba(255,255,255,.94);box-shadow:0 5px 20px #0001}
+      .planner-jumps a{display:flex;align-items:center;justify-content:center;text-align:center;gap:5px;background:var(--accent);color:#fff;border-radius:12px;padding:11px 8px;text-decoration:none;font-size:14px;font-weight:bold}
+      .planner-jumps a:hover{filter:brightness(1.08)}
+      .planner-jumps a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+      body.dp-custom-theme .planner-jumps a{color:var(--dp-button-ink,#fff)}
+      .dark .planner-jumps{background:#252239}
+      .single-page .page{min-height:0;scroll-snap-align:none;scroll-margin-top:100px;max-width:100%}
+      .single-page .day-plan{padding:24px;margin:22px 0 30px;border-top:4px solid var(--accent)}
+      .single-page .day-plan>.plan-title{font-size:30px;margin:4px 0 10px;text-align:left}
+      .plan-caption{margin:0 0 22px;line-height:1.6;opacity:.78}
+      .plan-task-board{padding:18px;border-radius:18px;background:rgba(127,127,127,.045)}
+      .plan-date-label{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:12px}
+      .plan-task-board>.nav{display:none}
+      .feature-group{margin-top:28px;padding-top:20px;border-top:1px solid rgba(127,127,127,.18);scroll-margin-top:100px}
+      .feature-group>h3{font-size:21px;color:var(--accent);margin:0 0 14px}
+      .feature-description{opacity:.78;line-height:1.6;margin:-3px 0 16px}
+      .feature-group>.page{margin:12px 0}
+      .feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+      .feature-grid>*{min-width:0;margin:0!important}
+      .feature-grid>.page{width:100%;padding:18px}
+      .feature-grid+.page,.page+.feature-grid{margin-top:14px}
+      .feature-grid .hub-card{height:100%}
+      #dp-extras .dp-intro{display:none}
+      #dp-extras .dp-grid{align-items:start}
+      .single-page .dp-card progress{width:100%;height:18px;accent-color:var(--accent)}
+      .single-page .dp-card button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+      .single-page .dp-card button[aria-pressed=true]{outline:3px solid currentColor;outline-offset:2px}
+      .single-page .dp-card input[type=color]{height:45px;padding:4px;cursor:pointer}
+      .single-page .dp-card :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+      .single-page #page9>.dp-card{margin-top:24px;scroll-margin-top:100px}
+      .single-page #page14>.dp-card{margin-top:16px}
+      .single-page #page6>.nav,.single-page #page11>.nav{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:12px 0}
+      .single-page #page19 .hub-grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+      .single-page #page21 .productivity-tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .single-page #page21 .dp-wide{grid-column:1/-1}
+      .single-page [data-original-hub]{transition:.2s}
+      .single-page:has(#page19.hub-compact) [data-original-hub]{padding:10px}
+      .single-page:has(#page19.hub-spacious) [data-original-hub]{padding:22px}
+      .planner-zen-return{display:none;margin:12px 0;padding:15px;border-radius:16px;background:rgba(255,255,255,.8);align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+      .dark .planner-zen-return{background:#302b48}
+      .zen-mode .planner-zen-return{display:flex}
+      .zen-mode .single-page #page2{display:block!important}
+      .zen-mode .single-page #page2>.plan-task-board,.zen-mode .single-page #page2>.plan-caption,.zen-mode .single-page #page2>.plan-title{display:none}
+      .zen-mode .single-page #page2>.feature-group:not(#evening-organization){display:none}
+      .zen-mode .single-page #evening-organization{margin-top:0;padding-top:0;border:0}
+      .zen-mode .single-page #evening-organization>:not(#page19){display:none}
+      .zen-mode .single-page #page19{display:block!important}
+      @media(max-width:800px){.feature-grid{grid-template-columns:1fr}.single-page #page21 .productivity-tools-grid{grid-template-columns:1fr}}
+      @media(max-width:650px){.single-page .day-plan{padding:15px}.single-page .day-plan>.plan-title{font-size:25px}.plan-task-board{padding:12px}.planner-jumps{gap:6px;padding:7px;top:5px}.planner-jumps a{font-size:12px;padding:10px 5px}.feature-grid>.page{padding:15px}.feature-group>h3{font-size:19px}.task{flex-wrap:wrap}.task-main{min-width:0}.task-actions{flex-basis:100%}.subtask-add input{min-width:0}.form-grid>input,.form-grid>select{min-width:0;width:100%}.single-page .page{scroll-margin-top:95px}}
+      @media(max-width:420px){.planner-jumps{grid-template-columns:repeat(2,minmax(0,1fr))}.single-page .page,.feature-group{scroll-margin-top:130px}.single-page .calendar{gap:3px}.single-page .calendar div{padding:3px;overflow-wrap:anywhere}.single-page #page19 .hub-grid,.single-page #page20 .advanced-grid{grid-template-columns:minmax(0,1fr)}}
+    `;
+    document.head.append(style);
+    function group(plan, id, title, description) {
+      const section = document.createElement('section');
+      section.className = 'feature-group'; section.id = id;
+      const heading = document.createElement('h3'); heading.textContent = title;
+      heading.id = id + '-title'; section.setAttribute('aria-labelledby', heading.id);
+      section.append(heading);
+      if (description) { const p = document.createElement('p'); p.className = 'feature-description'; p.textContent = description; section.append(p); }
+      plan.append(section); return section;
+    }
+    function grid(parent, ...children) {
+      const row = document.createElement('div'); row.className = 'feature-grid';
+      row.append(...children.filter(Boolean)); parent.append(row); return row;
+    }
+    const plans = [0,1,2,3].map(n => $('page' + n));
+    const captions = [
+      'Set your intentions, find a positive thought, and organize the day ahead.',
+      'Keep your study planning, homework, flashcards, timers and focus tools together.',
+      'Review your progress and organize your schedule, recurring tasks and upcoming plans.',
+      'Reflect on your day, write your notes, and personalize your planner.'
+    ];
+    plans.forEach((plan,n) => {
+      plan.classList.add('day-plan');
+      const heading = plan.querySelector('h2'); heading.classList.add('plan-title'); heading.id = 'plan-title-' + n;
+      plan.setAttribute('aria-labelledby', heading.id);
+      const board = document.createElement('div'); board.className = 'plan-task-board';
+      [...plan.children].filter(node => node !== heading).forEach(node => board.append(node));
+      const caption = document.createElement('p'); caption.className = 'plan-caption'; caption.textContent = captions[n];
+      plan.append(caption, board);
+      const date = $('dateInput' + n), label = document.createElement('label');
+      label.className = 'plan-date-label'; label.textContent = 'Plan date'; date.before(label); label.append(date);
+    });
+    const hubCards = [...$('page19').querySelectorAll('.hub-card')];
+    hubCards.forEach(card => card.setAttribute('data-original-hub', ''));
+    const hubDesign = hubCards.find(card => card.querySelector('#zenStatus'));
+    const hubFlashcards = hubCards.find(card => card.querySelector('#flashcardBox'));
+    const hubStudy = hubCards.find(card => card.querySelector('#hubStudyMinutes'));
+    const existingTaskFocus = $('focusTaskSelect').closest('.tool-card');
+    const extraFocus = $('dp-focus-task').closest('.dp-card');
+    const extraThemes = $('dp-theme-name').closest('.dp-card'); extraThemes.id = 'custom-themes-card';
+    const extraTodo = $('dp-todo-form').closest('.dp-card');
+    const extraChallenge = $('dp-challenge-title').closest('.dp-card');
+    const mood = $('moodStatus').closest('.hub-card');
+    const reportNotes = $('dailyNotes').closest('.note-box');
+    const morning = plans[0], afternoon = plans[1], evening = plans[2], night = plans[3];
+    const mindset = group(morning, 'morning-mindset', '🌟 Motivation, Inspiration & Mindset', 'Daily Motivation · Daily Inspiration · Mindset Boost · Positive Thought · Thought of the Day');
+    // Both existing quote displays are preserved together; no quote data is replaced.
+    mindset.append($('dp-extras'));
+    $('dp-extras').querySelector('h2').textContent = '🌟 Daily Motivation & Inspiration';
+    const thought = document.createElement('article'); thought.className = 'dp-card';
+    const thoughtTitle = document.createElement('h3'); thoughtTitle.textContent = '💭 Thought of the Day';
+    const thoughtDescription = document.createElement('p'); thoughtDescription.className = 'dp-muted'; thoughtDescription.textContent = 'A positive thought for inspiration and a daily mindset boost.';
+    thought.append(thoughtTitle, $('dailyQuote'), thoughtDescription);
+    $('dp-extras').querySelector('.dp-grid').append(thought);
+    const dailyOrganization = group(morning, 'morning-organization', '🗂️ Daily Organization');
+    dailyOrganization.append($('page14'), $('page10'), $('page21'));
+    $('page14').append(extraChallenge);
+    $('page21').querySelector('.productivity-tools-grid').prepend(extraTodo);
+    const learning = group(afternoon, 'afternoon-study', '📚 Study & Learning');
+    grid(learning, $('page7'), $('page8'));
+    grid(learning, hubFlashcards, hubStudy);
+    const focus = group(afternoon, 'afternoon-focus', '⏱️ Timers & Focus Mode', 'Your study timer, task focus modes, ambient sounds and study-session records, in one place.');
+    focus.append($('page5')); grid(focus, extraFocus, existingTaskFocus);
+    const organization = group(evening, 'evening-organization', '⏰ Planning & Organization');
+    organization.append($('page19'), $('page20'));
+    grid(organization, $('page12'), $('page13'));
+    organization.append($('page16'));
+    const reports = group(evening, 'evening-reports', '📊 Progress, Reports & Calendars');
+    reports.append($('page4'), $('page18'), $('page6'), $('page11'), $('page17'));
+    const reflection = group(night, 'night-reflection', '📝 Reflection & Notes');
+    reflection.append($('page15'), mood); $('page15').append(reportNotes);
+    const preferences = group(night, 'night-settings', '🎨 Appearance & Settings');
+    preferences.append($('page9'), hubDesign); $('page9').append(extraThemes);
+    // Keep the original settings shortcut useful after the custom-theme card moves.
+    const themeShortcut = $('page9').querySelector('.dp-shortcut');
+    if (themeShortcut) {
+      themeShortcut.textContent = '🎨 Jump to Custom Themes';
+      themeShortcut.addEventListener('click', event => {
+        event.preventDefault(); event.stopImmediatePropagation();
+        if (document.body.classList.contains('zen-mode')) toggleZenMode();
+        extraThemes.scrollIntoView({behavior:'smooth',block:'start'});
+      }, true);
+    }
+    const jumps = document.createElement('nav'); jumps.className = 'planner-jumps'; jumps.setAttribute('aria-label', 'Jump to a plan on this page');
+    ['🌅 Morning Plan','☀️ Afternoon Plan','🌆 Evening Plan','🌙 Night Plan'].forEach((title,n) => {
+      const link = document.createElement('a'); link.href = '#page' + n; link.textContent = title;
+      link.addEventListener('click', event => { event.preventDefault(); showPage(n); }); jumps.append(link);
+    });
+    $('pages').before(jumps);
+    const zenReturn = document.createElement('div'); zenReturn.className = 'planner-zen-return';
+    const zenText = document.createElement('span'); zenText.textContent = '🧘 Zen Mode — your Productivity Hub is in focus.';
+    const exitZen = document.createElement('button'); exitZen.textContent = 'Exit Zen Mode'; exitZen.addEventListener('click', () => toggleZenMode());
+    zenReturn.append(zenText, exitZen); jumps.after(zenReturn);
+    // All four task-date inputs refer to the same planner date on the main page.
+    const originalSyncDates = syncDates;
+    syncDates = function(...args) { const result = originalSyncDates.apply(this,args); plans.forEach((_,n) => $('dateInput'+n).value = selectedDate); return result; };
+    const originalShowPage = showPage;
+    showPage = function(n) { if (n !== 19 && document.body.classList.contains('zen-mode')) toggleZenMode(); return originalShowPage(n); };
+    const zenPlaces = new Map();
+    function arrangeZenCards() {
+      if (document.body.classList.contains('zen-mode')) {
+        const hubGrid = $('page19').querySelector('.hub-grid');
+        hubCards.forEach(card => {
+          if (!hubGrid.contains(card) && !zenPlaces.has(card)) {
+            const marker = document.createComment('Original location of this Hub tool');
+            card.before(marker); zenPlaces.set(card,marker);
+          }
+          hubGrid.append(card);
+        });
+      } else {
+        zenPlaces.forEach((marker,card) => marker.replaceWith(card)); zenPlaces.clear();
+      }
+    }
+    const originalToggleZen = toggleZenMode;
+    toggleZenMode = function(...args) {
+      const result = originalToggleZen.apply(this,args); arrangeZenCards();
+      if (document.body.classList.contains('zen-mode')) $('page19').scrollIntoView({behavior:'smooth',block:'start'});
+      return result;
+    };
+    // Hub design controls still target every original Hub card after reparenting.
+    cycleHubView = function() {
+      hubView = (hubView + 1) % 3;
+      const labels = ['✨ Soft','💎 Focused','🌈 Fun'];
+      hubCards.forEach(card => { card.style.transform = hubView === 0 ? '' : hubView === 1 ? 'translateY(-2px)' : 'scale(1.01)'; card.style.transition = '.2s'; });
+      $('designStatus').textContent = 'Current style: ' + labels[hubView]; toast('🎨 Hub style: ' + labels[hubView]);
+    };
+    syncDates(); arrangeZenCards();
+    // Non-destructive invariant: every pre-existing ID-bearing app element remains.
+    for (const element of originalElements) {
+      if (!app.contains(element)) console.error('Planner layout lost an existing element:', element.id);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', organizePlanner, {once:true});
+  else organizePlanner();
+})();
+</script>
+<script>
+/* Eight-page organization. Existing feature nodes, event listeners and data remain intact. */
+(() => {
+  function organizeEightPages() {
+    const $ = id => document.getElementById(id), app = $('app');
+    if (!app || !$('dp-extras') || app.classList.contains('organized-planner')) return;
+    const originalControls = new Set(app.querySelectorAll('button,input,select,textarea,progress'));
+    const hadZen = document.body.classList.contains('zen-mode');
+    if (hadZen) toggleZenMode();
+    app.classList.remove('single-page'); app.classList.add('organized-planner');
+    document.documentElement.classList.add('eight-page-planner');
+    const style = document.createElement('style');
+    style.textContent = `
+      html.eight-page-planner{scroll-snap-type:none}
+      .organized-planner>.topbar{flex-wrap:wrap;gap:10px}
+      .organized-planner>.topbar h1{margin-right:auto}
+      .organized-planner .page{min-height:0;max-width:100%;scroll-snap-align:none;scroll-margin-top:155px}
+      .planner-view[hidden]{display:none!important}
+      .planner-view{display:block;min-width:0;scroll-margin-top:155px;padding-bottom:20px}
+      .planner-view-header{padding:8px 2px 12px}
+      .planner-view-header h2{font-size:27px;color:var(--accent);margin:7px 0}
+      .planner-view-header p{line-height:1.55;margin:8px 0;opacity:.78}
+      .planner-view-header .view-number{font-size:12px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase}
+      .planner-navigation{position:sticky;top:8px;z-index:35;padding:12px;margin:12px 0 22px;border-radius:20px;background:rgba(255,255,255,.97);box-shadow:0 5px 22px #0002}
+      .dark .planner-navigation{background:#252239}
+      .planner-navigation-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+      .planner-navigation a{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 8px;min-height:45px;text-align:center;text-decoration:none;border-radius:12px;background:rgba(127,127,127,.075);color:inherit;font-weight:bold;font-size:13px;line-height:1.35;border:1px solid transparent}
+      .planner-navigation a:hover{border-color:var(--accent)}
+      .planner-navigation a[aria-current=page]{background:var(--accent);color:#fff}
+      body.dp-custom-theme .planner-navigation a[aria-current=page]{color:var(--dp-button-ink,#fff)}
+      .planner-navigation-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:9px;font-size:12px;opacity:.8}
+      .planner-mobile-picker{display:none;align-items:center;gap:10px}
+      .planner-mobile-picker select{flex:1;min-width:0;width:100%}
+      .planner-navigation :focus-visible,.organized-planner .dp-card :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+      .organized-planner #pages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:14px 0}
+      .organized-planner #pages>.day-plan{margin:0;padding:20px;min-width:0}
+      .organized-planner .day-plan>.plan-title{font-size:23px;text-align:left;margin-top:0}
+      .organized-planner .day-plan>.plan-caption{font-size:14px;margin-bottom:14px}
+      .organized-planner .plan-task-board{padding:0;background:transparent}
+      .organized-planner .plan-date-label{font-size:13px;gap:8px}
+      .organized-planner .plan-date-label input{min-width:0;max-width:100%}
+      .organized-planner .plan-task-board>.nav{display:none}
+      .organized-planner .task{flex-wrap:wrap}
+      .organized-planner .task-main{min-width:0}
+      .organized-planner .task-actions{flex-basis:100%}
+      .organized-planner .subtask-add input{min-width:0}
+      .organized-planner .form-grid>input,.organized-planner .form-grid>select{min-width:0;width:100%}
+      .organized-planner .layout-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start;margin:14px 0}
+      .organized-planner .layout-grid>*{min-width:0;margin:0!important}
+      .organized-planner .layout-grid>.page{padding:20px;width:100%}
+      .organized-planner .standalone-feature{margin:14px 0}
+      .organized-planner .tool-card{background:rgba(255,255,255,.72);border-radius:20px;padding:18px;box-shadow:0 5px 18px #0001}
+      .organized-planner .tool-card h3{margin-top:0;color:var(--accent)}
+      .dark .organized-planner .tool-card{background:#302b48}
+      .organized-planner #page21 .productivity-tools-grid{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+      .organized-planner #page6>.nav,.organized-planner #page11>.nav{display:flex;flex-direction:row;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin:12px 0}
+      .organized-planner #page9>.dp-card{margin-top:24px;scroll-margin-top:155px}
+      .organized-planner .dp-card progress{width:100%;height:18px;accent-color:var(--accent)}
+      .organized-planner .dp-card input[type=color]{height:45px;padding:4px;cursor:pointer}
+      .organized-planner .dp-card button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+      .organized-planner .dp-card button[aria-pressed=true]{outline:3px solid currentColor;outline-offset:2px}
+      .organized-planner:has(#page19.hub-compact) [data-original-hub]{padding:10px}
+      .organized-planner:has(#page19.hub-spacious) [data-original-hub]{padding:22px}
+      .organized-planner #view-reflection #page15{min-height:55vh}
+      .organized-planner #view-reflection>.hub-card{margin-top:24px}
+      .organized-planner #view-focus-sounds>.ambient-box{margin-top:14px}
+      .organized-planner .planner-view-header h2:focus{outline:none}
+      .organized-planner #view-settings>.hub-card{margin-top:18px}
+      .organized-planner #dp-extras>.dp-muted{line-height:1.6}
+      .organized-planner #page19>p,.organized-planner #page20>p{line-height:1.6}
+      .zen-mode .organized-planner #view-planning>:not(#page19){display:none}
+      .zen-mode .organized-planner #page19{display:block!important}
+      .zen-mode .organized-planner #page19 .hub-grid{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+      .dark .organized-planner .ambient-box{background:#302b48}
+      @media(max-width:850px){.organized-planner #pages,.organized-planner .layout-grid{grid-template-columns:1fr}.organized-planner .page{scroll-margin-top:165px}}
+      @media(max-width:700px){.planner-navigation-links{display:none}.planner-mobile-picker{display:flex}.planner-navigation{top:5px;padding:10px;margin-bottom:16px}.planner-navigation-meta{font-size:11px;flex-wrap:wrap}.organized-planner .page,.planner-view,.organized-planner #page9>.dp-card{scroll-margin-top:115px}.planner-view-header h2{font-size:24px}.organized-planner #pages>.day-plan,.organized-planner .layout-grid>.page{padding:15px}.organized-planner>.topbar h1{font-size:25px}}
+      @media(max-width:420px){.organized-planner #page19 .hub-grid,.organized-planner #page20 .advanced-grid,.organized-planner #page21 .productivity-tools-grid{grid-template-columns:minmax(0,1fr)}.organized-planner .calendar{gap:3px}.organized-planner .calendar div{padding:3px;overflow-wrap:anywhere}.organized-planner .settings-row{flex-wrap:wrap}.organized-planner .settings-row>select{max-width:100%}.organized-planner .topbar .dp-shortcut{font-size:12px}}
+      @media(prefers-reduced-motion:reduce){html.eight-page-planner{scroll-behavior:auto}.organized-planner *{scroll-behavior:auto!important}}
+    `;
+    document.head.append(style);
+    const definitions = [
+      ['daily','🌅','Daily Plans','Morning, Afternoon, Evening and Night, together with your daily goals and habits.'],
+      ['study','📚','Study & Productivity','Homework, subject planning, flashcards, quizzes and today’s productivity tools.'],
+      ['study-focus','🎯','Study Focus','Your Study Focus Center, study goal and completed study-session log.'],
+      ['focus-sounds','🎧','Focus & Sounds','Ambient sounds and both existing task-focus modes, together.'],
+      ['planning','⏰','Planning & Motivation','Your Productivity Hub, advanced planning tools, motivation and daily challenge.'],
+      ['reflection','📝','Reflection','Write your notes, then continue down the page for your Daily Check-in.'],
+      ['tasks','🗂️','Tasks & Organization','Your combined To-Do List, recurring tasks, categories and search tools.'],
+      ['dashboard','📊','Dashboard & Statistics','Daily reports, productivity statistics, weekly and monthly overviews, and streaks.'],
+      ['settings','⚙️','Settings','Appearance, custom themes, UI & Design, reminders and your existing data controls.']
+    ];
+    const views = new Map();
+    definitions.forEach(([key,icon,title,description],index) => {
+      const view = document.createElement('section'); view.id='view-'+key; view.dataset.view=key; view.className='planner-view'; view.hidden=true;
+      const header = document.createElement('header'); header.className='planner-view-header';
+      const number = document.createElement('p'); number.className='view-number'; number.textContent=index<8?'Page '+(index+1)+' of 8':'Planner preferences';
+      const heading = document.createElement('h2'); heading.id='view-heading-'+key; heading.tabIndex=-1; heading.textContent=icon+' '+title;
+      const caption = document.createElement('p'); caption.textContent=description;
+      header.append(number,heading,caption); view.append(header); view.setAttribute('aria-labelledby',heading.id);
+      views.set(key,view); app.append(view);
+    });
+    const grid = (view,...nodes) => { const row=document.createElement('div'); row.className='layout-grid'; row.append(...nodes.filter(Boolean)); view.append(row); return row; };
+    const hubCards=[...document.querySelectorAll('[data-original-hub]')];
+    const flashcards=$('flashcardBox').closest('.hub-card');
+    const studyCheck=$('hubStudyMinutes').closest('.hub-card');
+    const design=$('zenStatus').closest('.hub-card');
+    const ambient=$('ambientVolume').closest('.ambient-box');
+    const timerFocus=$('dp-focus-task').closest('.dp-card');
+    const taskFocus=$('focusTaskSelect').closest('.tool-card');
+    const todo=$('dp-todo-form').closest('.dp-card');
+    const challenge=$('dp-challenge-title').closest('.dp-card');
+    const mood=$('moodStatus').closest('.hub-card');
+    const daily=views.get('daily'),study=views.get('study'),focus=views.get('focus-sounds');
+    daily.append($('pages'),$('page10'));
+    for(let n=0;n<4;n++){
+      const caption=$('page'+n).querySelector(':scope > .plan-caption');
+      if(caption)caption.textContent=['Your morning tasks.','Your afternoon tasks.','Your evening tasks.','Your night tasks.'][n];
+    }
+    grid(study,$('page7'),$('page8')); grid(study,flashcards,studyCheck); study.append($('page21'));
+    views.get('study-focus').append($('page5'));
+    focus.append(ambient); grid(focus,timerFocus,taskFocus);
+    views.get('planning').append($('page19'),$('page20'),$('dp-extras'),challenge); challenge.classList.add('standalone-feature');
+    const dateExplanation=$('dp-extras').querySelector(':scope > .dp-muted');
+    if(dateExplanation)dateExplanation.textContent='This planner date is shared by your tasks, motivation, challenge and focus tools across all pages.';
+    views.get('reflection').append($('page15'),mood);
+    views.get('tasks').append(todo,$('page12'),$('page13'),$('page16')); todo.classList.add('standalone-feature');
+    views.get('dashboard').append($('page14'),$('page4'),$('page18'),$('page6'),$('page11'),$('page17'));
+    views.get('settings').append($('page9'),design);
+    // Only obsolete layout containers are removed, after their feature controls move.
+    app.querySelectorAll('.day-plan > .feature-group').forEach(group => {
+      if(group.querySelector('button,input,select,textarea,progress'))throw new Error('A feature was not assigned to its new page: '+group.id);
+      group.remove();
+    });
+    app.querySelectorAll(':scope > .planner-jumps').forEach(nav=>nav.remove());
+    const nav=document.createElement('nav'); nav.className='planner-navigation'; nav.setAttribute('aria-label','Daily Planner pages');
+    const links=document.createElement('div'); links.className='planner-navigation-links';
+    const mobile=document.createElement('label'); mobile.className='planner-mobile-picker'; mobile.textContent='Page';
+    const picker=document.createElement('select'); picker.id='planner-page-picker'; picker.setAttribute('aria-label','Choose a planner page'); mobile.append(picker);
+    const meta=document.createElement('div'); meta.className='planner-navigation-meta';
+    const locationLabel=document.createElement('span'),dateLabel=document.createElement('span'); dateLabel.id='planner-date-summary';
+    meta.append(locationLabel,dateLabel); nav.append(links,mobile,meta);
+    const topbar=app.querySelector(':scope > .topbar'); topbar.after(nav);
+    const zenReturn=app.querySelector(':scope > .planner-zen-return'); if(zenReturn)nav.after(zenReturn);
+    const navLinks=new Map();
+    definitions.forEach(([key,icon,title],index)=>{
+      picker.add(new Option((index<8?(index+1)+'. ':'')+icon+' '+title,key));
+      if(index>=8)return;
+      const link=document.createElement('a'); link.href='#'+key; link.textContent=(index+1)+'. '+icon+' '+title; link.setAttribute('aria-controls','view-'+key);
+      link.addEventListener('click',event=>{event.preventDefault();activateView(key,{scroll:true,focus:true,history:true});});
+      navLinks.set(key,link); links.append(link);
+    });
+    let currentView='daily',lastNonZenView='daily',suppressHistory=false;
+    const reducedMotion=()=>window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    function leaveZenForNavigation() {
+      if(!document.body.classList.contains('zen-mode'))return;
+      const previous=suppressHistory; suppressHistory=true;
+      try{toggleZenMode();}finally{suppressHistory=previous;}
+    }
+    function activateView(key,options={}) {
+      if(!views.has(key))return;
+      if(!options.skipZen&&key!=='planning')leaveZenForNavigation();
+      currentView=key;
+      views.forEach((view,name)=>{view.hidden=name!==key;});
+      navLinks.forEach((link,name)=>{if(name===key)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});
+      picker.value=key;
+      const index=definitions.findIndex(x=>x[0]===key);
+      locationLabel.textContent=(index<8?'Page '+(index+1)+' / 8 · ':'')+definitions[index][2];
+      dateLabel.textContent='Planner date: '+selectedDate;
+      const settingsButton=topbar.querySelector('button[onclick="showSettings()"]');
+      if(settingsButton){settingsButton.setAttribute('aria-label','Open Settings');settingsButton.setAttribute('aria-pressed',String(key==='settings'));}
+      if(options.history&&!suppressHistory&&location.hash!=='#'+key){try{history.pushState({plannerView:key},'','#'+key);}catch(_){/* Sandboxed preview can disallow history updates. */}}
+      if(options.scroll||options.focus){
+        const update=()=>{if(options.scroll)views.get(key).scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});if(options.focus)$('view-heading-'+key).focus({preventScroll:true});};
+        if(window.requestAnimationFrame)requestAnimationFrame(update);else update();
+      }
+    }
+    picker.addEventListener('change',()=>activateView(picker.value,{scroll:true,focus:true,history:true}));
+    // Preserve the old numeric page API used by every existing Open/Settings button.
+    const previousShowPage=showPage;
+    showPage=function(n){
+      if(n!==19)leaveZenForNavigation();
+      const target=$('page'+n),view=target?.closest('.planner-view');
+      if(view)activateView(view.dataset.view,{history:true});
+      return previousShowPage(n);
+    };
+    const previousSyncDates=syncDates;
+    syncDates=function(...args){const result=previousSyncDates.apply(this,args);dateLabel.textContent='Planner date: '+selectedDate;return result;};
+    const previousToggleZen=toggleZenMode;
+    toggleZenMode=function(...args){
+      const entering=!document.body.classList.contains('zen-mode');
+      if(entering){lastNonZenView=currentView;activateView('planning',{skipZen:true,history:true});}
+      const result=previousToggleZen.apply(this,args);
+      if(!entering)activateView(lastNonZenView,{skipZen:true,history:true});
+      return result;
+    };
+    // The existing Daily Boost shortcut closes over its original section. Reveal its
+    // new page before the original click listener scrolls to that same section.
+    topbar.querySelectorAll('.dp-shortcut').forEach(button=>button.addEventListener('click',()=>{
+      leaveZenForNavigation();
+      activateView('planning',{history:true});
+    },true));
+    function restoreAddress(){
+      const key=location.hash.slice(1);
+      if(views.has(key)){
+        $('welcome').classList.add('hidden');app.classList.remove('hidden');
+        activateView(key,{scroll:true});
+      }
+    }
+    window.addEventListener('popstate',restoreAddress); window.addEventListener('hashchange',restoreAddress);
+    const initialKey=location.hash.slice(1);
+    activateView(views.has(initialKey)?initialKey:'daily'); syncDates();
+    if(views.has(initialKey)){$('welcome').classList.add('hidden');app.classList.remove('hidden');}
+    if(hadZen&&(!views.has(initialKey)||initialKey==='planning'))toggleZenMode();
+    for(const element of originalControls){if(!app.contains(element))throw new Error('A pre-existing feature control was lost during page organization: '+(element.id||element.textContent));}
+    // Useful for navigation without changing any legacy planner functions.
+    window.setPlannerView=key=>activateView(key,{scroll:true,focus:true,history:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',organizeEightPages,{once:true});
+  else organizeEightPages();
+})();
+</script>
+</body>
+</html>
